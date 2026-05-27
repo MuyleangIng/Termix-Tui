@@ -4,7 +4,7 @@
 
 set -euo pipefail
 
-REPO_OWNER="muyleanging"
+REPO_OWNER="MuyleangIng"
 REPO_NAME="Termix-Tui"
 VERSION="${TERMIX_VERSION:-latest}"
 INSTALL_DIR="${TERMIX_INSTALL_DIR:-$HOME/.local/bin}"

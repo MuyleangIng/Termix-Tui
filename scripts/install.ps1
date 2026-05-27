@@ -11,7 +11,7 @@ param(
 
 $ErrorActionPreference = "Stop"
 
-$RepoOwner = "muyleanging"
+$RepoOwner = "MuyleangIng"
 $RepoName = "Termix-Tui"
 $ExeName = "termix.exe"
 
