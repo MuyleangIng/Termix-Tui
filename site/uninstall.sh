@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Public URL:
-# curl -fsSL https://muyleanging.github.io/termix/uninstall.sh | bash
+# curl -fsSL https://muyleanging.github.io/Termix-Tui/uninstall.sh | bash
 
 set -euo pipefail
 

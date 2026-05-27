@@ -1,6 +1,6 @@
 # Termix Windows Installer
 # Public URL:
-# irm https://muyleanging.github.io/termix/install.ps1 | iex
+# irm https://muyleanging.github.io/Termix-Tui/install.ps1 | iex
 
 param(
     [string]$Version = "latest",
@@ -12,7 +12,7 @@ param(
 $ErrorActionPreference = "Stop"
 
 $RepoOwner = "muyleanging"
-$RepoName = "termix"
+$RepoName = "Termix-Tui"
 $ExeName = "termix.exe"
 
 function Write-TermixInfo {

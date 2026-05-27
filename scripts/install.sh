@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 # Public URL:
-# curl -fsSL https://muyleanging.github.io/termix/install.sh | bash
+# curl -fsSL https://muyleanging.github.io/Termix-Tui/install.sh | bash
 
 set -euo pipefail
 
 REPO_OWNER="muyleanging"
-REPO_NAME="termix"
+REPO_NAME="Termix-Tui"
 VERSION="${TERMIX_VERSION:-latest}"
 INSTALL_DIR="${TERMIX_INSTALL_DIR:-$HOME/.local/bin}"
 NO_SETUP="${TERMIX_NO_SETUP:-0}"

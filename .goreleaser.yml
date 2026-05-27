@@ -1,6 +1,6 @@
 version: 2
 
-project_name: termix
+project_name: Termix-Tui
 
 before:
   hooks:
@@ -61,7 +61,7 @@ changelog:
 release:
   github:
     owner: muyleanging
-    name: termix
+    name: Termix-Tui
   draft: false
   prerelease: auto
   name_template: "Termix {{ .Tag }}"

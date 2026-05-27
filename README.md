@@ -10,7 +10,7 @@ It helps developers install, preview, repair, and apply terminal themes and font
 
 ## Homepage
 
-https://muyleanging.github.io/termix/
+https://muyleanging.github.io/Termix-Tui/
 
 ## Quick Install
 
@@ -19,14 +19,14 @@ Normal users do not need Go, `git clone`, or `go install`. Use the GitHub Pages 
 ### Windows
 
 ```powershell
-irm https://muyleanging.github.io/termix/install.ps1 | iex
+irm https://muyleanging.github.io/Termix-Tui/install.ps1 | iex
 termix setup
 ```
 
 ### macOS / Linux
 
 ```bash
-curl -fsSL https://muyleanging.github.io/termix/install.sh | bash
+curl -fsSL https://muyleanging.github.io/Termix-Tui/install.sh | bash
 termix setup
 ```
 
@@ -34,14 +34,14 @@ termix setup
 
 Download the latest binary from GitHub Releases:
 
-https://github.com/muyleanging/termix/releases/latest
+https://github.com/MuyleangIng/Termix-Tui/releases/latest
 
 ## Developer Build
 
 Only use this if you want to contribute or build from source:
 
 ```bash
-git clone https://github.com/muyleanging/termix.git
+git clone https://github.com/MuyleangIng/Termix-Tui.git
 cd termix
 go mod tidy
 go test ./...
@@ -113,16 +113,16 @@ The release workflow publishes:
 Public install URL:
 
 ```text
-https://muyleanging.github.io/termix/
+https://muyleanging.github.io/Termix-Tui/
 ```
 
 Installer scripts:
 
 ```text
-https://muyleanging.github.io/termix/install.ps1
-https://muyleanging.github.io/termix/install.sh
-https://muyleanging.github.io/termix/uninstall.ps1
-https://muyleanging.github.io/termix/uninstall.sh
+https://muyleanging.github.io/Termix-Tui/install.ps1
+https://muyleanging.github.io/Termix-Tui/install.sh
+https://muyleanging.github.io/Termix-Tui/uninstall.ps1
+https://muyleanging.github.io/Termix-Tui/uninstall.sh
 ```
 
 Use only the GitHub Pages URL above unless a custom domain is configured later.

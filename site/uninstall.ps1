@@ -1,6 +1,6 @@
 # Termix Windows Uninstaller
 # Public URL:
-# irm https://muyleanging.github.io/termix/uninstall.ps1 | iex
+# irm https://muyleanging.github.io/Termix-Tui/uninstall.ps1 | iex
 
 param(
     [string]$InstallDir = "$env:LOCALAPPDATA\Programs\Termix",

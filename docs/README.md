@@ -22,11 +22,11 @@ Open `docs/index.html` in a browser. No build step is required.
 GitHub Pages hosts only the website and installer scripts. The scripts download real binaries from GitHub Releases.
 
 ```powershell
-irm https://muyleanging.github.io/termix/install.ps1 | iex
+irm https://muyleanging.github.io/Termix-Tui/install.ps1 | iex
 ```
 
 ```bash
-curl -fsSL https://muyleanging.github.io/termix/install.sh | bash
+curl -fsSL https://muyleanging.github.io/Termix-Tui/install.sh | bash
 ```
 
 ## Sections
