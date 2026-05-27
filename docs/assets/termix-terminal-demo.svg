@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1120" height="720" viewBox="0 0 1120 720" role="img" aria-labelledby="title desc">
+  <title id="title">Termix terminal style demo</title>
+  <desc id="desc">A polished Termix terminal dashboard preview with consistent black, white, gray, and cyan styling.</desc>
+  <defs>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="20" stdDeviation="20" flood-color="#083344" flood-opacity="0.18"/>
+    </filter>
+  </defs>
+  <rect width="1120" height="720" fill="#ffffff"/>
+  <rect x="48" y="42" width="1024" height="636" rx="10" fill="#09090b" filter="url(#shadow)"/>
+  <rect x="48" y="42" width="1024" height="636" rx="10" fill="none" stroke="#06b6d4" stroke-width="2"/>
+
+  <rect x="48" y="42" width="1024" height="46" rx="10" fill="#09090b"/>
+  <line x1="48" y1="88" x2="1072" y2="88" stroke="#27272a"/>
+  <circle cx="78" cy="65" r="6" fill="#18181b" stroke="#06b6d4"/>
+  <circle cx="100" cy="65" r="6" fill="#18181b" stroke="#06b6d4"/>
+  <circle cx="122" cy="65" r="6" fill="#18181b" stroke="#06b6d4"/>
+  <text x="154" y="70" fill="#06b6d4" font-family="Cascadia Code, Consolas, monospace" font-size="16" font-weight="700">TERMIX v0.1.0</text>
+  <text x="332" y="70" fill="#f8fafc" font-family="Cascadia Code, Consolas, monospace" font-size="14">PowerShell 7</text>
+  <text x="452" y="70" fill="#94a3b8" font-family="Cascadia Code, Consolas, monospace" font-size="14">catppuccin_mocha</text>
+  <text x="915" y="70" fill="#94a3b8" font-family="Cascadia Code, Consolas, monospace" font-size="14">15:04:22</text>
+
+  <rect x="70" y="110" width="218" height="398" rx="6" fill="#111113" stroke="#27272a"/>
+  <text x="92" y="142" fill="#94a3b8" font-family="Cascadia Code, Consolas, monospace" font-size="13">NAVIGATION</text>
+  <rect x="88" y="166" width="172" height="28" rx="4" fill="#06b6d4"/>
+  <text x="102" y="185" fill="#031a20" font-family="Cascadia Code, Consolas, monospace" font-size="14" font-weight="700">› Themes</text>
+  <text x="102" y="224" fill="#f8fafc" font-family="Cascadia Code, Consolas, monospace" font-size="14">  Preview Lab</text>
+  <text x="102" y="260" fill="#f8fafc" font-family="Cascadia Code, Consolas, monospace" font-size="14">  Fonts</text>
+  <text x="102" y="296" fill="#f8fafc" font-family="Cascadia Code, Consolas, monospace" font-size="14">  Profiles</text>
+  <text x="102" y="332" fill="#f8fafc" font-family="Cascadia Code, Consolas, monospace" font-size="14">  Settings</text>
+  <text x="102" y="368" fill="#f8fafc" font-family="Cascadia Code, Consolas, monospace" font-size="14">  Updates</text>
+  <rect x="88" y="426" width="172" height="56" rx="4" fill="#18181b" stroke="#27272a"/>
+  <text x="104" y="450" fill="#94a3b8" font-family="Cascadia Code, Consolas, monospace" font-size="12">↑↓ select</text>
+  <text x="104" y="470" fill="#94a3b8" font-family="Cascadia Code, Consolas, monospace" font-size="12">Enter open</text>
+
+  <rect x="304" y="110" width="326" height="398" rx="6" fill="#111113" stroke="#06b6d4"/>
+  <text x="326" y="142" fill="#06b6d4" font-family="Cascadia Code, Consolas, monospace" font-size="15" font-weight="700">THEMES</text>
+  <rect x="326" y="166" width="262" height="28" rx="4" fill="#06b6d4"/>
+  <text x="340" y="185" fill="#031a20" font-family="Cascadia Code, Consolas, monospace" font-size="14" font-weight="700">› catppuccin_mocha</text>
+  <text x="340" y="224" fill="#f8fafc" font-family="Cascadia Code, Consolas, monospace" font-size="14">  paradox</text>
+  <text x="340" y="260" fill="#f8fafc" font-family="Cascadia Code, Consolas, monospace" font-size="14">  atomic</text>
+  <text x="340" y="296" fill="#f8fafc" font-family="Cascadia Code, Consolas, monospace" font-size="14">  dracula</text>
+  <text x="340" y="332" fill="#f8fafc" font-family="Cascadia Code, Consolas, monospace" font-size="14">  tokyo</text>
+  <text x="326" y="438" fill="#94a3b8" font-family="Cascadia Code, Consolas, monospace" font-size="13">Enter apply  R real preview</text>
+
+  <rect x="646" y="110" width="404" height="398" rx="6" fill="#111113" stroke="#27272a"/>
+  <text x="668" y="142" fill="#06b6d4" font-family="Cascadia Code, Consolas, monospace" font-size="15" font-weight="700">REAL OH MY POSH PREVIEW</text>
+  <rect x="668" y="166" width="340" height="132" rx="6" fill="#09090b" stroke="#27272a"/>
+  <rect x="690" y="194" width="78" height="28" rx="4" fill="#06b6d4"/>
+  <text x="708" y="213" fill="#031a20" font-family="Cascadia Code, Consolas, monospace" font-size="14" font-weight="700">Admin</text>
+  <polygon points="768,194 790,208 768,222" fill="#06b6d4"/>
+  <rect x="790" y="194" width="142" height="28" rx="4" fill="#18181b" stroke="#06b6d4"/>
+  <text x="808" y="213" fill="#f8fafc" font-family="Cascadia Code, Consolas, monospace" font-size="14" font-weight="700"> ~/workspace</text>
+  <polygon points="932,194 954,208 932,222" fill="#18181b" stroke="#06b6d4"/>
+  <rect x="690" y="238" width="122" height="28" rx="4" fill="#111113" stroke="#06b6d4"/>
+  <text x="708" y="257" fill="#06b6d4" font-family="Cascadia Code, Consolas, monospace" font-size="14" font-weight="700"> main ✔</text>
+  <polygon points="812,238 834,252 812,266" fill="#111113" stroke="#06b6d4"/>
+  <text x="690" y="330" fill="#f8fafc" font-family="Cascadia Code, Consolas, monospace" font-size="15">PS C:\Users\Dev&gt; termix themes</text>
+  <text x="690" y="364" fill="#94a3b8" font-family="Cascadia Code, Consolas, monospace" font-size="13">Font fallback: Cascadia Code · warning is non-blocking</text>
+  <rect x="690" y="390" width="72" height="22" rx="3" fill="#111113" stroke="#06b6d4"/>
+  <text x="704" y="406" fill="#06b6d4" font-family="Cascadia Code, Consolas, monospace" font-size="12" font-weight="700">READY</text>
+  <text x="776" y="406" fill="#f8fafc" font-family="Cascadia Code, Consolas, monospace" font-size="13">real preview rendered by Oh My Posh</text>
+  <rect x="690" y="422" width="72" height="22" rx="3" fill="#111113" stroke="#52525b"/>
+  <text x="704" y="438" fill="#94a3b8" font-family="Cascadia Code, Consolas, monospace" font-size="12" font-weight="700">WARN</text>
+  <text x="776" y="438" fill="#f8fafc" font-family="Cascadia Code, Consolas, monospace" font-size="13">missing fonts never stop startup</text>
+
+  <line x1="70" y1="532" x2="1050" y2="532" stroke="#06b6d4" stroke-width="2"/>
+  <rect x="70" y="552" width="980" height="76" rx="6" fill="#111113" stroke="#27272a"/>
+  <text x="92" y="582" fill="#06b6d4" font-family="Cascadia Code, Consolas, monospace" font-size="14" font-weight="700">ACTIVITY</text>
+  <text x="190" y="582" fill="#94a3b8" font-family="Cascadia Code, Consolas, monospace" font-size="13">4 logs · Ctrl+L collapse · drag divider to resize</text>
+  <rect x="92" y="600" width="78" height="22" rx="3" fill="#111113" stroke="#06b6d4"/>
+  <text x="104" y="616" fill="#06b6d4" font-family="Cascadia Code, Consolas, monospace" font-size="12" font-weight="700">SUCCESS</text>
+  <text x="186" y="616" fill="#f8fafc" font-family="Cascadia Code, Consolas, monospace" font-size="13">Windows Terminal font set to Cascadia Code</text>
+
+  <text x="70" y="656" fill="#94a3b8" font-family="Cascadia Code, Consolas, monospace" font-size="13">Made by MuyleangIng  │  ↑↓ Select  Enter Open  Tab Focus  ? Help  Q Quit</text>
+</svg>

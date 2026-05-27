@@ -1,0 +1,12 @@
+home_dir: ~/.termix
+theme_dirs:
+  - ~/.termix/themes
+  - ~/AppData/Local/Programs/oh-my-posh/themes
+favorite_themes:
+  - catppuccin_mocha
+  - paradox
+  - atomic
+  - dracula
+  - tokyo
+default_shell: PowerShell 7
+default_font: Cascadia Code Nerd Font
