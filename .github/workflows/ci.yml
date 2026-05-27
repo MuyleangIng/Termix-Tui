@@ -38,7 +38,9 @@ jobs:
 
       - name: Format check
         shell: bash
-        run: test -z "$(gofmt -l .)"
+        run: |
+          files="$(find . -name '*.go' -not -path './.git/*')"
+          test -z "$(gofmt -l $files)"
 
       - name: Vet
         run: go vet ./...
