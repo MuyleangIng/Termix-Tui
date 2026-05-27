@@ -118,6 +118,7 @@ function Install-Termix {
 
     Write-TermixInfo "Downloading $assetName..."
     Invoke-WebRequest -Uri $asset.browser_download_url -OutFile $tempZip -UseBasicParsing
+    Unblock-File -Path $tempZip -ErrorAction SilentlyContinue
 
     Write-TermixInfo "Extracting..."
     Expand-Archive -Path $tempZip -DestinationPath $extractDir -Force
@@ -142,6 +143,7 @@ function Install-Termix {
     }
 
     Copy-Item $binary.FullName $targetExe -Force
+    Unblock-File -Path $targetExe -ErrorAction SilentlyContinue
     Write-TermixSuccess "Installed Termix to $targetExe"
 
     if (-not $NoPath) {
