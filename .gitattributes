@@ -1,0 +1,9 @@
+*.go text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.sh text eol=lf
+*.ps1 text eol=lf
+*.md text eol=lf
+*.html text eol=lf
+*.css text eol=lf
+*.svg text eol=lf
