@@ -6,7 +6,8 @@ param(
     [string]$Version = "latest",
     [string]$InstallDir = "$env:LOCALAPPDATA\Programs\Termix",
     [switch]$NoSetup,
-    [switch]$NoPath
+    [switch]$NoPath,
+    [switch]$NoBuildFallback
 )
 
 $ErrorActionPreference = "Stop"
@@ -88,6 +89,101 @@ function Add-ToUserPath {
     Write-TermixSuccess "Added Termix to User PATH."
 }
 
+function Clear-DownloadMark {
+    param([string]$Path)
+
+    if (-not (Test-Path $Path)) {
+        return
+    }
+
+    Unblock-File -Path $Path -ErrorAction SilentlyContinue
+    Remove-Item -LiteralPath "${Path}:Zone.Identifier" -Force -ErrorAction SilentlyContinue
+}
+
+function Get-GoCommandPath {
+    $cmd = Get-Command go -ErrorAction SilentlyContinue
+    if ($cmd) {
+        return $cmd.Source
+    }
+
+    $defaultGo = "C:\Program Files\Go\bin\go.exe"
+    if (Test-Path $defaultGo) {
+        return $defaultGo
+    }
+
+    return $null
+}
+
+function Test-TermixBinary {
+    param([string]$Path)
+
+    try {
+        & $Path --version
+        return ($LASTEXITCODE -eq 0)
+    }
+    catch {
+        $script:TermixVerifyError = $_.Exception.Message
+        return $false
+    }
+}
+
+function Build-TermixFromSource {
+    param(
+        [string]$Tag,
+        [string]$TargetExe
+    )
+
+    $goPath = Get-GoCommandPath
+    if (-not $goPath) {
+        throw "Go is not installed, so the source-build fallback cannot run."
+    }
+
+    $sourceUrl = "https://github.com/$RepoOwner/$RepoName/archive/refs/tags/$Tag.zip"
+    $sourceRoot = Join-Path $env:TEMP "termix-source-build"
+    $sourceZip = Join-Path $sourceRoot "source.zip"
+    $sourceExtract = Join-Path $sourceRoot "extract"
+
+    if (Test-Path $sourceRoot) {
+        Remove-Item $sourceRoot -Recurse -Force
+    }
+
+    New-Item -ItemType Directory -Path $sourceRoot | Out-Null
+    New-Item -ItemType Directory -Path $sourceExtract | Out-Null
+
+    Write-TermixWarn "Windows blocked the unsigned release binary."
+    Write-TermixInfo "Go was found, so Termix will build from source locally as a fallback."
+    Write-TermixInfo "Downloading source for $Tag..."
+    Invoke-WebRequest -Uri $sourceUrl -OutFile $sourceZip -UseBasicParsing
+    Clear-DownloadMark -Path $sourceZip
+
+    Write-TermixInfo "Extracting source..."
+    Expand-Archive -Path $sourceZip -DestinationPath $sourceExtract -Force
+
+    $sourceDir = Get-ChildItem -Path $sourceExtract -Recurse -Filter "go.mod" |
+        Where-Object { (Get-Content $_.FullName -Raw) -match "github.com/muyleanging/termix" } |
+        Select-Object -First 1 |
+        ForEach-Object { $_.Directory.FullName }
+
+    if (-not $sourceDir) {
+        throw "Could not find Termix source after downloading $Tag."
+    }
+
+    Write-TermixInfo "Building Termix locally..."
+    Push-Location $sourceDir
+    try {
+        & $goPath build -o $TargetExe .
+        if ($LASTEXITCODE -ne 0) {
+            throw "go build failed with exit code $LASTEXITCODE."
+        }
+    }
+    finally {
+        Pop-Location
+    }
+
+    Clear-DownloadMark -Path $TargetExe
+    Write-TermixSuccess "Built local Termix binary at $TargetExe"
+}
+
 function Install-Termix {
     $arch = Get-WindowsArch
     $assetName = "termix_Windows_$arch.zip"
@@ -118,7 +214,7 @@ function Install-Termix {
 
     Write-TermixInfo "Downloading $assetName..."
     Invoke-WebRequest -Uri $asset.browser_download_url -OutFile $tempZip -UseBasicParsing
-    Unblock-File -Path $tempZip -ErrorAction SilentlyContinue
+    Clear-DownloadMark -Path $tempZip
 
     Write-TermixInfo "Extracting..."
     Expand-Archive -Path $tempZip -DestinationPath $extractDir -Force
@@ -143,7 +239,8 @@ function Install-Termix {
     }
 
     Copy-Item $binary.FullName $targetExe -Force
-    Unblock-File -Path $targetExe -ErrorAction SilentlyContinue
+    Clear-DownloadMark -Path $binary.FullName
+    Clear-DownloadMark -Path $targetExe
     Write-TermixSuccess "Installed Termix to $targetExe"
 
     if (-not $NoPath) {
@@ -151,10 +248,34 @@ function Install-Termix {
     }
 
     Write-TermixInfo "Verifying install..."
-    & $targetExe --version
+    if (-not (Test-TermixBinary -Path $targetExe)) {
+        if (-not $NoBuildFallback) {
+            try {
+                Build-TermixFromSource -Tag $tag -TargetExe $targetExe
+            }
+            catch {
+                Write-TermixWarn $_
+            }
+        }
 
-    if ($LASTEXITCODE -ne 0) {
-        throw "Termix installed, but version check failed."
+        if (-not (Test-TermixBinary -Path $targetExe)) {
+            Write-TermixError "Termix installed, but Windows blocked it from running."
+            Write-Host ""
+            Write-Host "Installed file:"
+            Write-Host "  $targetExe"
+            Write-Host ""
+            Write-Host "Reason:"
+            Write-Host "  $script:TermixVerifyError"
+            Write-Host ""
+            Write-Host "Fix options:"
+            Write-Host "  1. Ask Windows Security or your organization admin to allow this unsigned open-source binary."
+            Write-Host "  2. Install Go, then rerun this installer so it can build Termix locally."
+            Write-Host "  3. Build manually from source:"
+            Write-Host "     git clone https://github.com/$RepoOwner/$RepoName.git"
+            Write-Host "     cd $RepoName"
+            Write-Host "     go build -o `"$targetExe`" ."
+            throw "Windows Application Control blocked Termix."
+        }
     }
 
     Write-TermixSuccess "Termix installed successfully."
