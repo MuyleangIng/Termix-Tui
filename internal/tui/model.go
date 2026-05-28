@@ -65,8 +65,9 @@ type previewMsg struct {
 	err  error
 }
 type actionMsg struct {
-	label string
-	err   error
+	label         string
+	err           error
+	refreshThemes bool
 }
 type themesMsg struct {
 	items []themepkg.Theme
@@ -262,7 +263,9 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		} else {
 			m.logs = cappedLogs(append([]string{"SUCCESS " + msg.label}, m.logs...))
 		}
-		cmds = append(cmds, loadThemesCmd(m.rt))
+		if msg.refreshThemes {
+			cmds = append(cmds, loadThemesCmd(m.rt))
+		}
 	case themesMsg:
 		if msg.err != nil {
 			m.logs = cappedLogs(append([]string{"WARN theme scan: " + msg.err.Error()}, m.logs...))
@@ -925,7 +928,7 @@ func (m Model) actionCmd(item string) tea.Cmd {
 	case screenUpdate:
 		return func() tea.Msg {
 			err := runUpdateAction(m.rt, item)
-			return actionMsg{label: "updated " + item, err: err}
+			return actionMsg{label: "updated " + item, err: err, refreshThemes: item == "Theme cache"}
 		}
 	case screenUninstall:
 		return func() tea.Msg {
@@ -935,7 +938,7 @@ func (m Model) actionCmd(item string) tea.Cmd {
 	case screenSettings:
 		return func() tea.Msg {
 			err := runSettingsAction(m.rt, item)
-			return actionMsg{label: "checked " + item, err: err}
+			return actionMsg{label: "checked " + item, err: err, refreshThemes: item == "Import All Themes" || item == "Theme paths"}
 		}
 	case screenFonts:
 		return func() tea.Msg {
@@ -964,10 +967,10 @@ func (m Model) pendingActionCmd(pending pendingAction) tea.Cmd {
 		switch pending.kind {
 		case "apply-theme":
 			if err := validateProfileTarget(profileTargetByName(m.rt, pending.profile)); err != nil {
-				return actionMsg{label: "apply " + pending.theme.Name + " to " + pending.profile, err: err}
+				return actionMsg{label: "apply theme " + pending.theme.Name + " to " + pending.profile, err: err}
 			}
 			err := applySelectedPromptToShell(m.rt, pending.profile, pending.theme)
-			return actionMsg{label: "applied " + pending.theme.Name + " to " + pending.profile, err: err}
+			return actionMsg{label: "applied theme " + pending.theme.Name + " to " + pending.profile + " profile; restart shell to see it", err: err}
 		case "install-font":
 			err := installer.New(m.rt).Install(context.Background(), "font:"+pending.font)
 			if err == nil {
