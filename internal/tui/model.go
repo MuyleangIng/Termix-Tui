@@ -26,7 +26,7 @@ import (
 )
 
 const (
-	appVersion = "v0.1.0"
+	appVersion = "v0.1.11"
 	appAuthor  = "Ing Muyleang"
 	appEmail   = "muyleanging@gmail.com"
 )
@@ -36,7 +36,6 @@ type screen int
 const (
 	screenDashboard screen = iota
 	screenThemes
-	screenPreviewLab
 	screenFonts
 	screenDoctor
 	screenProfiles
@@ -136,7 +135,6 @@ type Model struct {
 var nav = []navItem{
 	{"⌘", "Dashboard", screenDashboard},
 	{"", "Themes", screenThemes},
-	{"󰛨", "Preview Lab", screenPreviewLab},
 	{"", "Fonts", screenFonts},
 	{"󰒡", "Doctor", screenDoctor},
 	{"", "Profiles", screenProfiles},
@@ -374,30 +372,15 @@ func (m Model) handleKey(msg tea.KeyMsg) (Model, bool, tea.Cmd) {
 			m.activityRows = 7
 		}
 		m.logs = cappedLogs(append([]string{"INFO activity panel toggled"}, m.logs...))
-	case " ", "space":
-		if m.screen == screenThemes {
-			m.logs = cappedLogs(append([]string{"INFO compare pages removed; use Preview Lab for real theme preview"}, m.logs...))
-		}
 	case "a":
 		if m.screen == screenFonts {
 			return m.openFontInput("add"), false, nil
-		}
-		if m.screen == screenPreviewLab {
-			theme := m.currentTheme()
-			m.confirm = true
-			m.confirmIndex = profileIndexByName(m.rt, m.activeShell)
-			m.pending = pendingAction{kind: "apply-theme", label: "apply " + theme.Name + " to " + m.activeShell, profile: m.activeShell, theme: theme}
-			return m, false, nil
 		}
 	case "c":
 		if m.screen == screenFonts {
 			m.logs = cappedLogs(append([]string{"INFO custom fonts are managed with A/E/D"}, m.logs...))
 		}
 	case "r":
-		if m.screen == screenPreviewLab {
-			m.busy = "refreshing preview"
-			return m, false, m.renderPreviewCmd()
-		}
 		if m.screen == screenFonts {
 			m.fontItems = fontpkg.Detect(userHome())
 			m.logs = cappedLogs(append([]string{"SUCCESS font scan refreshed"}, m.logs...))
@@ -448,8 +431,6 @@ func (m Model) handleKey(msg tea.KeyMsg) (Model, bool, tea.Cmd) {
 		m.open(screenUpdate)
 	case "x":
 		m.open(screenUninstall)
-	case "p":
-		m.open(screenPreviewLab)
 	}
 	return m, false, nil
 }
@@ -751,7 +732,7 @@ func (m *Model) jumpSelection(end bool) {
 }
 
 func (m *Model) syncThemeIndex() {
-	if m.screen == screenThemes || m.screen == screenPreviewLab {
+	if m.screen == screenThemes {
 		m.themeIndex = clamp(0, max(0, len(themes)-1), m.contentIndex)
 	}
 }
@@ -951,14 +932,14 @@ func (m Model) currentItems() []string {
 		return setupThemeRows()
 	case screenSetupPreview, screenSetupApply:
 		return []string{"Apply setup"}
-	case screenThemes, screenPreviewLab:
+	case screenThemes:
 		return themes
 	case screenFonts:
 		return fonts
 	case screenProfiles:
 		return profileRows(m.rt)
 	case screenSettings:
-		return []string{"Toggle Light/Dark Mode", "Toggle Border Style", "Send Feedback", "Report Issue", "Request Update", "Install Oh My Posh", "Install Nerd Fonts", "Import All Themes", "Install PowerShell 7", "Install Windows Terminal", "Install Git Bash", "Install WSL", "Shell profiles", "Theme paths", "Font settings", "Preview renderer", "Backups", "Restore points", "Reset workspace"}
+		return []string{"Toggle Light/Dark Mode", "Toggle Border Style", "Send Feedback", "Report Issue", "Request Update", "Shell profiles", "Theme paths", "Font settings", "Backups", "Restore points", "Reset workspace"}
 	case screenUpdate:
 		return []string{"Oh My Posh engine", "Nerd Fonts", "PowerShell profile", "Theme cache", "Terminal profiles"}
 	case screenUninstall:
@@ -966,12 +947,12 @@ func (m Model) currentItems() []string {
 	case screenDoctor:
 		return []string{"ANSI support", "Unicode support", "Nerd Font", "PowerShell profile", "Windows Terminal", "Oh My Posh"}
 	default:
-		return []string{"Theme Manager", "Preview Lab", "Fonts", "Profile Manager", "Doctor", "Settings"}
+		return []string{"Theme Manager", "Fonts", "Profile Manager", "Doctor", "Settings"}
 	}
 }
 
 func (m Model) needsPreview() bool {
-	return m.screen == screenThemes || m.screen == screenPreviewLab || m.screen == screenSetupTheme || m.screen == screenSetupPreview
+	return m.screen == screenThemes || m.screen == screenSetupTheme || m.screen == screenSetupPreview
 }
 
 func (m Model) currentTheme() themepkg.Theme {
@@ -1014,7 +995,7 @@ func (m Model) actionCmd(item string) tea.Cmd {
 	case screenSettings:
 		return func() tea.Msg {
 			err := runSettingsAction(m.rt, item)
-			return actionMsg{label: "checked " + item, err: err, refreshThemes: item == "Import All Themes" || item == "Theme paths"}
+			return actionMsg{label: "checked " + item, err: err, refreshThemes: item == "Theme paths"}
 		}
 	case screenFonts:
 		return func() tea.Msg {
@@ -1133,25 +1114,10 @@ func runSettingsAction(rt *app.Runtime, item string) error {
 		return nil
 	case "Request Update":
 		return nil
-	case "Install Oh My Posh":
-		return installer.New(rt).Install(context.Background(), "oh-my-posh")
-	case "Install Nerd Fonts":
-		return installer.New(rt).Install(context.Background(), "fonts")
-	case "Import All Themes":
-		_, err := themepkg.InstallOfficialThemes(context.Background(), rt.Config)
-		return err
-	case "Install PowerShell 7":
-		return installer.New(rt).Install(context.Background(), "powershell")
-	case "Install Windows Terminal":
-		return installer.New(rt).Install(context.Background(), "terminal")
-	case "Install Git Bash":
-		return installer.New(rt).Install(context.Background(), "git")
-	case "Install WSL":
-		return installer.New(rt).Install(context.Background(), "wsl")
-	case "Shell profiles", "Preview renderer":
+	case "Shell profiles":
 		return applySelectedPrompt(rt, themepkg.Theme{Name: "catppuccin_mocha", Path: findThemePath(rt, "catppuccin_mocha")})
 	case "Theme paths":
-		return themepkg.EnsureStarterThemes(rt.Config)
+		return themepkg.EnsureAvailable(context.Background(), rt.Config)
 	case "Font settings":
 		return profile.ApplyWindowsTerminalFont(userHome(), rt.Config.DefaultFont)
 	case "Reset workspace":
@@ -1599,15 +1565,6 @@ func (m Model) previewPanel(w, h int) string {
 			"\nCategory: " + firstOrDefault([]string{item.Category}, "community") +
 			"\nSegments: " + fmt.Sprintf("%d", item.Segments) +
 			"\n\nEnter opens apply confirmation.\nR refreshes real preview.\n\n" + m.realThemePreviewCard(item, max(24, w-4), max(8, h-9))
-	case screenPreviewLab:
-		theme := selectedText(themes, m.themeIndex)
-		preview := m.themePreviews[theme]
-		body = sectionTitle("PREVIEW LAB") +
-			"\nProfile: " + m.activeShell +
-			"\nTheme: " + theme +
-			"\nShell: " + m.rt.Config.DefaultShell +
-			"\n\n" + m.previewLabBody(theme, preview, max(24, w-4), max(8, h-9)) +
-			"\n\n" + badgeRow("Enter refresh", "A apply", "R reload", "Tab focus")
 	case screenFonts:
 		font := selectedText(fonts, m.contentIndex)
 		resolved := fontpkg.ResolveAvailableFamily(userHome(), font)
@@ -1844,7 +1801,7 @@ func fontSampleText() string {
 }
 
 func dependencyPreviewMessage(errText string) string {
-	return "Oh My Posh real preview is unavailable.\nInstall Oh My Posh to enable real theme rendering.\n\n" + fitLine(errText, 80) + "\n\nUse Settings > Install Oh My Posh or press I when install flow is available."
+	return "Oh My Posh real preview is unavailable.\nRun termix setup or termix install to install required tools.\n\n" + fitLine(errText, 80)
 }
 
 func (m Model) preferredNerdFontMissing() bool {
@@ -1888,7 +1845,7 @@ func (m Model) setupLayout() setupLayoutMetrics {
 		layout.containerH = min(bodyH, min(12, max(6, bodyH-2)))
 	} else {
 		layout.containerW = clamp(64, 96, w-4)
-		layout.containerH = min(22, max(16, bodyH-2))
+		layout.containerH = min(24, max(18, bodyH-2))
 	}
 	layout.x = max(0, (w-layout.containerW)/2)
 	layout.y = headerH + max(0, (bodyH-layout.containerH)/2)
@@ -1925,7 +1882,7 @@ func (m Model) setupSmallView(w, h int) string {
 
 func (m Model) setupOnboarding(w, h int) string {
 	innerW := max(32, w-4)
-	panelH := 9
+	panelH := 12
 	colW := max(24, (innerW-3)/2)
 	target := m.currentSetupProfileTarget()
 	resolvedFont := fontpkg.ResolveAvailableFamily(userHome(), m.setupFont)
@@ -1934,19 +1891,18 @@ func (m Model) setupOnboarding(w, h int) string {
 		notice = "Ready to configure " + target.Name + "."
 	}
 	if m.busy != "" {
-		notice = m.spinner.View() + " " + m.busy
+		notice = m.spinner.View() + " " + m.busy + "  65%"
 	}
 
 	leftLines := []string{
+		sectionTitle("CHOOSE PROFILE"),
+		"",
+		setupList(setupProfileRows(m.rt), m.contentIndex),
+		"",
 		sectionTitle("APPLY AUTOMATICALLY"),
-		"",
-		ok.Render("✓") + " verify official themes",
-		ok.Render("✓") + " resolve font fallback",
-		ok.Render("✓") + " configure terminal font",
+		ok.Render("✓") + " install missing tools",
+		ok.Render("✓") + " import official themes",
 		ok.Render("✓") + " write selected profile",
-		"",
-		"Selected profile:",
-		accent.Render(target.Name) + "  " + setupProfileState(target),
 	}
 	rightLines := []string{
 		sectionTitle("PREVIEW"),
@@ -1958,6 +1914,7 @@ func (m Model) setupOnboarding(w, h int) string {
 		"This updates your shell profile",
 		"and Windows Terminal config.",
 		"Target: " + target.Detail,
+		"State: " + setupProfileState(target),
 	}
 	left := focusedPanel(false).Width(colW).Height(panelH).Render(fitBlock(strings.Join(leftLines, "\n"), max(12, colW-4), max(5, panelH-2)))
 	right := focusedPanel(false).Width(colW).Height(panelH).Render(fitBlock(strings.Join(rightLines, "\n"), max(12, colW-4), max(5, panelH-2)))
@@ -1965,6 +1922,11 @@ func (m Model) setupOnboarding(w, h int) string {
 		m.setupButtonView("Back", m.setupButton == 0) + "          " + m.setupButtonView("Apply", m.setupButton == 1),
 	)
 	status := lipgloss.NewStyle().Foreground(theme.muted).Width(innerW).Render(fitLine(notice, innerW))
+	progressLine := ""
+	if m.busy != "" {
+		m.progress.Width = min(34, max(18, innerW/2))
+		progressLine = lipgloss.NewStyle().Align(lipgloss.Center).Width(innerW).Render(m.progress.ViewAs(0.65))
+	}
 	headerBlock := lipgloss.JoinVertical(lipgloss.Left,
 		title.Render("TERMIX FIRST SETUP"),
 		label.Render("Configure your terminal profile, theme, and font"),
@@ -1975,6 +1937,7 @@ func (m Model) setupOnboarding(w, h int) string {
 		lipgloss.JoinHorizontal(lipgloss.Top, left, " ", right),
 		"",
 		status,
+		progressLine,
 		"",
 		buttons,
 	)
@@ -1993,7 +1956,7 @@ func (m Model) setupPreviewText() string {
 	if strings.EqualFold(m.setupTheme, "No prompt style") {
 		return "No prompt style will be written.\n" + m.setupShell + " keeps its current prompt."
 	}
-	return "Preview Lab will render the real Oh My Posh prompt for " + m.setupTheme + "."
+	return "Themes page will render the real Oh My Posh prompt for " + m.setupTheme + "."
 }
 
 func (m Model) startupView() string {
@@ -2043,7 +2006,7 @@ func startupStatus(index, step int, pct float64) string {
 
 func (m Model) commandPalette(w int) string {
 	boxW := clamp(34, 56, w-4)
-	return cardHot.Width(boxW).Render(fitBlock(sectionTitle("HELP / COMMANDS")+"\n? or h toggles this help. F1 is ignored by Termix.\n\n❯ Open Theme Manager\n  Open Preview Lab\n  Manage Fonts\n  Run Terminal Doctor\n  Configure Profile", max(20, boxW-4), 9))
+	return cardHot.Width(boxW).Render(fitBlock(sectionTitle("HELP / COMMANDS")+"\n? or h toggles this help. F1 is ignored by Termix.\n\n❯ Open Theme Manager\n  Manage Fonts\n  Run Terminal Doctor\n  Configure Profile\n  Settings", max(20, boxW-4), 9))
 }
 
 func (m Model) searchBox(w int) string {

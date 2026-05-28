@@ -53,8 +53,11 @@ func TestSetupViewFitsTerminal(t *testing.T) {
 	if !strings.Contains(view, "TERMIX FIRST SETUP") {
 		t.Fatal("setup view missing title")
 	}
-	if !strings.Contains(view, "APPLY AUTOMATICALLY") {
-		t.Fatal("setup view missing apply panel")
+	if !strings.Contains(view, "CHOOSE PROFILE") {
+		t.Fatal("setup view missing profile picker")
+	}
+	if !strings.Contains(view, "PowerShell 7") {
+		t.Fatal("setup view missing selected profile")
 	}
 }
 
