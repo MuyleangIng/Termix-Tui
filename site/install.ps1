@@ -119,8 +119,12 @@ function Test-TermixBinary {
     param([string]$Path)
 
     try {
-        & $Path --version
-        return ($LASTEXITCODE -eq 0)
+        $output = & $Path --version 2>&1
+        if ($LASTEXITCODE -eq 0) {
+            return $true
+        }
+        $script:TermixVerifyError = ($output | Out-String).Trim()
+        return $false
     }
     catch {
         $script:TermixVerifyError = $_.Exception.Message
@@ -193,9 +197,11 @@ function Build-TermixFromSource {
     }
 
     Write-TermixInfo "Building Termix locally..."
+    $buildDate = (Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ")
+    $ldflags = "-X main.version=$Tag -X main.commit=source -X main.date=$buildDate"
     Push-Location $sourceDir
     try {
-        & $goPath build -o $TargetExe .
+        & $goPath build -ldflags $ldflags -o $TargetExe .
         if ($LASTEXITCODE -ne 0) {
             throw "go build failed with exit code $LASTEXITCODE."
         }
