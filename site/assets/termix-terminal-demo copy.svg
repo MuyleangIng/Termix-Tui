@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1120" height="720" viewBox="0 0 1120 720" role="img" aria-labelledby="title desc">
+  <title id="title">Termix TUI dashboard preview</title>
+  <desc id="desc">A modern terminal dashboard preview with cyan borders, navigation, workspace panels, and an activity log.</desc>
+  <defs>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="0" stdDeviation="10" flood-color="#00d9ff" flood-opacity="0.28"/>
+    </filter>
+    <linearGradient id="scan" x1="0" x2="1">
+      <stop offset="0" stop-color="#00d9ff" stop-opacity="0.16"/>
+      <stop offset="1" stop-color="#a78bfa" stop-opacity="0.10"/>
+    </linearGradient>
+  </defs>
+  <rect width="1120" height="720" fill="#05070A"/>
+  <rect x="48" y="42" width="1024" height="636" rx="14" fill="#080A0D" stroke="#00BFD8" stroke-width="2" filter="url(#glow)"/>
+  <rect x="48" y="42" width="1024" height="46" rx="14" fill="#101216"/>
+  <line x1="48" y1="88" x2="1072" y2="88" stroke="#00BFD8" stroke-opacity="0.55"/>
+  <circle cx="78" cy="65" r="6" fill="#101216" stroke="#00D9FF"/>
+  <circle cx="100" cy="65" r="6" fill="#101216" stroke="#FF9F43"/>
+  <circle cx="122" cy="65" r="6" fill="#101216" stroke="#28E06F"/>
+  <text x="154" y="70" fill="#00D9FF" font-family="JetBrains Mono, Cascadia Code, Consolas, monospace" font-size="15" font-weight="700">TERMIX v0.1.11 | PowerShell 7 | atomic | Dark | ANSI ✓ | UTF8 ✓</text>
+
+  <rect x="70" y="112" width="214" height="392" rx="8" fill="#101216" stroke="#00BFD8" stroke-opacity="0.48"/>
+  <text x="92" y="144" fill="#00D9FF" font-family="JetBrains Mono, Cascadia Code, Consolas, monospace" font-size="13" font-weight="700">[ NAVIGATION ]</text>
+  <rect x="88" y="166" width="174" height="30" rx="5" fill="#20C7D9"/>
+  <text x="104" y="186" fill="#05070A" font-family="JetBrains Mono, Cascadia Code, Consolas, monospace" font-size="14" font-weight="700">Dashboard</text>
+  <text x="104" y="226" fill="#E6EDF3" font-family="JetBrains Mono, Cascadia Code, Consolas, monospace" font-size="14">Themes</text>
+  <text x="104" y="264" fill="#E6EDF3" font-family="JetBrains Mono, Cascadia Code, Consolas, monospace" font-size="14">Fonts</text>
+  <text x="104" y="302" fill="#E6EDF3" font-family="JetBrains Mono, Cascadia Code, Consolas, monospace" font-size="14">Profiles</text>
+  <text x="104" y="340" fill="#E6EDF3" font-family="JetBrains Mono, Cascadia Code, Consolas, monospace" font-size="14">Settings</text>
+  <rect x="88" y="420" width="174" height="58" rx="6" fill="#05070A" stroke="#00BFD8" stroke-opacity="0.35"/>
+  <text x="104" y="445" fill="#9AA7B8" font-family="JetBrains Mono, Cascadia Code, Consolas, monospace" font-size="12">↑↓ Select</text>
+  <text x="104" y="466" fill="#9AA7B8" font-family="JetBrains Mono, Cascadia Code, Consolas, monospace" font-size="12">Enter Open</text>
+
+  <rect x="304" y="112" width="318" height="392" rx="8" fill="#101216" stroke="#00BFD8" stroke-width="2"/>
+  <text x="326" y="144" fill="#00D9FF" font-family="JetBrains Mono, Cascadia Code, Consolas, monospace" font-size="14" font-weight="700">[ DASHBOARD ]</text>
+  <rect x="326" y="166" width="252" height="30" rx="5" fill="#20C7D9"/>
+  <text x="342" y="186" fill="#05070A" font-family="JetBrains Mono, Cascadia Code, Consolas, monospace" font-size="14" font-weight="700">&gt; Theme Manager</text>
+  <text x="342" y="226" fill="#E6EDF3" font-family="JetBrains Mono, Cascadia Code, Consolas, monospace" font-size="14">Fonts</text>
+  <text x="342" y="264" fill="#E6EDF3" font-family="JetBrains Mono, Cascadia Code, Consolas, monospace" font-size="14">Profile Manager</text>
+  <text x="342" y="302" fill="#E6EDF3" font-family="JetBrains Mono, Cascadia Code, Consolas, monospace" font-size="14">Doctor</text>
+  <text x="342" y="340" fill="#E6EDF3" font-family="JetBrains Mono, Cascadia Code, Consolas, monospace" font-size="14">Settings</text>
+  <rect x="326" y="404" width="252" height="58" rx="6" fill="url(#scan)" stroke="#00BFD8" stroke-opacity="0.45"/>
+  <text x="344" y="430" fill="#28E06F" font-family="JetBrains Mono, Cascadia Code, Consolas, monospace" font-size="12" font-weight="700">READY</text>
+  <text x="344" y="452" fill="#9AA7B8" font-family="JetBrains Mono, Cascadia Code, Consolas, monospace" font-size="12">automatic setup complete</text>
+
+  <rect x="642" y="112" width="408" height="392" rx="8" fill="#101216" stroke="#00BFD8" stroke-opacity="0.48"/>
+  <text x="664" y="144" fill="#00D9FF" font-family="JetBrains Mono, Cascadia Code, Consolas, monospace" font-size="14" font-weight="700">[ WORKSPACE ]</text>
+  <text x="664" y="180" fill="#E6EDF3" font-family="JetBrains Mono, Cascadia Code, Consolas, monospace" font-size="14">Active profile: PowerShell 7</text>
+  <text x="664" y="212" fill="#E6EDF3" font-family="JetBrains Mono, Cascadia Code, Consolas, monospace" font-size="14">Theme: atomic</text>
+  <text x="664" y="244" fill="#E6EDF3" font-family="JetBrains Mono, Cascadia Code, Consolas, monospace" font-size="14">Mode: Dark</text>
+  <rect x="664" y="284" width="346" height="86" rx="8" fill="#05070A" stroke="#00BFD8" stroke-opacity="0.45"/>
+  <rect x="686" y="314" width="84" height="28" rx="5" fill="#00D9FF"/>
+  <text x="704" y="333" fill="#05070A" font-family="JetBrains Mono, Cascadia Code, Consolas, monospace" font-size="13" font-weight="700">Admin</text>
+  <polygon points="770,314 792,328 770,342" fill="#00D9FF"/>
+  <rect x="792" y="314" width="142" height="28" rx="5" fill="#A78BFA"/>
+  <text x="808" y="333" fill="#05070A" font-family="JetBrains Mono, Cascadia Code, Consolas, monospace" font-size="13" font-weight="700">~/workspace</text>
+  <polygon points="934,314 956,328 934,342" fill="#A78BFA"/>
+  <rect x="686" y="404" width="104" height="24" rx="4" fill="#101216" stroke="#28E06F"/>
+  <text x="704" y="421" fill="#28E06F" font-family="JetBrains Mono, Cascadia Code, Consolas, monospace" font-size="12" font-weight="700">SUCCESS</text>
+  <text x="806" y="421" fill="#E6EDF3" font-family="JetBrains Mono, Cascadia Code, Consolas, monospace" font-size="13">profile block verified</text>
+
+  <rect x="70" y="532" width="980" height="92" rx="8" fill="#101216" stroke="#00BFD8" stroke-opacity="0.5"/>
+  <text x="92" y="564" fill="#00D9FF" font-family="JetBrains Mono, Cascadia Code, Consolas, monospace" font-size="14" font-weight="700">[ ACTIVITY ]</text>
+  <text x="92" y="592" fill="#28E06F" font-family="JetBrains Mono, Cascadia Code, Consolas, monospace" font-size="13">SUCCESS setup apply result: PowerShell 7 / atomic</text>
+  <text x="92" y="616" fill="#9AA7B8" font-family="JetBrains Mono, Cascadia Code, Consolas, monospace" font-size="13">INFO setup layout ready</text>
+  <text x="452" y="616" fill="#9AA7B8" font-family="JetBrains Mono, Cascadia Code, Consolas, monospace" font-size="13">INFO preview rendered</text>
+  <text x="70" y="656" fill="#9AA7B8" font-family="JetBrains Mono, Cascadia Code, Consolas, monospace" font-size="13">Made by MuyleangIng | ↑↓ Select | Tab Focus | Enter Open | Q Quit</text>
+</svg>
