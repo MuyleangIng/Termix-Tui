@@ -3,6 +3,7 @@ package shell
 import (
 	"fmt"
 	"path/filepath"
+	"strings"
 )
 
 type Adapter interface {
@@ -19,18 +20,18 @@ type Nushell struct{}
 
 func (PowerShell) Name() string { return "PowerShell 7" }
 func (PowerShell) ProfilePath(home string) string {
-	return filepath.Join(home, "Documents", "PowerShell", "Microsoft.PowerShell_profile.ps1")
+	return filepath.Join(documentsDir(home), "PowerShell", "Microsoft.PowerShell_profile.ps1")
 }
 func (PowerShell) InitSnippet(themePath string) string {
-	return fmt.Sprintf("oh-my-posh init pwsh --config %q | Invoke-Expression", themePath)
+	return fmt.Sprintf("oh-my-posh init pwsh --config %s | Invoke-Expression", quotePowerShellPath(themePath))
 }
 
 func (WindowsPowerShell) Name() string { return "Windows PowerShell" }
 func (WindowsPowerShell) ProfilePath(home string) string {
-	return filepath.Join(home, "Documents", "WindowsPowerShell", "Microsoft.PowerShell_profile.ps1")
+	return filepath.Join(documentsDir(home), "WindowsPowerShell", "Microsoft.PowerShell_profile.ps1")
 }
 func (WindowsPowerShell) InitSnippet(themePath string) string {
-	return fmt.Sprintf("oh-my-posh init powershell --config %q | Invoke-Expression", themePath)
+	return fmt.Sprintf("oh-my-posh init pwsh --config %s | Invoke-Expression", quotePowerShellPath(themePath))
 }
 
 func (b Bash) Name() string {
@@ -62,4 +63,10 @@ func (Nushell) InitSnippet(themePath string) string {
 
 func Supported() []Adapter {
 	return []Adapter{PowerShell{}, WindowsPowerShell{}, Bash{Label: "Git Bash"}, Bash{Label: "WSL Ubuntu"}, Fish{}, Nushell{}}
+}
+
+func quotePowerShellPath(path string) string {
+	path = strings.ReplaceAll(path, "`", "``")
+	path = strings.ReplaceAll(path, `"`, "`\"")
+	return `"` + path + `"`
 }
