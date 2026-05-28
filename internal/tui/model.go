@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"time"
 
@@ -120,6 +121,8 @@ type Model struct {
 	setupShell    string
 	setupFont     string
 	setupTheme    string
+	setupButton   int
+	setupNotice   string
 
 	navIndex     int
 	contentIndex int
@@ -204,6 +207,7 @@ func base(rt *app.Runtime, setup bool) Model {
 		setupShell:    rt.Config.DefaultShell,
 		setupFont:     rt.Config.DefaultFont,
 		setupTheme:    firstOrDefault(rt.Config.FavoriteThemes, "catppuccin_mocha"),
+		setupButton:   1,
 		activityRows:  clamp(4, 20, firstPositive(rt.Config.ActivityHeight, 7)),
 		logs:          initialLogs,
 	}
@@ -223,6 +227,10 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.WindowSizeMsg:
 		m.width, m.height = msg.Width, msg.Height
 		m.progress.Width = max(12, min(38, msg.Width/4))
+		if m.setup {
+			layout := m.setupLayout()
+			m.logs = cappedLogs(append([]string{fmt.Sprintf("INFO setup layout terminal=%dx%d container=%dx%d pos=%d,%d focus=%s profile=%s theme=%s", layout.terminalW, layout.terminalH, layout.containerW, layout.containerH, layout.x, layout.y, m.setupFocusedElement(), m.currentSetupProfileTarget().Name, m.setupTheme)}, m.logs...))
+		}
 	case tickMsg:
 		m.now = time.Time(msg)
 		if m.startup {
@@ -258,6 +266,21 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 	case actionMsg:
 		m.busy = ""
+		if m.setup && strings.HasPrefix(msg.label, "setup") {
+			if msg.err != nil {
+				m.setupNotice = "ERROR " + msg.err.Error()
+				m.logs = cappedLogs(append([]string{"ERROR setup apply result: " + msg.err.Error()}, m.logs...))
+			} else {
+				m.setupNotice = "SUCCESS setup applied"
+				m.logs = cappedLogs(append([]string{"SUCCESS setup apply result: " + m.setupShell + " / " + m.setupTheme}, m.logs...))
+				m.setup = false
+				m.screen = screenDashboard
+			}
+			if msg.refreshThemes {
+				cmds = append(cmds, loadThemesCmd(m.rt))
+			}
+			break
+		}
 		if msg.err != nil {
 			m.logs = cappedLogs(append([]string{"ERROR " + msg.label + ": " + msg.err.Error()}, m.logs...))
 		} else {
@@ -296,6 +319,9 @@ func (m Model) handleKey(msg tea.KeyMsg) (Model, bool, tea.Cmd) {
 	}
 	if m.confirm {
 		return m.handleConfirmKey(msg)
+	}
+	if m.setup {
+		return m.handleSetupKey(msg)
 	}
 	switch msg.String() {
 	case "q", "ctrl+c":
@@ -424,6 +450,42 @@ func (m Model) handleKey(msg tea.KeyMsg) (Model, bool, tea.Cmd) {
 		m.open(screenUninstall)
 	case "p":
 		m.open(screenPreviewLab)
+	}
+	return m, false, nil
+}
+
+func (m Model) handleSetupKey(msg tea.KeyMsg) (Model, bool, tea.Cmd) {
+	switch msg.String() {
+	case "q", "ctrl+c":
+		return m, true, nil
+	case "f1":
+		m.logs = cappedLogs(append([]string{"INFO F1 ignored by Termix setup; use the footer shortcuts"}, m.logs...))
+	case "?", "h":
+		m.setupNotice = "Use Up/Down to select a profile, Tab to choose Back or Apply, Enter to run the focused action."
+	case "esc", "backspace":
+		return m.exitSetup(), false, nil
+	case "tab", "shift+tab", "left", "right":
+		m.setupButton = 1 - clamp(0, 1, m.setupButton)
+		m.logs = cappedLogs(append([]string{"INFO setup focus: " + m.setupFocusedElement()}, m.logs...))
+	case "up", "k":
+		m.moveSelection(-1)
+		m.captureSetupSelection()
+	case "down", "j":
+		m.moveSelection(1)
+		m.captureSetupSelection()
+	case "home":
+		m.jumpSelection(false)
+		m.captureSetupSelection()
+	case "end":
+		m.jumpSelection(true)
+		m.captureSetupSelection()
+	case "enter":
+		if m.setupButton == 0 {
+			return m.exitSetup(), false, nil
+		}
+		var cmd tea.Cmd
+		m, cmd = m.activate()
+		return m, false, cmd
 	}
 	return m, false, nil
 }
@@ -697,22 +759,13 @@ func (m *Model) syncThemeIndex() {
 func (m Model) activate() (Model, tea.Cmd) {
 	if m.setup {
 		m.captureSetupSelection()
-		if m.screen == screenSetupShell {
-			m.setup = false
-			m.screen = screenDashboard
-			m.busy = "applying setup"
-			return m, setupApplyCmd(m.rt, m.setupShell, m.setupFont, m.setupTheme)
-		}
-		if m.screen < screenSetupApply {
-			m.screen++
-			m.contentIndex = 0
-		} else {
-			m.setup = false
-			m.screen = screenDashboard
-			m.busy = "applying setup"
-			return m, setupApplyCmd(m.rt, m.setupShell, m.setupFont, m.setupTheme)
-		}
-		return m, nil
+		m.busy = "applying setup"
+		m.setupNotice = "Applying setup..."
+		layout := m.setupLayout()
+		m.logs = cappedLogs(append([]string{
+			fmt.Sprintf("INFO setup apply terminal=%dx%d container=%dx%d pos=%d,%d focus=%s profile=%s theme=%s", layout.terminalW, layout.terminalH, layout.containerW, layout.containerH, layout.x, layout.y, m.setupFocusedElement(), m.setupShell, m.setupTheme),
+		}, m.logs...))
+		return m, setupApplyCmd(m.rt, m.setupShell, m.setupFont, m.setupTheme)
 	}
 	if m.focus == focusSidebar {
 		m.open(nav[m.navIndex].view)
@@ -826,6 +879,23 @@ func (m Model) deleteCustomFont() Model {
 	_ = config.SaveCustomFonts(m.rt.Config, m.rt.Config.CustomFonts)
 	m.logs = cappedLogs(append([]string{"SUCCESS custom font removed: " + name}, m.logs...))
 	return m
+}
+
+func (m Model) exitSetup() Model {
+	m.setup = false
+	m.screen = screenDashboard
+	m.navIndex = 0
+	m.busy = ""
+	m.setupNotice = ""
+	m.logs = cappedLogs(append([]string{"INFO setup exited safely"}, m.logs...))
+	return m
+}
+
+func (m Model) setupFocusedElement() string {
+	if m.setupButton == 0 {
+		return "Back"
+	}
+	return "Apply"
 }
 
 func (m Model) isSelectedCustomFont() bool {
@@ -1126,6 +1196,14 @@ func appendFile(path, data string) error {
 
 func setupApplyCmd(rt *app.Runtime, shellName, fontName, themeName string) tea.Cmd {
 	return func() tea.Msg {
+		if runtime.GOOS == "windows" {
+			if err := installer.New(rt).Install(context.Background(), "oh-my-posh"); err != nil {
+				return actionMsg{label: "setup", err: err}
+			}
+			if err := installer.New(rt).Install(context.Background(), "fonts"); err != nil {
+				return actionMsg{label: "setup", err: err}
+			}
+		}
 		if err := themepkg.EnsureAvailable(context.Background(), rt.Config); err != nil {
 			return actionMsg{label: "setup", err: err}
 		}
@@ -1444,6 +1522,10 @@ func (m Model) footer(w int) string {
 	left := "Made by MuyleangIng"
 	right := "Open Source • Modern Terminal Experience Manager"
 	shortcuts := "↑↓ Select  Enter Open  Tab Focus  ? Help  Q Quit"
+	if m.setup {
+		shortcuts = "↑↓ Select  Tab Focus  Enter Apply  Esc Back  Q Quit"
+		right = "Configure your terminal experience"
+	}
 	line := footerLine(w-2, left, right, shortcuts)
 	return footer.Width(w).Render(line)
 }
@@ -1774,56 +1856,137 @@ func (m Model) preferredNerdFontMissing() bool {
 	return true
 }
 
-func (m Model) setupView() string {
-	w := max(40, m.width)
-	h := max(14, m.height)
-	headerH := 1
-	footerH := footerHeight(w)
-	bodyH := max(6, h-headerH-footerH)
-	var body string
-	switch m.screen {
-	case screenSetupShell:
-		target := m.currentSetupProfileTarget()
-		detail := "Status: " + setupProfileState(target) +
-			"\nTarget: " + target.Detail +
-			"\n\nQuick setup uses:" +
-			"\nFont: " + m.setupFont +
-			"\nTheme: " + m.setupTheme +
-			"\n\nEnter applies now. Edit fonts/themes later in the TUI."
-		body = m.setupCard("CHOOSE PROFILE", setupList(setupProfileRows(m.rt), m.contentIndex), detail)
-	case screenSetupFont:
-		font := selectedText(fonts, m.contentIndex)
-		resolved := fontpkg.ResolveAvailableFamily(userHome(), font)
-		body = m.setupCard("CHOOSE FONT", setupList(fonts, m.contentIndex), "Font: "+font+"\nResolved face: "+resolved+"\n\nNerd Font is optional. Icons may fallback if glyphs are missing.\n\n User   ~/workspace   main ✔")
-	case screenSetupTheme:
-		theme := selectedText(setupThemeRows(), m.contentIndex)
-		preview := "Real theme previews are rendered in Preview Lab after setup.\nPress Enter to continue."
-		if strings.EqualFold(theme, "No prompt style") {
-			preview = "Prompt style disabled\nTerminal font can still be applied."
-		}
-		body = m.setupCard("CHOOSE THEME", setupList(setupThemeRows(), m.contentIndex), preview)
-	case screenSetupPreview:
-		body = m.setupCard("LIVE PREVIEW", "Profile: "+m.setupShell+"\nFont: "+m.setupFont+"\nTheme: "+m.setupTheme, m.setupPreviewText()+"\n\nANSI ✓ UTF8 ✓ Powerline ✓")
-	default:
-		body = m.setupCard("APPLY AUTOMATICALLY", "✓ seed theme styles\n✓ resolve font fallback\n✓ configure terminal font\n✓ write selected profile", "Profile: "+m.setupShell+"\nFont: "+m.setupFont+"\nTheme: "+m.setupTheme+"\n\nPress Enter to apply and open dashboard.")
-	}
-	return appShell.Render(fitScreen(lipgloss.JoinVertical(lipgloss.Left,
-		fitScreen(m.header(w), w, headerH),
-		fitScreen(lipgloss.Place(w, bodyH, lipgloss.Center, lipgloss.Center, body), w, bodyH),
-		fitScreen(m.footer(w), w, footerH),
-	), w, h))
+type setupLayoutMetrics struct {
+	terminalW  int
+	terminalH  int
+	headerH    int
+	footerH    int
+	bodyH      int
+	containerW int
+	containerH int
+	x          int
+	y          int
+	small      bool
 }
 
-func (m Model) setupCard(name, list, detail string) string {
-	available := max(34, m.width-6)
-	if available < 82 {
-		body := sectionTitle(name) + "\n" + list + "\n\n" + sectionTitle("PREVIEW") + "\n" + detail + "\n\n[ Back ]  [ Apply ]"
-		return cardHot.Width(available).Render(fitBlock(body, available-4, max(8, m.height-6)))
+func (m Model) setupLayout() setupLayoutMetrics {
+	w := max(1, m.width)
+	h := max(1, m.height)
+	headerH := 1
+	footerH := footerHeight(w)
+	bodyH := max(1, h-headerH-footerH)
+	layout := setupLayoutMetrics{
+		terminalW: w,
+		terminalH: h,
+		headerH:   headerH,
+		footerH:   footerH,
+		bodyH:     bodyH,
+		small:     w < 68 || h < 20,
 	}
-	left := cardHot.Width(30).Render(fitBlock(sectionTitle(name)+"\n"+list, 26, 8))
-	rightW := min(46, available-33)
-	right := card.Width(rightW).Render(fitBlock(sectionTitle("PREVIEW")+"\n"+detail+"\n\n[ Back ]        [ Apply ]", max(16, rightW-4), 10))
-	return fitScreen(lipgloss.JoinHorizontal(lipgloss.Top, left, " ", right), available, max(10, m.height-6))
+	if layout.small {
+		layout.containerW = min(w, min(56, max(20, w-4)))
+		layout.containerH = min(bodyH, min(12, max(6, bodyH-2)))
+	} else {
+		layout.containerW = clamp(64, 96, w-4)
+		layout.containerH = min(22, max(16, bodyH-2))
+	}
+	layout.x = max(0, (w-layout.containerW)/2)
+	layout.y = headerH + max(0, (bodyH-layout.containerH)/2)
+	return layout
+}
+
+func (m Model) setupView() string {
+	layout := m.setupLayout()
+	var body string
+	if layout.small {
+		body = m.setupSmallView(layout.containerW, layout.containerH)
+	} else {
+		body = m.setupOnboarding(layout.containerW, layout.containerH)
+	}
+	centered := fitScreen(lipgloss.Place(layout.terminalW, layout.bodyH, lipgloss.Center, lipgloss.Center, body), layout.terminalW, layout.bodyH)
+	return appShell.Render(fitScreen(lipgloss.JoinVertical(lipgloss.Left,
+		fitScreen(m.header(layout.terminalW), layout.terminalW, layout.headerH),
+		centered,
+		fitScreen(m.footer(layout.terminalW), layout.terminalW, layout.footerH),
+	), layout.terminalW, layout.terminalH))
+}
+
+func (m Model) setupSmallView(w, h int) string {
+	lines := []string{
+		title.Render("TERMIX FIRST SETUP"),
+		"",
+		"Terminal too small.",
+		"Resize to at least 68x20.",
+		"",
+		"Q quits safely.",
+	}
+	return cardWarn.Width(w).Height(h).Render(fitBlock(strings.Join(lines, "\n"), max(12, w-4), max(4, h-2)))
+}
+
+func (m Model) setupOnboarding(w, h int) string {
+	innerW := max(32, w-4)
+	panelH := 9
+	colW := max(24, (innerW-3)/2)
+	target := m.currentSetupProfileTarget()
+	resolvedFont := fontpkg.ResolveAvailableFamily(userHome(), m.setupFont)
+	notice := m.setupNotice
+	if notice == "" {
+		notice = "Ready to configure " + target.Name + "."
+	}
+	if m.busy != "" {
+		notice = m.spinner.View() + " " + m.busy
+	}
+
+	leftLines := []string{
+		sectionTitle("APPLY AUTOMATICALLY"),
+		"",
+		ok.Render("✓") + " verify official themes",
+		ok.Render("✓") + " resolve font fallback",
+		ok.Render("✓") + " configure terminal font",
+		ok.Render("✓") + " write selected profile",
+		"",
+		"Selected profile:",
+		accent.Render(target.Name) + "  " + setupProfileState(target),
+	}
+	rightLines := []string{
+		sectionTitle("PREVIEW"),
+		"",
+		"Profile: " + target.Name,
+		"Font: " + resolvedFont,
+		"Theme: " + m.setupTheme,
+		"",
+		"This updates your shell profile",
+		"and Windows Terminal config.",
+		"Target: " + target.Detail,
+	}
+	left := focusedPanel(false).Width(colW).Height(panelH).Render(fitBlock(strings.Join(leftLines, "\n"), max(12, colW-4), max(5, panelH-2)))
+	right := focusedPanel(false).Width(colW).Height(panelH).Render(fitBlock(strings.Join(rightLines, "\n"), max(12, colW-4), max(5, panelH-2)))
+	buttons := lipgloss.NewStyle().Align(lipgloss.Center).Width(innerW).Render(
+		m.setupButtonView("Back", m.setupButton == 0) + "          " + m.setupButtonView("Apply", m.setupButton == 1),
+	)
+	status := lipgloss.NewStyle().Foreground(theme.muted).Width(innerW).Render(fitLine(notice, innerW))
+	headerBlock := lipgloss.JoinVertical(lipgloss.Left,
+		title.Render("TERMIX FIRST SETUP"),
+		label.Render("Configure your terminal profile, theme, and font"),
+	)
+	content := lipgloss.JoinVertical(lipgloss.Left,
+		headerBlock,
+		"",
+		lipgloss.JoinHorizontal(lipgloss.Top, left, " ", right),
+		"",
+		status,
+		"",
+		buttons,
+	)
+	return cardHot.Width(w).Height(h).Render(fitBlock(content, innerW, max(8, h-2)))
+}
+
+func (m Model) setupButtonView(name string, focused bool) string {
+	text := "[ " + name + " ]"
+	if focused {
+		return lipgloss.NewStyle().Foreground(theme.inkInverse).Background(theme.cyan).Bold(true).Padding(0, 1).Render(text)
+	}
+	return lipgloss.NewStyle().Foreground(theme.ink).Background(theme.elevated).Padding(0, 1).Render(text)
 }
 
 func (m Model) setupPreviewText() string {
