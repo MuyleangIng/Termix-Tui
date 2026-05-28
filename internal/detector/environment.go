@@ -32,7 +32,7 @@ func Detect(ctx context.Context) Environment {
 		OS:              runtime.GOOS,
 		Terminal:        firstNonEmpty(os.Getenv("WT_SESSION"), os.Getenv("TERM_PROGRAM"), os.Getenv("TERM"), "unknown"),
 		PowerShell:      detectTool(ctx, "PowerShell 7", "pwsh", "--version"),
-		WindowsTerminal: detectTool(ctx, "Windows Terminal", "wt", "--version"),
+		WindowsTerminal: detectCommand("Windows Terminal", "wt"),
 		OhMyPosh:        detectTool(ctx, "Oh My Posh", "oh-my-posh", "version"),
 		GitBash:         detectTool(ctx, "Git Bash", "bash", "--version"),
 		WSL:             detectTool(ctx, "WSL", "wsl", "--status"),
@@ -40,6 +40,14 @@ func Detect(ctx context.Context) Environment {
 		ANSI:            true,
 		GPU:             os.Getenv("WT_SESSION") != "",
 	}
+}
+
+func detectCommand(name, bin string) ToolState {
+	path, err := exec.LookPath(bin)
+	if err != nil {
+		return ToolState{Name: name}
+	}
+	return ToolState{Name: name, Path: path, Installed: true}
 }
 
 func detectTool(ctx context.Context, name, bin, versionArg string) ToolState {
