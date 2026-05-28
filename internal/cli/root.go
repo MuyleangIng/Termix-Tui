@@ -237,18 +237,39 @@ func updateCommand() *cobra.Command {
 func uninstallCommand() *cobra.Command {
 	return &cobra.Command{
 		Use:   "uninstall [component]",
-		Short: "Remove Termix-managed configs, themes, cache, fonts, and prompts",
-		Args:  cobra.MaximumNArgs(1),
+		Short: "Remove Termix profiles, data, themes, and executable",
+		Long: `Remove Termix-managed profiles, config, cache, downloaded themes, and the executable.
+
+With no component, Termix performs a full uninstall:
+  termix uninstall
+
+To remove only one part:
+  termix uninstall profile
+  termix uninstall cache
+  termix uninstall downloaded-themes
+  termix uninstall config
+  termix uninstall executable`,
+		Args: cobra.MaximumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			component := "all"
-			if len(args) == 1 {
+			if len(args) == 0 {
+				component = "all"
+			} else {
 				component = args[0]
 			}
 			rt, err := runtime(cmd.Context())
 			if err != nil {
 				return err
 			}
-			return uninstaller.New(rt).Uninstall(cmd.Context(), component)
+			if err := uninstaller.New(rt).Uninstall(cmd.Context(), component); err != nil {
+				return err
+			}
+			if strings.EqualFold(component, "all") {
+				fmt.Fprintln(os.Stdout, "Uninstalled Termix profiles, cache, config, downloaded themes, and scheduled executable removal.")
+			} else {
+				fmt.Fprintf(os.Stdout, "Uninstalled Termix component: %s\n", component)
+			}
+			return nil
 		},
 	}
 }

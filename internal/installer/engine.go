@@ -104,6 +104,18 @@ func (e Engine) plan(component string) []func(context.Context) error {
 			requireTool("pwsh", winget("Microsoft.PowerShell")),
 			requireTool("wt", winget("Microsoft.WindowsTerminal")),
 			requireTool("git", winget("Git.Git")),
+			func(ctx context.Context) error {
+				cmd := exec.CommandContext(ctx, "oh-my-posh", "font", "install", "CascadiaCode", "--headless", "--plain")
+				output, err := cmd.CombinedOutput()
+				if err != nil {
+					return fmt.Errorf("oh-my-posh font install CascadiaCode failed: %w\n%s", err, string(output))
+				}
+				return nil
+			},
+			func(ctx context.Context) error {
+				_, err := theme.InstallOfficialThemes(ctx, e.rt.Config)
+				return err
+			},
 		}
 	}
 }

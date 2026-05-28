@@ -83,7 +83,7 @@ termix themes apply <theme> --profile <p>   Apply a theme to a profile
 termix fonts list                           Show recommended font status
 termix fonts install <font> --yes           Install a supported Nerd Font
 termix fonts apply <font> --windows-terminal Save/apply a font
-termix uninstall                            Remove Termix-managed config safely
+termix uninstall                            Fully remove Termix profiles, data, themes, and executable
 ```
 
 ## Release

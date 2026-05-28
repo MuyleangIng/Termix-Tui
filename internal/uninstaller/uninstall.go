@@ -4,7 +4,10 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"os/exec"
 	"path/filepath"
+	"runtime"
+	"strings"
 
 	"github.com/muyleanging/termix/internal/app"
 	"github.com/muyleanging/termix/internal/profile"
@@ -14,6 +17,8 @@ import (
 type Manager struct {
 	rt *app.Runtime
 }
+
+var scheduleSelfRemoval = scheduleExecutableRemoval
 
 func New(rt *app.Runtime) Manager { return Manager{rt: rt} }
 
@@ -33,15 +38,17 @@ func (m Manager) Uninstall(ctx context.Context, component string) error {
 		return profile.RemoveAllPrompts(home)
 	case "config":
 		return backupAndRemove(filepath.Join(m.rt.Config.HomeDir, "config.yaml"))
+	case "app", "binary", "exe", "executable", "self":
+		return scheduleSelfRemoval()
 	case "all":
-		if err := theme.ClearCache(m.rt.Config); err != nil {
-			return err
-		}
 		home, _ := os.UserHomeDir()
 		if err := profile.RemoveAllPrompts(home); err != nil {
 			return err
 		}
-		return backupAndRemove(filepath.Join(m.rt.Config.HomeDir, "config.yaml"))
+		if err := os.RemoveAll(m.rt.Config.HomeDir); err != nil {
+			return err
+		}
+		return scheduleSelfRemoval()
 	default:
 		return fmt.Errorf("unknown uninstall component %q", component)
 	}
@@ -60,4 +67,63 @@ func backupAndRemove(path string) error {
 		return err
 	}
 	return os.Remove(path)
+}
+
+func scheduleExecutableRemoval() error {
+	exe, err := os.Executable()
+	if err != nil {
+		return err
+	}
+	exe, err = filepath.Abs(exe)
+	if err != nil {
+		return err
+	}
+	if runtime.GOOS != "windows" {
+		return os.Remove(exe)
+	}
+
+	dir := filepath.Dir(exe)
+	removeDir := strings.EqualFold(filepath.Base(dir), "Termix")
+	script, err := os.CreateTemp("", "termix-uninstall-*.ps1")
+	if err != nil {
+		return err
+	}
+	scriptPath := script.Name()
+	body := windowsSelfRemoveScript(exe, dir, scriptPath, removeDir)
+	if _, err := script.WriteString(body); err != nil {
+		_ = script.Close()
+		return err
+	}
+	if err := script.Close(); err != nil {
+		return err
+	}
+	return exec.Command("powershell.exe", "-NoProfile", "-ExecutionPolicy", "Bypass", "-WindowStyle", "Hidden", "-File", scriptPath).Start()
+}
+
+func windowsSelfRemoveScript(exe, dir, scriptPath string, removeDir bool) string {
+	removeDirLiteral := "$false"
+	if removeDir {
+		removeDirLiteral = "$true"
+	}
+	return fmt.Sprintf(`Start-Sleep -Seconds 2
+$exe = %s
+$dir = %s
+$scriptPath = %s
+$removeDir = %s
+Remove-Item -LiteralPath $exe -Force -ErrorAction SilentlyContinue
+Get-ChildItem -LiteralPath $dir -Filter 'termix.exe.bak-*' -ErrorAction SilentlyContinue | Remove-Item -Force -ErrorAction SilentlyContinue
+if ($removeDir) {
+    Remove-Item -LiteralPath $dir -Recurse -Force -ErrorAction SilentlyContinue
+    $userPath = [Environment]::GetEnvironmentVariable('Path', 'User')
+    if ($userPath) {
+        $parts = $userPath -split ';' | Where-Object { $_ -and ($_ -ne $dir) }
+        [Environment]::SetEnvironmentVariable('Path', ($parts -join ';'), 'User')
+    }
+}
+Remove-Item -LiteralPath $scriptPath -Force -ErrorAction SilentlyContinue
+`, psSingleQuoted(exe), psSingleQuoted(dir), psSingleQuoted(scriptPath), removeDirLiteral)
+}
+
+func psSingleQuoted(value string) string {
+	return "'" + strings.ReplaceAll(value, "'", "''") + "'"
 }
