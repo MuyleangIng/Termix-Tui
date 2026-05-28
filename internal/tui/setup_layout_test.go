@@ -4,6 +4,7 @@ import (
 	"strings"
 	"testing"
 
+	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/muyleanging/termix/internal/app"
 	"github.com/muyleanging/termix/internal/config"
@@ -67,6 +68,45 @@ func TestSetupViewSmallTerminalMessageFits(t *testing.T) {
 	assertViewFits(t, view, 50, 14)
 	if !strings.Contains(view, "Terminal too small.") {
 		t.Fatal("small setup view missing friendly message")
+	}
+}
+
+func TestSetupProfileSelectionUsesArrowKeys(t *testing.T) {
+	m := testSetupModel(100, 30)
+	if m.setupShell != "PowerShell 7" {
+		t.Fatalf("initial setup shell = %q", m.setupShell)
+	}
+
+	next, quit, cmd := m.handleSetupKey(tea.KeyMsg{Type: tea.KeyDown})
+	if quit {
+		t.Fatal("down should not quit")
+	}
+	if cmd != nil {
+		t.Fatal("down should not start a command")
+	}
+	if next.contentIndex != 1 {
+		t.Fatalf("contentIndex after down = %d, want 1", next.contentIndex)
+	}
+	if next.setupShell != "Windows PowerShell" {
+		t.Fatalf("setupShell after down = %q, want Windows PowerShell", next.setupShell)
+	}
+	if next.setupFocusedElement() != "Profile" {
+		t.Fatalf("focus after down = %q, want Profile", next.setupFocusedElement())
+	}
+}
+
+func TestSetupTabCyclesProfileBackApply(t *testing.T) {
+	m := testSetupModel(100, 30)
+	if got := m.setupFocusedElement(); got != "Profile" {
+		t.Fatalf("initial setup focus = %q, want Profile", got)
+	}
+	m, _, _ = m.handleSetupKey(tea.KeyMsg{Type: tea.KeyTab})
+	if got := m.setupFocusedElement(); got != "Back" {
+		t.Fatalf("focus after first tab = %q, want Back", got)
+	}
+	m, _, _ = m.handleSetupKey(tea.KeyMsg{Type: tea.KeyTab})
+	if got := m.setupFocusedElement(); got != "Apply" {
+		t.Fatalf("focus after second tab = %q, want Apply", got)
 	}
 }
 

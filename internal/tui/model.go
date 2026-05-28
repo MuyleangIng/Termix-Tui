@@ -205,7 +205,7 @@ func base(rt *app.Runtime, setup bool) Model {
 		setupShell:    rt.Config.DefaultShell,
 		setupFont:     rt.Config.DefaultFont,
 		setupTheme:    firstOrDefault(rt.Config.FavoriteThemes, "catppuccin_mocha"),
-		setupButton:   1,
+		setupButton:   -1,
 		activityRows:  clamp(4, 20, firstPositive(rt.Config.ActivityHeight, 7)),
 		logs:          initialLogs,
 	}
@@ -445,24 +445,32 @@ func (m Model) handleSetupKey(msg tea.KeyMsg) (Model, bool, tea.Cmd) {
 		m.setupNotice = "Use Up/Down to select a profile, Tab to choose Back or Apply, Enter to run the focused action."
 	case "esc", "backspace":
 		return m.exitSetup(), false, nil
-	case "tab", "shift+tab", "left", "right":
-		m.setupButton = 1 - clamp(0, 1, m.setupButton)
+	case "tab", "right":
+		m.setupButton = nextSetupFocus(m.setupButton, 1)
+		m.logs = cappedLogs(append([]string{"INFO setup focus: " + m.setupFocusedElement()}, m.logs...))
+	case "shift+tab", "left":
+		m.setupButton = nextSetupFocus(m.setupButton, -1)
 		m.logs = cappedLogs(append([]string{"INFO setup focus: " + m.setupFocusedElement()}, m.logs...))
 	case "up", "k":
-		m.moveSelection(-1)
-		m.captureSetupSelection()
+		m = m.moveSetupProfileSelection(-1)
 	case "down", "j":
-		m.moveSelection(1)
-		m.captureSetupSelection()
+		m = m.moveSetupProfileSelection(1)
 	case "home":
-		m.jumpSelection(false)
+		m.contentIndex = 0
+		m.setupButton = -1
 		m.captureSetupSelection()
 	case "end":
-		m.jumpSelection(true)
+		m.contentIndex = max(0, len(setupProfileRows(m.rt))-1)
+		m.setupButton = -1
 		m.captureSetupSelection()
 	case "enter":
 		if m.setupButton == 0 {
 			return m.exitSetup(), false, nil
+		}
+		if m.setupButton < 0 {
+			m.setupButton = 1
+			m.setupNotice = "Profile selected: " + m.setupShell + ". Press Enter again to apply."
+			return m, false, nil
 		}
 		var cmd tea.Cmd
 		m, cmd = m.activate()
@@ -873,10 +881,38 @@ func (m Model) exitSetup() Model {
 }
 
 func (m Model) setupFocusedElement() string {
+	if m.setupButton < 0 {
+		return "Profile"
+	}
 	if m.setupButton == 0 {
 		return "Back"
 	}
 	return "Apply"
+}
+
+func (m Model) moveSetupProfileSelection(delta int) Model {
+	rows := setupProfileRows(m.rt)
+	m.contentIndex = clamp(0, max(0, len(rows)-1), m.contentIndex+delta)
+	m.setupButton = -1
+	m.captureSetupSelection()
+	target := m.currentSetupProfileTarget()
+	if target.Name != "" {
+		m.setupNotice = "Selected profile: " + target.Name + ". Tab to Apply."
+	}
+	return m
+}
+
+func nextSetupFocus(current, delta int) int {
+	order := []int{-1, 0, 1}
+	index := 0
+	for i, value := range order {
+		if value == current {
+			index = i
+			break
+		}
+	}
+	index = (index + delta + len(order)) % len(order)
+	return order[index]
 }
 
 func (m Model) isSelectedCustomFont() bool {
@@ -1916,7 +1952,7 @@ func (m Model) setupOnboarding(w, h int) string {
 		"Target: " + target.Detail,
 		"State: " + setupProfileState(target),
 	}
-	left := focusedPanel(false).Width(colW).Height(panelH).Render(fitBlock(strings.Join(leftLines, "\n"), max(12, colW-4), max(5, panelH-2)))
+	left := focusedPanel(m.setupButton < 0).Width(colW).Height(panelH).Render(fitBlock(strings.Join(leftLines, "\n"), max(12, colW-4), max(5, panelH-2)))
 	right := focusedPanel(false).Width(colW).Height(panelH).Render(fitBlock(strings.Join(rightLines, "\n"), max(12, colW-4), max(5, panelH-2)))
 	buttons := lipgloss.NewStyle().Align(lipgloss.Center).Width(innerW).Render(
 		m.setupButtonView("Back", m.setupButton == 0) + "          " + m.setupButtonView("Apply", m.setupButton == 1),
