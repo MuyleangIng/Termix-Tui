@@ -79,7 +79,14 @@ func scheduleExecutableRemoval() error {
 		return err
 	}
 	if runtime.GOOS != "windows" {
-		return os.Remove(exe)
+		if err := os.Remove(exe); err != nil && !os.IsNotExist(err) {
+			return err
+		}
+		alias := filepath.Join(filepath.Dir(exe), "termix-tui")
+		if err := os.Remove(alias); err != nil && !os.IsNotExist(err) {
+			return err
+		}
+		return nil
 	}
 
 	dir := filepath.Dir(exe)
@@ -111,6 +118,7 @@ $dir = %s
 $scriptPath = %s
 $removeDir = %s
 Remove-Item -LiteralPath $exe -Force -ErrorAction SilentlyContinue
+Remove-Item -LiteralPath (Join-Path $dir 'termix-tui.exe') -Force -ErrorAction SilentlyContinue
 Get-ChildItem -LiteralPath $dir -Filter 'termix.exe.bak-*' -ErrorAction SilentlyContinue | Remove-Item -Force -ErrorAction SilentlyContinue
 if ($removeDir) {
     Remove-Item -LiteralPath $dir -Recurse -Force -ErrorAction SilentlyContinue

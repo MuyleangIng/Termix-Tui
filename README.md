@@ -21,6 +21,7 @@ Normal users do not need Go, `git clone`, or `go install`. Use the GitHub Pages 
 ```powershell
 irm https://muyleanging.github.io/Termix-Tui/install.ps1 | iex
 termix setup
+termix-tui
 ```
 
 ### macOS / Linux
@@ -28,6 +29,7 @@ termix setup
 ```bash
 curl -fsSL https://muyleanging.github.io/Termix-Tui/install.sh | bash
 termix setup
+termix-tui
 ```
 
 ## Manual Download
@@ -46,13 +48,14 @@ cd termix
 go mod tidy
 go test ./...
 go build -o bin/termix .
+./bin/termix tui
 ```
 
 On Windows:
 
 ```powershell
 go build -o bin\termix.exe .
-.\bin\termix.exe
+.\bin\termix.exe tui
 ```
 
 ## Features
@@ -70,7 +73,9 @@ go build -o bin\termix.exe .
 ## Commands
 
 ```text
-termix                                      Launch the main dashboard
+termix                                      Show CLI help and commands
+termix tui                                  Launch the main dashboard
+termix-tui                                  Launch the main dashboard from installer alias
 termix setup                                Run the first-time setup wizard
 termix doctor                               Run diagnostics
 termix repair --dry-run                     Preview repair actions
@@ -84,6 +89,7 @@ termix fonts list                           Show recommended font status
 termix fonts install <font> --yes           Install a supported Nerd Font
 termix fonts apply <font> --windows-terminal Save/apply a font
 termix uninstall                            Fully remove Termix profiles, data, themes, and executable
+termix uninstall profile                    Remove only Termix shell profile blocks
 ```
 
 ## Release

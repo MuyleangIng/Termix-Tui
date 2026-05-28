@@ -15,6 +15,7 @@ $ErrorActionPreference = "Stop"
 $RepoOwner = "MuyleangIng"
 $RepoName = "Termix-Tui"
 $ExeName = "termix.exe"
+$TuiExeName = "termix-tui.exe"
 
 function Write-TermixInfo {
     param([string]$Message)
@@ -230,6 +231,7 @@ function Install-Termix {
     }
 
     $targetExe = Join-Path $InstallDir $ExeName
+    $targetTuiExe = Join-Path $InstallDir $TuiExeName
 
     if (Test-Path $targetExe) {
         $backupName = "termix.exe.bak-" + (Get-Date -Format "yyyyMMdd-HHmmss")
@@ -278,6 +280,9 @@ function Install-Termix {
         }
     }
 
+    Copy-Item $targetExe $targetTuiExe -Force
+    Clear-DownloadMark -Path $targetTuiExe
+    Write-TermixSuccess "Installed TUI launcher to $targetTuiExe"
     Write-TermixSuccess "Termix installed successfully."
 
     if (-not $NoSetup) {
@@ -291,7 +296,7 @@ function Install-Termix {
 
     Write-Host ""
     Write-TermixSuccess "Done."
-    Write-Host "Open a new terminal if 'termix' is not found immediately."
+    Write-Host "Open a new terminal if 'termix' or 'termix-tui' is not found immediately."
 }
 
 try {

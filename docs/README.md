@@ -70,6 +70,7 @@ Use these commands for production setup and repair:
 
 ```powershell
 termix setup
+termix tui
 termix repair --dry-run
 termix repair
 termix reinstall
@@ -78,12 +79,15 @@ termix cache rebuild
 termix themes update
 termix themes apply catppuccin_mocha --profile "PowerShell 7"
 termix fonts apply "JetBrainsMono Nerd Font" --windows-terminal
+termix uninstall
 ```
 
 Important behavior:
 
 - `termix cache clear` removes cache metadata only.
-- Downloaded themes are removed only with `termix uninstall downloaded-themes`.
+- `termix` shows CLI help; use `termix tui` or the installer alias `termix-tui` for the full-screen dashboard.
+- `termix uninstall` is a full uninstall: profile blocks, config, cache, downloaded themes, and executable.
+- Downloaded themes are removed only with `termix uninstall downloaded-themes` when you are doing a partial uninstall.
 - Profile repair replaces the managed Termix block instead of appending duplicates.
 - Missing Nerd Fonts are warnings; Termix resolves an installed fallback font.
 - Official themes come from <https://github.com/JanDeDobbeleer/oh-my-posh/tree/main/themes>.

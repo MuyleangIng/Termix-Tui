@@ -158,9 +158,12 @@ install_termix() {
   fi
 
   cp "$binary" "$INSTALL_DIR/termix"
+  cp "$binary" "$INSTALL_DIR/termix-tui"
   chmod +x "$INSTALL_DIR/termix"
+  chmod +x "$INSTALL_DIR/termix-tui"
 
   success "Installed Termix to $INSTALL_DIR/termix"
+  success "Installed TUI launcher to $INSTALL_DIR/termix-tui"
 
   if ! echo "$PATH" | tr ':' '\n' | grep -qx "$INSTALL_DIR"; then
     warn "$INSTALL_DIR is not in PATH."

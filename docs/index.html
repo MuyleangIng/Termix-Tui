@@ -130,13 +130,15 @@
             <h3>Windows PowerShell</h3>
             <pre><code>irm https://muyleanging.github.io/Termix-Tui/install.ps1 | iex
 
-termix setup</code></pre>
+termix setup
+termix-tui</code></pre>
           </article>
           <article>
             <h3>macOS / Linux</h3>
             <pre><code>curl -fsSL https://muyleanging.github.io/Termix-Tui/install.sh | bash
 
-termix setup</code></pre>
+termix setup
+termix-tui</code></pre>
           </article>
         </div>
         <div class="section-heading">
@@ -164,14 +166,14 @@ termix setup</code></pre>
             <pre><code>go mod tidy
 go test ./...
 go build -o bin/termix.exe .
-.\bin\termix.exe</code></pre>
+.\bin\termix.exe tui</code></pre>
           </article>
           <article>
             <h3>macOS / Linux developer build</h3>
             <pre><code>go mod tidy
 go test ./...
 go build -o bin/termix .
-./bin/termix</code></pre>
+./bin/termix tui</code></pre>
           </article>
         </div>
       </section>
@@ -189,7 +191,8 @@ go build -o bin/termix .
         <div class="card-grid">
           <article class="plain-card">
             <h3>First-time setup</h3>
-            <pre><code>termix setup</code></pre>
+            <pre><code>termix setup
+termix-tui</code></pre>
             <p>Detects terminal, shell profile, Oh My Posh, official themes, fonts, and setup status.</p>
           </article>
           <article class="plain-card">
@@ -219,18 +222,19 @@ termix cache clear</code></pre>
           </article>
           <article>
             <h3>Safe profile block</h3>
-            <pre><code># &gt;&gt;&gt; Termix Oh My Posh &gt;&gt;&gt;
+            <pre><code># BEGIN TERMIX THEME
 oh-my-posh init pwsh --config "FULL_THEME_PATH" | Invoke-Expression
-# &lt;&lt;&lt; Termix Oh My Posh &lt;&lt;&lt;</code></pre>
+# END TERMIX THEME</code></pre>
             <p>Termix backs up profile files and replaces only its managed block, so repeated apply commands do not create duplicates.</p>
           </article>
           <article>
-            <h3>Safe uninstall</h3>
-            <pre><code>termix uninstall profile
+            <h3>Uninstall</h3>
+            <pre><code>termix uninstall
+termix uninstall profile
 termix uninstall cache
 termix uninstall downloaded-themes
 termix uninstall config</code></pre>
-            <p>Profile uninstall removes only the Termix block. Downloaded themes are removed only by the explicit downloaded-themes action.</p>
+            <p>Bare uninstall removes Termix-managed profile blocks, config, cache, downloaded themes, and the executable. Component commands remove only that part.</p>
           </article>
         </div>
       </section>
@@ -251,6 +255,10 @@ termix uninstall config</code></pre>
             <tbody>
               <tr>
                 <td><code>termix</code></td>
+                <td>Show CLI help and available commands.</td>
+              </tr>
+              <tr>
+                <td><code>termix tui</code> or <code>termix-tui</code></td>
                 <td>Launch the dashboard.</td>
               </tr>
               <tr>

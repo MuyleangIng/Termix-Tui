@@ -43,6 +43,11 @@ else
   info "Termix binary not found at $INSTALL_DIR/termix"
 fi
 
+if [ -f "$INSTALL_DIR/termix-tui" ]; then
+  rm -f "$INSTALL_DIR/termix-tui"
+  success "Removed $INSTALL_DIR/termix-tui"
+fi
+
 DATA_DIR="$HOME/.termix"
 
 if [ "$CLEAN_DATA" = "1" ]; then

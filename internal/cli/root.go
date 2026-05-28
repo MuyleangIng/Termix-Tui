@@ -33,13 +33,35 @@ func ExecuteWithVersion(version, commit, date string) error {
 		Long:    "Termix is a premium CLI and TUI platform for shells, Oh My Posh, fonts, Windows Terminal, WSL, and terminal profiles.",
 		Version: fmt.Sprintf("%s\ncommit: %s\nbuilt: %s", version, commit, date),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return runTUI(cmd.Context())
+			if isTUIExecutable(os.Args[0]) {
+				return runTUI(cmd.Context())
+			}
+			return cmd.Help()
 		},
 	}
 
 	root.PersistentFlags().StringVar(&cfgPath, "config", "", "config file path")
-	root.AddCommand(setupCommand(), doctorCommand(), installCommand(), updateCommand(), uninstallCommand(), cleanCommand(), resetCommand(), reinstallCommand(), repairCommand(), cacheCommand(), themesCommand(), fontsCommand(), profileCommand(), applyCommand())
+	root.AddCommand(tuiCommand(), setupCommand(), doctorCommand(), installCommand(), updateCommand(), uninstallCommand(), cleanCommand(), resetCommand(), reinstallCommand(), repairCommand(), cacheCommand(), themesCommand(), fontsCommand(), profileCommand(), applyCommand())
 	return root.Execute()
+}
+
+func isTUIExecutable(path string) bool {
+	if index := strings.LastIndexAny(path, `/\`); index >= 0 {
+		path = path[index+1:]
+	}
+	name := strings.TrimSuffix(strings.ToLower(path), ".exe")
+	return name == "termix-tui"
+}
+
+func tuiCommand() *cobra.Command {
+	return &cobra.Command{
+		Use:     "tui",
+		Aliases: []string{"ui", "app"},
+		Short:   "Open the Termix full-screen TUI",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			return runTUI(cmd.Context())
+		},
+	}
 }
 
 func applyCommand() *cobra.Command {
