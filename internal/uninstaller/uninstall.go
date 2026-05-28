@@ -30,7 +30,7 @@ func (m Manager) Uninstall(ctx context.Context, component string) error {
 		return os.RemoveAll(filepath.Join(m.rt.Config.HomeDir, "themes"))
 	case "profile", "integration", "prompt", "oh-my-posh":
 		home, _ := os.UserHomeDir()
-		return profile.RemovePrompt(home, m.rt.Config.DefaultShell)
+		return profile.RemoveAllPrompts(home)
 	case "config":
 		return backupAndRemove(filepath.Join(m.rt.Config.HomeDir, "config.yaml"))
 	case "all":
@@ -38,7 +38,7 @@ func (m Manager) Uninstall(ctx context.Context, component string) error {
 			return err
 		}
 		home, _ := os.UserHomeDir()
-		if err := profile.RemovePrompt(home, m.rt.Config.DefaultShell); err != nil {
+		if err := profile.RemoveAllPrompts(home); err != nil {
 			return err
 		}
 		return backupAndRemove(filepath.Join(m.rt.Config.HomeDir, "config.yaml"))

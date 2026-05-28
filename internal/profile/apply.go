@@ -60,13 +60,35 @@ func RemovePrompt(home, shellName string) error {
 	if adapter == nil {
 		return fmt.Errorf("unsupported shell %q", shellName)
 	}
-	path := adapter.ProfilePath(home)
+	return removePromptPath(adapter.ProfilePath(home))
+}
+
+func RemoveAllPrompts(home string) error {
+	seen := map[string]bool{}
+	for _, adapter := range shell.Supported() {
+		path := adapter.ProfilePath(home)
+		key := strings.ToLower(filepath.Clean(path))
+		if seen[key] {
+			continue
+		}
+		seen[key] = true
+		if err := removePromptPath(path); err != nil {
+			return fmt.Errorf("remove %s prompt %q: %w", adapter.Name(), path, err)
+		}
+	}
+	return nil
+}
+
+func removePromptPath(path string) error {
 	existing, err := os.ReadFile(path)
 	if err != nil {
 		if os.IsNotExist(err) {
 			return nil
 		}
 		return err
+	}
+	if !hasManagedBlock(string(existing)) {
+		return nil
 	}
 	backup := fmt.Sprintf("%s.termix.%s.bak", path, time.Now().Format("20060102150405"))
 	if err := os.WriteFile(backup, existing, 0o644); err != nil {
@@ -85,16 +107,7 @@ func HasPromptBlock(home, shellName string) bool {
 	if err != nil {
 		return false
 	}
-	existing := string(data)
-	if strings.Contains(existing, markerStart) && strings.Contains(existing, markerEnd) {
-		return true
-	}
-	for _, markers := range legacyMarkers {
-		if strings.Contains(existing, markers[0]) && strings.Contains(existing, markers[1]) {
-			return true
-		}
-	}
-	return false
+	return hasManagedBlock(string(data))
 }
 
 func ProfilePath(home, shellName string) string {
@@ -159,6 +172,18 @@ func removeManagedBlocks(existing string) string {
 		existing = removeBlockPair(existing, markers[0], markers[1])
 	}
 	return strings.TrimSpace(existing) + "\n"
+}
+
+func hasManagedBlock(existing string) bool {
+	if strings.Contains(existing, markerStart) && strings.Contains(existing, markerEnd) {
+		return true
+	}
+	for _, markers := range legacyMarkers {
+		if strings.Contains(existing, markers[0]) && strings.Contains(existing, markers[1]) {
+			return true
+		}
+	}
+	return false
 }
 
 func removeBlockPair(existing, startMarker, endMarker string) string {

@@ -114,6 +114,27 @@ func TestRemovePromptRemovesOnlyManagedBlock(t *testing.T) {
 	}
 }
 
+func TestRemoveAllPromptsRemovesEverySupportedProfileBlock(t *testing.T) {
+	home := t.TempDir()
+	themePath := writeTheme(t, home, "amro")
+
+	for _, shellName := range []string{"PowerShell 7", "Windows PowerShell", "Git Bash", "Fish", "Nushell"} {
+		if err := ApplyPrompt(home, shellName, themePath); err != nil {
+			t.Fatalf("apply %s: %v", shellName, err)
+		}
+	}
+
+	if err := RemoveAllPrompts(home); err != nil {
+		t.Fatal(err)
+	}
+
+	for _, shellName := range []string{"PowerShell 7", "Windows PowerShell", "Git Bash", "Fish", "Nushell"} {
+		if HasPromptBlock(home, shellName) {
+			t.Fatalf("expected %s prompt block to be removed", shellName)
+		}
+	}
+}
+
 func writeTheme(t *testing.T, home, name string) string {
 	t.Helper()
 	path := filepath.Join(home, "themes", name+".omp.json")
