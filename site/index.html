@@ -6,564 +6,126 @@
     <title>Termix - Terminal Theme Manager</title>
     <meta
       name="description"
-      content="Termix is an open source terminal theme manager for Oh My Posh, Nerd Fonts, Windows Terminal, PowerShell, Git Bash, and WSL."
+      content="Termix is an open-source CLI and TUI for terminal themes, shell profiles, Nerd Fonts, and Oh My Posh."
     />
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
     <header class="site-header">
-      <a class="brand" href="#home">Termix</a>
+      <a class="brand" href="#home">TERMIX</a>
       <nav aria-label="Main navigation">
+        <a href="#features">Features</a>
+        <a href="#preview">Preview</a>
         <a href="#install">Install</a>
-        <a href="#demo">Demo</a>
-        <a href="#usage">CLI</a>
-        <a href="#recovery">Repair</a>
-        <a href="#docs">Docs</a>
-        <a href="#contribute">Contribute</a>
-        <a href="#feedback">Feedback</a>
+        <a href="https://github.com/MuyleangIng/Termix-Tui">GitHub</a>
       </nav>
     </header>
 
     <main>
       <section id="home" class="hero">
         <div class="hero-copy">
-          <p class="eyebrow">Open source terminal workspace</p>
-          <h1>Termix</h1>
+          <div class="status-bar" aria-label="Termix status">
+            <span>TERMIX v0.1.11</span>
+            <span>PowerShell 7</span>
+            <span>atomic</span>
+            <span>Dark</span>
+            <span>ANSI ✓</span>
+            <span>UTF8 ✓</span>
+          </div>
+          <p class="terminal-label">[ TERMINAL WORKSPACE ]</p>
+          <h1>Manage your terminal like a TUI dashboard.</h1>
           <p class="lede">
-            A focused CLI and TUI for managing terminal profiles, Oh My Posh themes,
-            Nerd Fonts, Windows Terminal, PowerShell 7, Git Bash, and WSL.
+            Termix applies Oh My Posh themes, shell profile blocks, Nerd Fonts,
+            and Windows Terminal settings from one focused CLI/TUI workflow.
           </p>
           <div class="actions">
-            <a class="button primary" href="#install">Install</a>
-            <a class="button" href="#demo">View style demo</a>
-            <a class="button" href="#usage">Read CLI docs</a>
+            <a class="button primary" href="#install">Get Started</a>
+            <a class="button" href="https://github.com/MuyleangIng/Termix-Tui">View GitHub</a>
           </div>
         </div>
-        <a class="terminal-image-card" href="#demo" aria-label="Open terminal style demo">
-          <img src="./assets/termix-terminal-demo.svg" alt="Termix terminal dashboard style demo" />
+        <a class="terminal-image-card" href="#preview" aria-label="View Termix TUI preview">
+          <img src="./assets/termix-terminal-demo.svg" alt="Termix TUI dashboard preview with cyan terminal panels" />
         </a>
       </section>
 
-      <section id="demo" class="section visual-demo">
+      <section id="features" class="section">
         <div class="section-heading">
-          <p class="eyebrow">Terminal style demo</p>
-          <h2>Real dashboard look for docs and releases</h2>
+          <p class="terminal-label">[ FEATURES ]</p>
+          <h2>Built for shell setup, not manual profile editing.</h2>
+        </div>
+        <div class="feature-grid">
+          <article class="terminal-panel">
+            <h3>[ THEME MANAGER ]</h3>
+            <p>Download official Oh My Posh themes, browse them, and apply one to the selected profile.</p>
+          </article>
+          <article class="terminal-panel">
+            <h3>[ PROFILE MANAGER ]</h3>
+            <p>Write safe managed blocks for PowerShell 7, Windows PowerShell, Git Bash, WSL, Fish, and Nushell.</p>
+          </article>
+          <article class="terminal-panel">
+            <h3>[ FONT SETUP ]</h3>
+            <p>Install and apply a Nerd Font with fallback handling when glyphs are missing.</p>
+          </article>
+          <article class="terminal-panel">
+            <h3>[ CROSS-SHELL ]</h3>
+            <p>Keep shell-specific profile paths separate so one profile fix does not break another shell.</p>
+          </article>
+          <article class="terminal-panel">
+            <h3>[ LIVE PREVIEW ]</h3>
+            <p>Use real Oh My Posh theme data in the terminal workflow before applying a prompt.</p>
+          </article>
+          <article class="terminal-panel">
+            <h3>[ BACKUP & RESTORE ]</h3>
+            <p>Back up profile files before replacing Termix-managed blocks and keep user content intact.</p>
+          </article>
+        </div>
+      </section>
+
+      <section id="preview" class="section preview-section">
+        <div class="section-heading">
+          <p class="terminal-label">[ WORKSPACE ]</p>
+          <h2>A homepage preview that feels like Termix.</h2>
           <p>
-            Use this visual preview in GitHub Pages, README screenshots, or release notes so users can see
-            the terminal style before installing Termix.
+            The preview uses the same dark panels, cyan borders, status chips,
+            and activity-log rhythm as the TUI without copying a screenshot.
           </p>
         </div>
-        <div class="demo-frame">
-          <img src="./assets/termix-terminal-demo.svg" alt="Termix terminal UI with theme preview, activity log, and footer" />
-        </div>
-        <div class="actions demo-actions">
-          <a class="button primary" href="./assets/termix-terminal-demo.svg">Open SVG</a>
-          <a class="button" href="#fonts">Fix font warning</a>
+        <div class="preview-frame">
+          <img src="./assets/termix-terminal-demo.svg" alt="Responsive SVG preview of the Termix terminal dashboard" />
         </div>
       </section>
 
-      <section class="section showcase">
+      <section id="install" class="section install-section">
         <div class="section-heading">
-          <p class="eyebrow">TUI style system</p>
-          <h2>Consistent terminal surfaces</h2>
-        </div>
-        <div class="showcase-grid">
-          <article class="tui-panel dark-panel">
-            <div class="tui-header"><strong>TERMIX v0.1.11</strong><span>Dark</span></div>
-            <div class="tui-body">
-              <p class="tui-title">Navigation</p>
-              <p><span class="cursor">›</span> Themes</p>
-              <p>  Fonts</p>
-            </div>
-          </article>
-          <article class="tui-panel dark-panel">
-            <div class="tui-header"><strong>Real Preview</strong><span>Oh My Posh</span></div>
-            <div class="tui-body">
-              <p class="tui-title">Prompt</p>
-              <p><span class="prompt-block">Admin</span><span class="prompt-block outline">~/workspace</span></p>
-              <p><span class="prompt-block outline">main ✔</span></p>
-              <p><span class="status success">READY</span> rendered by Oh My Posh</p>
-            </div>
-          </article>
-          <article class="tui-panel dark-panel">
-            <div class="tui-header"><strong>Fonts</strong><span>Fallback</span></div>
-            <div class="tui-body">
-              <p class="tui-title">Font Manager</p>
-              <p>CaskaydiaCove <span class="status muted">missing</span></p>
-              <p>Cascadia Code <span class="status success">active</span></p>
-              <p>W applies Windows Terminal</p>
-            </div>
-          </article>
-        </div>
-      </section>
-
-      <section class="band">
-        <div class="stat-grid">
-          <div>
-            <strong>Profiles</strong>
-            <span>PowerShell 7, Windows PowerShell, Git Bash, WSL, Fish, Nushell</span>
-          </div>
-          <div>
-            <strong>Themes</strong>
-            <span>Import official Oh My Posh styles and preview before applying</span>
-          </div>
-          <div>
-            <strong>Fonts</strong>
-            <span>Install and apply Nerd Fonts for glyph and icon support</span>
-          </div>
-        </div>
-      </section>
-
-      <section id="install" class="section">
-        <div class="section-heading">
-          <p class="eyebrow">Install</p>
-          <h2>Install Termix without Go</h2>
+          <p class="terminal-label">[ INSTALL ]</p>
+          <h2>Install, open a new terminal, run setup.</h2>
           <p>
-            Normal users do not need to clone the repository or install Go.
-            Use the installer script from GitHub Pages. The script downloads
-            the latest Termix binary from GitHub Releases. On Windows, it also
-            bootstraps the default tools, CascadiaCode Nerd Font, and official
-            Oh My Posh themes. Open a new terminal before running setup so the
-            interactive picker receives arrow keys correctly.
+            The Windows installer downloads the latest release and bootstraps
+            Oh My Posh, the default Nerd Font, and official themes.
           </p>
         </div>
-        <div class="code-grid">
-          <article>
-            <h3>Windows PowerShell</h3>
+        <div class="command-grid">
+          <article class="command-card">
+            <div class="command-title"><span>Windows PowerShell</span><span class="chip">recommended</span></div>
             <pre><code>irm https://muyleanging.github.io/Termix-Tui/install.ps1 | iex
 
 termix setup
 termix-tui</code></pre>
           </article>
-          <article>
-            <h3>macOS / Linux</h3>
+          <article class="command-card">
+            <div class="command-title"><span>macOS / Linux</span><span class="chip muted">shell</span></div>
             <pre><code>curl -fsSL https://muyleanging.github.io/Termix-Tui/install.sh | bash
 
 termix setup
 termix-tui</code></pre>
           </article>
         </div>
-        <div class="section-heading">
-          <p class="eyebrow">Manual download</p>
-          <h2>GitHub Releases</h2>
-          <p>
-            You can also download Termix manually from GitHub Releases:
-          </p>
-          <p>
-            <a class="button" href="https://github.com/MuyleangIng/Termix-Tui/releases/latest">
-              Download latest release
-            </a>
-          </p>
-        </div>
-        <div class="section-heading">
-          <p class="eyebrow">Developer build</p>
-          <h2>Build from source</h2>
-          <p>
-            This is only for contributors or developers.
-          </p>
-        </div>
-        <div class="code-grid">
-          <article>
-            <h3>Windows developer build</h3>
-            <pre><code>go mod tidy
-go test ./...
-go build -o bin/termix.exe .
-.\bin\termix.exe tui</code></pre>
-          </article>
-          <article>
-            <h3>macOS / Linux developer build</h3>
-            <pre><code>go mod tidy
-go test ./...
-go build -o bin/termix .
-./bin/termix tui</code></pre>
-          </article>
-        </div>
-      </section>
-
-      <section id="recovery" class="section">
-        <div class="section-heading">
-          <p class="eyebrow">Setup and recovery</p>
-          <h2>Clean setup, repair, reinstall, and uninstall</h2>
-          <p>
-            Termix keeps theme files, cache metadata, shell profile blocks, and font settings separate.
-            That means broken cache can be cleared without deleting themes, and shell profile integration
-            can be repaired without duplicating Oh My Posh commands.
-          </p>
-        </div>
-        <div class="card-grid">
-          <article class="plain-card">
-            <h3>First-time setup</h3>
-            <pre><code>termix setup
-termix-tui</code></pre>
-            <p>Picks the target shell profile, verifies official themes, and applies the default Termix font/theme.</p>
-          </article>
-          <article class="plain-card">
-            <h3>Clean reinstall</h3>
-            <pre><code>termix reinstall
-termix reinstall --dry-run</code></pre>
-            <p>Clears cache metadata, rebuilds official theme cache, repairs the managed profile block, saves config, and runs with fallback fonts.</p>
-          </article>
-          <article class="plain-card">
-            <h3>Repair broken state</h3>
-            <pre><code>termix repair
-termix profile repair "PowerShell 7"</code></pre>
-            <p>Fixes CONFIG NOT FOUND, missing theme paths, duplicate profile blocks, and stale cache references.</p>
-          </article>
-        </div>
-        <div class="code-grid">
-          <article>
-            <h3>Theme source and cache</h3>
-            <pre><code>termix themes update
-termix cache rebuild
-termix cache clear</code></pre>
-            <p>
-              Official themes come from
-              <a href="https://github.com/JanDeDobbeleer/oh-my-posh/tree/main/themes">Oh My Posh themes</a>.
-              Clearing cache removes metadata only; downloaded theme files stay available.
-            </p>
-          </article>
-          <article>
-            <h3>Safe profile block</h3>
-            <pre><code># BEGIN TERMIX THEME
-oh-my-posh init pwsh --config "FULL_THEME_PATH" | Invoke-Expression
-# END TERMIX THEME</code></pre>
-            <p>Termix backs up profile files and replaces only its managed block, so repeated apply commands do not create duplicates.</p>
-          </article>
-          <article>
-            <h3>Uninstall</h3>
-            <pre><code>termix uninstall
-termix uninstall profile
-termix uninstall cache
-termix uninstall downloaded-themes
-termix uninstall config</code></pre>
-            <p>Bare uninstall removes Termix-managed profile blocks, config, cache, downloaded themes, and the executable. Component commands remove only that part.</p>
-          </article>
-        </div>
-      </section>
-
-      <section id="usage" class="section">
-        <div class="section-heading">
-          <p class="eyebrow">CLI</p>
-          <h2>Common commands</h2>
-        </div>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Command</th>
-                <th>Purpose</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td><code>termix</code></td>
-                <td>Show CLI help and available commands.</td>
-              </tr>
-              <tr>
-                <td><code>termix tui</code> or <code>termix-tui</code></td>
-                <td>Launch the dashboard.</td>
-              </tr>
-              <tr>
-                <td><code>termix setup</code></td>
-                <td>Run first-time profile, font, and theme setup.</td>
-              </tr>
-              <tr>
-                <td><code>termix repair --dry-run</code></td>
-                <td>Preview profile, cache, theme, and font repairs without writing files.</td>
-              </tr>
-              <tr>
-                <td><code>termix reinstall</code></td>
-                <td>Clean broken cache, rebuild official themes, repair profile integration, save config, and mark setup complete.</td>
-              </tr>
-              <tr>
-                <td><code>termix themes</code></td>
-                <td>List discovered Oh My Posh theme files.</td>
-              </tr>
-              <tr>
-                <td><code>termix themes update</code></td>
-                <td>Download official Oh My Posh themes and rebuild cache.</td>
-              </tr>
-              <tr>
-                <td><code>termix themes apply catppuccin_mocha --profile "PowerShell 7"</code></td>
-                <td>Write or replace the managed Oh My Posh block in the selected profile.</td>
-              </tr>
-              <tr>
-                <td><code>termix cache rebuild</code></td>
-                <td>Rebuild cache from real theme files. If none exist, Termix imports official themes.</td>
-              </tr>
-              <tr>
-                <td><code>termix doctor</code></td>
-                <td>Check terminal, shell, Unicode, WSL, and Oh My Posh health.</td>
-              </tr>
-              <tr>
-                <td><code>termix fonts list</code></td>
-                <td>Show recommended fonts and installed/missing status.</td>
-              </tr>
-              <tr>
-                <td><code>termix fonts apply "JetBrainsMono Nerd Font" --windows-terminal</code></td>
-                <td>Save the font in Termix and optionally apply it to Windows Terminal with backup.</td>
-              </tr>
-              <tr>
-                <td><code>termix fonts install "JetBrainsMono Nerd Font" --yes</code></td>
-                <td>Install a supported Nerd Font only after explicit confirmation.</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </section>
-
-      <section id="docs" class="section split">
-        <div>
-          <p class="eyebrow">Docs</p>
-          <h2>How Termix works</h2>
-          <p>
-            Termix separates terminal design into three parts: the shell profile,
-            the Oh My Posh prompt theme, and the terminal font. This keeps profile
-            setup predictable and makes it easier to preview safely before writing
-            profile files.
-          </p>
-        </div>
-        <ul class="check-list">
-          <li>Select the profile you want to design.</li>
-          <li>Import and preview themes.</li>
-          <li>Pick a Nerd Font that supports prompt glyphs.</li>
-          <li>Confirm the target profile before applying.</li>
-          <li>Use Doctor to check missing tools.</li>
-          <li>Use <code>termix repair</code> for CONFIG NOT FOUND, stale theme cache, or duplicate profile blocks.</li>
-          <li>Use <code>?</code> or <code>h</code> for Termix help. Termix does not use <code>F1</code>.</li>
-        </ul>
-      </section>
-
-      <section id="fonts" class="section">
-        <div class="section-heading">
-          <p class="eyebrow">Fonts</p>
-          <h2>Install, choose, and customize fonts</h2>
-        </div>
-        <p>
-          Termix recommends a Nerd Font for prompt icons, but it should never require one to start.
-          If <code>CaskaydiaCove Nerd Font</code> is missing, Termix falls back to the next available
-          font and shows a warning instead of blocking the app.
-        </p>
-        <div class="card-grid">
-          <article class="plain-card">
-            <h3>Recommended fonts</h3>
-            <p>CaskaydiaCove Nerd Font, CascadiaCode Nerd Font, JetBrainsMono Nerd Font, FiraCode Nerd Font, MesloLGM Nerd Font, Hack Nerd Font, UbuntuMono Nerd Font.</p>
-          </article>
-          <article class="plain-card">
-            <h3>Fallback stack</h3>
-            <p><code>CaskaydiaCove Nerd Font</code>, <code>Cascadia Code</code>, <code>JetBrains Mono</code>, <code>Fira Code</code>, <code>Consolas</code>, <code>Courier New</code>, <code>monospace</code>.</p>
-          </article>
-          <article class="plain-card">
-            <h3>Fonts page controls</h3>
-            <p><code>Enter</code> saves the font in Termix. <code>W</code> applies it to Windows Terminal. <code>I</code> installs a missing recommended Nerd Font. <code>A</code>/<code>E</code>/<code>D</code> manage custom names. <code>R</code> rescans.</p>
-          </article>
-        </div>
-        <div class="code-grid">
-          <article>
-            <h3>Windows install</h3>
-            <pre><code>winget install DEVCOM.CascadiaCodeNerdFont
-winget install DEVCOM.JetBrainsMonoNerdFont
-winget install DEVCOM.FiraCodeNerdFont
-winget install DEVCOM.HackNerdFont</code></pre>
-          </article>
-          <article>
-            <h3>macOS install</h3>
-            <pre><code>brew install --cask font-caskaydia-cove-nerd-font
-brew install --cask font-jetbrains-mono-nerd-font
-brew install --cask font-fira-code-nerd-font</code></pre>
-          </article>
-          <article>
-            <h3>Linux install</h3>
-            <pre><code>mkdir -p ~/.local/share/fonts
-# extract Nerd Font .ttf files there
-fc-cache -fv</code></pre>
-          </article>
-        </div>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Task</th>
-                <th>Steps</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>Fix missing font warning</td>
-                <td>Open <code>termix</code>, go to <strong>Fonts</strong>, choose an installed fallback such as <code>Cascadia Code</code> or <code>Consolas</code>, press <code>Enter</code>, then press <code>W</code> to write it to Windows Terminal.</td>
-              </tr>
-              <tr>
-                <td>Install Nerd Font</td>
-                <td>Highlight a missing recommended Nerd Font, press <code>I</code>, confirm with <code>Y</code>, then press <code>R</code> to rescan.</td>
-              </tr>
-              <tr>
-                <td>Add custom font</td>
-                <td>Press <code>A</code>, type the exact font family name, press <code>Enter</code>. Use <code>E</code> to edit and <code>D</code> to remove custom fonts.</td>
-              </tr>
-              <tr>
-                <td>Manual Windows Terminal setup</td>
-                <td>Open Windows Terminal settings and set the profile font face to an installed font, for example <code>Cascadia Code</code>, <code>JetBrainsMono Nerd Font</code>, or <code>Consolas</code>.</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </section>
-
-      <section class="section">
-        <div class="section-heading">
-          <p class="eyebrow">Keyboard</p>
-          <h2>Windows Terminal F1 popup</h2>
-        </div>
-        <p>
-          Termix does not depend on the Windows Terminal <code>F1</code> help shortcut.
-          If Windows Terminal still opens its Help/About popup before Termix receives
-          keyboard input, unbind <code>F1</code> in Windows Terminal <code>settings.json</code>:
-        </p>
-        <pre><code>{
-  "command": "unbound",
-  "keys": "f1"
-}</code></pre>
-      </section>
-
-      <section class="section">
-        <div class="section-heading">
-          <p class="eyebrow">Troubleshooting</p>
-          <h2>Common fixes</h2>
-        </div>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Problem</th>
-                <th>Fix</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>CONFIG NOT FOUND</td>
-                <td>Run <code>termix repair</code>, then apply a theme with <code>termix themes apply catppuccin_mocha --profile "PowerShell 7"</code>.</td>
-              </tr>
-              <tr>
-                <td>Theme cache empty</td>
-                <td>Run <code>termix themes update</code> or <code>termix cache rebuild</code>. Cache rebuild never deletes downloaded themes.</td>
-              </tr>
-              <tr>
-                <td>Missing CaskaydiaCove Nerd Font</td>
-                <td>Use the Fonts page or run <code>termix fonts apply "Cascadia Code"</code>. Missing Nerd Font is a warning, not a startup failure.</td>
-              </tr>
-              <tr>
-                <td>PowerShell prompt did not change</td>
-                <td>Run <code>termix profile repair "PowerShell 7"</code>, restart the terminal, or reload the PowerShell profile.</td>
-              </tr>
-              <tr>
-                <td>Duplicate profile commands</td>
-                <td>Run <code>termix repair</code>. Termix replaces one managed block instead of appending duplicates.</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </section>
-
-      <section id="contribute" class="section">
-        <div class="section-heading">
-          <p class="eyebrow">Contribute</p>
-          <h2>Open source project</h2>
-        </div>
-        <div class="card-grid">
-          <article class="plain-card">
-            <h3>Report issues</h3>
-            <p>Include your OS, shell, terminal app, Termix version, and the command or TUI screen where the issue happened.</p>
-          </article>
-          <article class="plain-card">
-            <h3>Request updates</h3>
-            <p>Suggest new shells, font providers, theme sources, preview improvements, or setup workflow changes.</p>
-          </article>
-          <article class="plain-card">
-            <h3>Contribute code</h3>
-            <p>Run <code>go test ./...</code> before opening a pull request. Keep changes scoped and easy to review.</p>
-          </article>
-        </div>
-      </section>
-
-      <section id="feedback" class="section feedback founder-section">
-        <div class="founder-card">
-          <div class="founder-avatar-wrap">
-            <img
-              class="founder-avatar"
-              src="https://muyleanging.com/_next/image?url=%2Fmuyleanging.jpg&amp;w=640&amp;q=75"
-              alt="Ing Muyleang, founder of Termix"
-              loading="lazy"
-            />
-          </div>
-          <div class="founder-info">
-            <p class="eyebrow">Founder and contact</p>
-            <h2>Ing Muyleang</h2>
-            <p class="founder-role">Founder &amp; Maintainer of Termix</p>
-            <p>
-              Termix is an open-source project founded and maintained by Ing Muyleang.
-              I build tools that make developer terminals easier to customize, repair,
-              and manage across Windows, macOS, Linux, PowerShell, Git Bash, and WSL.
-            </p>
-            <div class="founder-actions">
-              <a class="button primary" href="https://muyleanging.com" target="_blank" rel="noopener">Visit Website</a>
-              <a class="button" href="mailto:muyleanging@gmail.com?subject=Termix%20Feedback">Send Feedback</a>
-              <a class="button" href="https://github.com/MuyleangIng/Termix-Tui/issues/new?template=bug_report.md" target="_blank" rel="noopener">Report Issue</a>
-              <a class="button" href="https://github.com/MuyleangIng/Termix-Tui/issues/new?template=feature_request.md" target="_blank" rel="noopener">Request Feature</a>
-            </div>
-          </div>
-        </div>
-        <form class="feedback-form" id="feedbackForm">
-          <p class="form-note">
-            GitHub Pages is static, so this form opens your email app with the message filled in.
-            For direct sending, use a small backend or a trusted form service. Never put a Gmail app password in public HTML.
-          </p>
-          <label for="email">Your email</label>
-          <input id="email" name="email" type="email" placeholder="you@example.com" />
-          <label for="subject">Subject</label>
-          <select id="subject" name="subject">
-            <option>Termix Feedback</option>
-            <option>Termix Issue</option>
-            <option>Termix Update Request</option>
-          </select>
-          <label for="message">Message</label>
-          <textarea id="message" name="message" rows="5" placeholder="Write feedback, issue details, or an update request"></textarea>
-          <button type="submit">Send feedback</button>
-          <div class="feedback-actions">
-            <a href="mailto:muyleanging@gmail.com?subject=Termix%20Feedback">Open email</a>
-            <a href="https://github.com/MuyleangIng/Termix-Tui/issues/new?template=bug_report.md">Report issue</a>
-            <a href="https://github.com/MuyleangIng/Termix-Tui/issues/new?template=feature_request.md">Request update</a>
-          </div>
-        </form>
       </section>
     </main>
 
     <footer class="site-footer">
-      <span>Termix v0.1.11</span>
-      <span>Open source project</span>
-      <span>Founder: Ing Muyleang</span>
+      <span>Made by MuyleangIng</span>
+      <span>TERMIX v0.1.11 | Open source terminal workspace</span>
     </footer>
-    <script>
-      const form = document.querySelector("#feedbackForm");
-      form?.addEventListener("submit", (event) => {
-        event.preventDefault();
-        const data = new FormData(form);
-        const subject = String(data.get("subject") || "Termix Feedback");
-        const email = String(data.get("email") || "");
-        const message = String(data.get("message") || "");
-        const body = [
-          "From: " + email,
-          "",
-          "Message:",
-          message,
-          "",
-          "Sent from the Termix GitHub Pages feedback form."
-        ].join("\n");
-        window.location.href =
-          "mailto:muyleanging@gmail.com?subject=" +
-          encodeURIComponent(subject) +
-          "&body=" +
-          encodeURIComponent(body);
-      });
-    </script>
   </body>
 </html>
