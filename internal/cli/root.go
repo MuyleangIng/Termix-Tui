@@ -132,7 +132,7 @@ func runTUI(ctx context.Context) error {
 func setupCommand() *cobra.Command {
 	return &cobra.Command{
 		Use:   "setup",
-		Short: "Run the first-time interactive setup wizard",
+		Short: "Pick a shell profile and apply the default Termix setup",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			rt, err := runtime(cmd.Context())
 			if err != nil {

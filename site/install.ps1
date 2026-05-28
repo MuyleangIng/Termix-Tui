@@ -5,9 +5,9 @@
 param(
     [string]$Version = "latest",
     [string]$InstallDir = "$env:LOCALAPPDATA\Programs\Termix",
-    [switch]$NoSetup,
     [switch]$NoPath,
-    [switch]$NoBuildFallback
+    [switch]$NoBuildFallback,
+    [switch]$NoBootstrap
 )
 
 $ErrorActionPreference = "Stop"
@@ -125,6 +125,29 @@ function Test-TermixBinary {
     catch {
         $script:TermixVerifyError = $_.Exception.Message
         return $false
+    }
+}
+
+function Bootstrap-TermixDefaults {
+    param([string]$Path)
+
+    if ($NoBootstrap) {
+        Write-TermixInfo "Skipped dependency/theme bootstrap."
+        return
+    }
+
+    Write-TermixInfo "Installing default tools, Nerd Font, and official themes..."
+    try {
+        & $Path install
+        if ($LASTEXITCODE -eq 0) {
+            Write-TermixSuccess "Default tools, font, and themes are ready."
+            return
+        }
+        Write-TermixWarn "Bootstrap exited with code $LASTEXITCODE. You can retry later with: termix install"
+    }
+    catch {
+        Write-TermixWarn "Bootstrap did not complete. You can retry later with: termix install"
+        Write-TermixWarn $_
     }
 }
 
@@ -283,20 +306,15 @@ function Install-Termix {
     Copy-Item $targetExe $targetTuiExe -Force
     Clear-DownloadMark -Path $targetTuiExe
     Write-TermixSuccess "Installed TUI launcher to $targetTuiExe"
+    Bootstrap-TermixDefaults -Path $targetExe
     Write-TermixSuccess "Termix installed successfully."
-
-    if (-not $NoSetup) {
-        $answer = Read-Host "Run termix setup now? [Y/n]"
-        if ($answer -eq "" -or $answer.ToLower() -eq "y" -or $answer.ToLower() -eq "yes") {
-            & $targetExe setup
-        } else {
-            Write-TermixInfo "You can run setup later with: termix setup"
-        }
-    }
 
     Write-Host ""
     Write-TermixSuccess "Done."
-    Write-Host "Open a new terminal if 'termix' or 'termix-tui' is not found immediately."
+    Write-Host "Next steps:"
+    Write-Host "  1. Open a new terminal."
+    Write-Host "  2. Run: termix setup"
+    Write-Host "  3. Open the dashboard with: termix-tui"
 }
 
 try {

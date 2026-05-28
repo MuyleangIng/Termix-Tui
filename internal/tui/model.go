@@ -697,6 +697,12 @@ func (m *Model) syncThemeIndex() {
 func (m Model) activate() (Model, tea.Cmd) {
 	if m.setup {
 		m.captureSetupSelection()
+		if m.screen == screenSetupShell {
+			m.setup = false
+			m.screen = screenDashboard
+			m.busy = "applying setup"
+			return m, setupApplyCmd(m.rt, m.setupShell, m.setupFont, m.setupTheme)
+		}
 		if m.screen < screenSetupApply {
 			m.screen++
 			m.contentIndex = 0
@@ -1120,10 +1126,9 @@ func appendFile(path, data string) error {
 
 func setupApplyCmd(rt *app.Runtime, shellName, fontName, themeName string) tea.Cmd {
 	return func() tea.Msg {
-		if err := themepkg.EnsureStarterThemes(rt.Config); err != nil {
+		if err := themepkg.EnsureAvailable(context.Background(), rt.Config); err != nil {
 			return actionMsg{label: "setup", err: err}
 		}
-		_ = installer.New(rt).Install(context.Background(), "fonts")
 		if err := profile.ApplyWindowsTerminalFont(userHome(), fontName); err != nil {
 			return actionMsg{label: "setup", err: err}
 		}
@@ -1779,7 +1784,12 @@ func (m Model) setupView() string {
 	switch m.screen {
 	case screenSetupShell:
 		target := m.currentSetupProfileTarget()
-		detail := "Status: " + setupProfileState(target) + "\nTarget: " + target.Detail + "\n\nThis profile will receive the prompt style."
+		detail := "Status: " + setupProfileState(target) +
+			"\nTarget: " + target.Detail +
+			"\n\nQuick setup uses:" +
+			"\nFont: " + m.setupFont +
+			"\nTheme: " + m.setupTheme +
+			"\n\nEnter applies now. Edit fonts/themes later in the TUI."
 		body = m.setupCard("CHOOSE PROFILE", setupList(setupProfileRows(m.rt), m.contentIndex), detail)
 	case screenSetupFont:
 		font := selectedText(fonts, m.contentIndex)
@@ -1807,12 +1817,12 @@ func (m Model) setupView() string {
 func (m Model) setupCard(name, list, detail string) string {
 	available := max(34, m.width-6)
 	if available < 82 {
-		body := sectionTitle(name) + "\n" + list + "\n\n" + sectionTitle("PREVIEW") + "\n" + detail + "\n\n[ Back ]  [ Apply ]  [ Next ]"
+		body := sectionTitle(name) + "\n" + list + "\n\n" + sectionTitle("PREVIEW") + "\n" + detail + "\n\n[ Back ]  [ Apply ]"
 		return cardHot.Width(available).Render(fitBlock(body, available-4, max(8, m.height-6)))
 	}
 	left := cardHot.Width(30).Render(fitBlock(sectionTitle(name)+"\n"+list, 26, 8))
 	rightW := min(46, available-33)
-	right := card.Width(rightW).Render(fitBlock(sectionTitle("PREVIEW")+"\n"+detail+"\n\n[ Back ]        [ Apply ]        [ Next ]", max(16, rightW-4), 10))
+	right := card.Width(rightW).Render(fitBlock(sectionTitle("PREVIEW")+"\n"+detail+"\n\n[ Back ]        [ Apply ]", max(16, rightW-4), 10))
 	return fitScreen(lipgloss.JoinHorizontal(lipgloss.Top, left, " ", right), available, max(10, m.height-6))
 }
 

@@ -8,7 +8,6 @@ REPO_OWNER="MuyleangIng"
 REPO_NAME="Termix-Tui"
 VERSION="${TERMIX_VERSION:-latest}"
 INSTALL_DIR="${TERMIX_INSTALL_DIR:-$HOME/.local/bin}"
-NO_SETUP="${TERMIX_NO_SETUP:-0}"
 
 info() {
   printf '\033[36m[TERMIX]\033[0m %s\n' "$1"
@@ -178,18 +177,12 @@ install_termix() {
 
   success "Termix installed successfully."
 
-  if [ "$NO_SETUP" != "1" ]; then
-    printf "Run termix setup now? [Y/n] "
-    read -r answer
-    case "$answer" in
-      ""|y|Y|yes|YES)
-        "$INSTALL_DIR/termix" setup
-        ;;
-      *)
-        info "You can run setup later with: termix setup"
-        ;;
-    esac
-  fi
+  echo ""
+  success "Done."
+  info "Next steps:"
+  echo "  1. Open a new terminal."
+  echo "  2. Run: termix setup"
+  echo "  3. Open the dashboard with: termix-tui"
 }
 
 install_termix

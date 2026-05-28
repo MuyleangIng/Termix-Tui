@@ -6,7 +6,13 @@ Run:
 termix setup
 ```
 
-Setup detects the terminal, shell profile, Oh My Posh, official themes, fonts, and Termix config.
+Setup asks for the target shell profile, verifies official themes are available, applies the default Termix font/theme, and writes the managed shell profile block.
+
+Use the full dashboard for later changes:
+
+```bash
+termix-tui
+```
 
 For a broken install:
 

@@ -122,7 +122,10 @@
           <p>
             Normal users do not need to clone the repository or install Go.
             Use the installer script from GitHub Pages. The script downloads
-            the latest Termix binary from GitHub Releases.
+            the latest Termix binary from GitHub Releases. On Windows, it also
+            bootstraps the default tools, CascadiaCode Nerd Font, and official
+            Oh My Posh themes. Open a new terminal before running setup so the
+            interactive picker receives arrow keys correctly.
           </p>
         </div>
         <div class="code-grid">
@@ -193,7 +196,7 @@ go build -o bin/termix .
             <h3>First-time setup</h3>
             <pre><code>termix setup
 termix-tui</code></pre>
-            <p>Detects terminal, shell profile, Oh My Posh, official themes, fonts, and setup status.</p>
+            <p>Picks the target shell profile, verifies official themes, and applies the default Termix font/theme.</p>
           </article>
           <article class="plain-card">
             <h3>Clean reinstall</h3>

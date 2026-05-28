@@ -3,7 +3,9 @@ package installer
 import (
 	"context"
 	"fmt"
+	"os"
 	"os/exec"
+	"path/filepath"
 	"runtime"
 
 	"github.com/muyleanging/termix/internal/app"
@@ -48,11 +50,24 @@ func (e Engine) plan(component string) []func(context.Context) error {
 
 	requireTool := func(name string, install func(context.Context) error) func(context.Context) error {
 		return func(ctx context.Context) error {
-			if _, err := exec.LookPath(name); err == nil {
+			if _, err := resolveToolPath(name); err == nil {
 				return nil
 			}
 			return install(ctx)
 		}
+	}
+
+	installCascadiaCode := func(ctx context.Context) error {
+		omp, err := resolveToolPath("oh-my-posh")
+		if err != nil {
+			return fmt.Errorf("oh-my-posh was installed but is not available in PATH yet; open a new terminal or run termix install again: %w", err)
+		}
+		cmd := exec.CommandContext(ctx, omp, "font", "install", "CascadiaCode", "--headless", "--plain")
+		output, err := cmd.CombinedOutput()
+		if err != nil {
+			return fmt.Errorf("oh-my-posh font install CascadiaCode failed: %w\n%s", err, string(output))
+		}
+		return nil
 	}
 
 	switch component {
@@ -61,14 +76,7 @@ func (e Engine) plan(component string) []func(context.Context) error {
 	case "font", "fonts", "nerd-font", "nerd-fonts":
 		return []func(context.Context) error{
 			requireTool("oh-my-posh", winget("JanDeDobbeleer.OhMyPosh")),
-			func(ctx context.Context) error {
-				cmd := exec.CommandContext(ctx, "oh-my-posh", "font", "install", "CascadiaCode", "--headless", "--plain")
-				output, err := cmd.CombinedOutput()
-				if err != nil {
-					return fmt.Errorf("oh-my-posh font install CascadiaCode failed: %w\n%s", err, string(output))
-				}
-				return nil
-			},
+			installCascadiaCode,
 		}
 	case "font:CaskaydiaCove Nerd Font", "font:CascadiaCode Nerd Font", "font:Cascadia Code Nerd Font":
 		return []func(context.Context) error{winget("DEVCOM.CascadiaCodeNerdFont")}
@@ -104,18 +112,40 @@ func (e Engine) plan(component string) []func(context.Context) error {
 			requireTool("pwsh", winget("Microsoft.PowerShell")),
 			requireTool("wt", winget("Microsoft.WindowsTerminal")),
 			requireTool("git", winget("Git.Git")),
-			func(ctx context.Context) error {
-				cmd := exec.CommandContext(ctx, "oh-my-posh", "font", "install", "CascadiaCode", "--headless", "--plain")
-				output, err := cmd.CombinedOutput()
-				if err != nil {
-					return fmt.Errorf("oh-my-posh font install CascadiaCode failed: %w\n%s", err, string(output))
-				}
-				return nil
-			},
+			installCascadiaCode,
 			func(ctx context.Context) error {
 				_, err := theme.InstallOfficialThemes(ctx, e.rt.Config)
 				return err
 			},
 		}
 	}
+}
+
+func resolveToolPath(name string) (string, error) {
+	if path, err := exec.LookPath(name); err == nil {
+		return path, nil
+	}
+	if runtime.GOOS != "windows" {
+		return "", fmt.Errorf("%s not found", name)
+	}
+	exe := name
+	if filepath.Ext(exe) == "" {
+		exe += ".exe"
+	}
+	candidates := []string{
+		filepath.Join(os.Getenv("LOCALAPPDATA"), "Microsoft", "WindowsApps", exe),
+		filepath.Join(os.Getenv("LOCALAPPDATA"), "Programs", name, exe),
+		filepath.Join(os.Getenv("LOCALAPPDATA"), "Programs", name, "bin", exe),
+		filepath.Join(os.Getenv("ProgramFiles"), name, exe),
+		filepath.Join(os.Getenv("ProgramFiles"), name, "bin", exe),
+	}
+	for _, candidate := range candidates {
+		if candidate == "" || !filepath.IsAbs(candidate) {
+			continue
+		}
+		if info, err := os.Stat(candidate); err == nil && !info.IsDir() {
+			return candidate, nil
+		}
+	}
+	return "", fmt.Errorf("%s not found", name)
 }

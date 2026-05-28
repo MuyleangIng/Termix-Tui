@@ -19,7 +19,8 @@ Open `docs/index.html` in a browser. No build step is required.
 
 ## Public Install URLs
 
-GitHub Pages hosts only the website and installer scripts. The scripts download real binaries from GitHub Releases.
+GitHub Pages hosts only the website and installer scripts. The scripts download real binaries from GitHub Releases. On Windows, the installer also bootstraps the default tools, CascadiaCode Nerd Font, and official Oh My Posh themes.
+After installing, open a new terminal before running `termix setup`; setup is not launched from inside the installer so arrow-key selection works correctly.
 
 ```powershell
 irm https://muyleanging.github.io/Termix-Tui/install.ps1 | iex

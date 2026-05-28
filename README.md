@@ -14,7 +14,7 @@ https://muyleanging.github.io/Termix-Tui/
 
 ## Quick Install
 
-Normal users do not need Go, `git clone`, or `go install`. Use the GitHub Pages installer. It downloads the latest binary from GitHub Releases.
+Normal users do not need Go, `git clone`, or `go install`. Use the GitHub Pages installer. It downloads the latest binary from GitHub Releases. On Windows, the installer also bootstraps the default Termix tools, CascadiaCode Nerd Font, and official Oh My Posh themes. After installing, open a new terminal and run `termix setup` so the interactive picker receives arrow keys correctly.
 
 ### Windows
 
@@ -62,7 +62,7 @@ go build -o bin\termix.exe .
 
 - Cobra CLI command: `termix`
 - Bubble Tea and Lip Gloss TUI with keyboard, mouse, resize-aware layouts, panels, status indicators, and Nerd Font glyphs
-- First-time setup wizard for shell, font, and theme selection
+- Quick first-time setup that picks the target shell profile and applies the default font/theme
 - Environment detection for Windows Terminal, PowerShell 7, Git Bash, WSL, Oh My Posh, ANSI, Unicode, and profile hints
 - Real Oh My Posh preview engine using `oh-my-posh print primary --config "<theme>.omp.json"`
 - Theme scanner for `.omp.json` files, metadata extraction, favorites, categories, cache rebuild, and official theme import
@@ -76,7 +76,7 @@ go build -o bin\termix.exe .
 termix                                      Show CLI help and commands
 termix tui                                  Launch the main dashboard
 termix-tui                                  Launch the main dashboard from installer alias
-termix setup                                Run the first-time setup wizard
+termix setup                                Pick a profile and apply the default setup
 termix doctor                               Run diagnostics
 termix repair --dry-run                     Preview repair actions
 termix repair                               Repair cache, config, theme path, and profile integration
