@@ -19,9 +19,7 @@ warn() {
   printf '\033[33m[WARN]\033[0m %s\n' "$1"
 }
 
-warn "This removes the Termix executable."
-warn "To remove shell profile integration safely, run this before deleting Termix:"
-echo "  termix uninstall"
+warn "This removes Termix, Termix profile blocks, Termix data, and Termix-installed dependencies."
 echo ""
 
 printf "Continue uninstalling Termix executable? [y/N] "
@@ -35,6 +33,15 @@ case "$answer" in
     exit 0
     ;;
 esac
+
+if command -v termix >/dev/null 2>&1; then
+  info "Running Termix full uninstall first..."
+  if termix uninstall; then
+    success "Termix full uninstall completed."
+  else
+    warn "Termix full uninstall failed. Continuing fallback cleanup."
+  fi
+fi
 
 if [ -f "$INSTALL_DIR/termix" ]; then
   rm -f "$INSTALL_DIR/termix"

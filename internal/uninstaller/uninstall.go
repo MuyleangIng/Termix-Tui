@@ -19,6 +19,7 @@ type Manager struct {
 }
 
 var scheduleSelfRemoval = scheduleExecutableRemoval
+var uninstallExternalDeps = uninstallExternalDependencies
 
 func New(rt *app.Runtime) Manager { return Manager{rt: rt} }
 
@@ -33,9 +34,11 @@ func (m Manager) Uninstall(ctx context.Context, component string) error {
 		return theme.ClearCache(m.rt.Config)
 	case "themes", "downloaded-themes":
 		return os.RemoveAll(filepath.Join(m.rt.Config.HomeDir, "themes"))
-	case "profile", "integration", "prompt", "oh-my-posh":
+	case "profile", "integration", "prompt":
 		home, _ := os.UserHomeDir()
 		return profile.RemoveAllPrompts(home)
+	case "dependency", "dependencies", "deps", "tools", "oh-my-posh":
+		return uninstallExternalDeps(ctx)
 	case "config":
 		return backupAndRemove(filepath.Join(m.rt.Config.HomeDir, "config.yaml"))
 	case "app", "binary", "exe", "executable", "self":
@@ -48,10 +51,40 @@ func (m Manager) Uninstall(ctx context.Context, component string) error {
 		if err := os.RemoveAll(m.rt.Config.HomeDir); err != nil {
 			return err
 		}
+		if err := uninstallExternalDeps(ctx); err != nil {
+			return err
+		}
 		return scheduleSelfRemoval()
 	default:
 		return fmt.Errorf("unknown uninstall component %q", component)
 	}
+}
+
+func uninstallExternalDependencies(ctx context.Context) error {
+	if runtime.GOOS != "windows" {
+		return nil
+	}
+	if _, err := exec.LookPath("winget"); err != nil {
+		return nil
+	}
+	targets := []string{
+		"JanDeDobbeleer.OhMyPosh",
+		"DEVCOM.CascadiaCodeNerdFont",
+	}
+	var failures []string
+	for _, id := range targets {
+		cmd := exec.CommandContext(ctx, "winget", "uninstall", "--id", id, "--silent", "--accept-source-agreements")
+		output, err := cmd.CombinedOutput()
+		text := strings.ToLower(string(output))
+		if err == nil || strings.Contains(text, "no installed package found") || strings.Contains(text, "no package found") {
+			continue
+		}
+		failures = append(failures, fmt.Sprintf("%s: %v\n%s", id, err, string(output)))
+	}
+	if len(failures) > 0 {
+		return fmt.Errorf("uninstall external dependencies: %s", strings.Join(failures, "\n"))
+	}
+	return nil
 }
 
 func backupAndRemove(path string) error {

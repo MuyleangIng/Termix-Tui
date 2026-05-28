@@ -44,15 +44,24 @@ function Remove-FromUserPath {
     Write-TermixSuccess "Removed Termix from User PATH."
 }
 
-Write-TermixWarn "This removes the Termix executable."
-Write-TermixWarn "To remove shell profile integration safely, run this before deleting Termix:"
-Write-Host "  termix uninstall"
+Write-TermixWarn "This removes Termix, Termix profile blocks, Termix data, and Termix-installed dependencies."
 Write-Host ""
 
 $answer = Read-Host "Continue uninstalling Termix executable? [y/N]"
 if ($answer.ToLower() -ne "y" -and $answer.ToLower() -ne "yes") {
     Write-TermixInfo "Cancelled."
     exit 0
+}
+
+$termixCmd = Get-Command termix -ErrorAction SilentlyContinue
+if ($termixCmd) {
+    Write-TermixInfo "Running Termix full uninstall first..."
+    & $termixCmd.Source uninstall
+    if ($LASTEXITCODE -eq 0) {
+        Write-TermixSuccess "Termix full uninstall completed."
+    } else {
+        Write-TermixWarn "Termix full uninstall exited with code $LASTEXITCODE. Continuing fallback cleanup."
+    }
 }
 
 if (Test-Path $InstallDir) {
@@ -67,6 +76,7 @@ if (-not $KeepPath) {
 }
 
 $dataDir = Join-Path $env:LOCALAPPDATA "Termix"
+$termixHome = Join-Path $env:USERPROFILE ".termix"
 
 if ($CleanData) {
     if (Test-Path $dataDir) {
@@ -76,8 +86,13 @@ if ($CleanData) {
             Write-TermixSuccess "Removed Termix data folder."
         }
     }
+    if (Test-Path $termixHome) {
+        Remove-Item $termixHome -Recurse -Force
+        Write-TermixSuccess "Removed Termix home folder: $termixHome"
+    }
 } else {
     Write-TermixInfo "Termix data folder was kept: $dataDir"
+    Write-TermixInfo "Termix home folder was kept: $termixHome"
     Write-TermixInfo "Run with -CleanData if you want to remove config/cache/themes."
 }
 
