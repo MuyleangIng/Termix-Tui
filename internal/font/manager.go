@@ -91,6 +91,14 @@ func ResolveAvailableFamily(home, name string) string {
 }
 
 func Detect(home string) []Font {
+	return detect(home, true)
+}
+
+func DetectQuick(home string) []Font {
+	return detect(home, false)
+}
+
+func detect(home string, includeSystemCommands bool) []Font {
 	fontDirs := []string{
 		filepath.Join(os.Getenv("WINDIR"), "Fonts"),
 		filepath.Join(home, "AppData", "Local", "Microsoft", "Windows", "Fonts"),
@@ -103,7 +111,10 @@ func Detect(home string) []Font {
 	}
 	items := make([]Font, len(Supported))
 	copy(items, Supported)
-	systemFonts := installedFontNames()
+	systemFonts := ""
+	if includeSystemCommands {
+		systemFonts = installedFontNames()
+	}
 	for i := range items {
 		if matchesInstalledName(systemFonts, items[i].Name, items[i].Family) {
 			items[i].Installed = true

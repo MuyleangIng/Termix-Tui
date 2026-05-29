@@ -137,7 +137,7 @@ termix themes apply <theme> --profile <p>   Apply a theme to a profile
 termix fonts list                           Show recommended font status
 termix fonts install <font> --yes           Install a supported Nerd Font
 termix fonts apply <font>                    Save/apply a font to supported terminal settings
-termix uninstall                            Fully remove Termix profiles, data, themes, and executable
+termix uninstall                            Confirm, then fully remove Termix profiles, data, themes, tools, and executable
 termix uninstall profile                    Remove only Termix shell profile blocks
 
 ```

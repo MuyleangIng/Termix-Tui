@@ -87,7 +87,7 @@ Important behavior:
 
 - `termix cache clear` removes cache metadata only.
 - `termix` shows CLI help; use `termix tui` or the installer alias `termix-tui` for the full-screen dashboard.
-- `termix uninstall` is a full uninstall: profile blocks, config, cache, downloaded themes, and executable.
+- `termix uninstall` asks for confirmation, then performs a full uninstall: profile blocks, config, cache, downloaded themes, external tools, and executable.
 - Downloaded themes are removed only with `termix uninstall downloaded-themes` when you are doing a partial uninstall.
 - Profile repair replaces the managed Termix block instead of appending duplicates.
 - Missing Nerd Fonts are warnings; Termix resolves an installed fallback font.

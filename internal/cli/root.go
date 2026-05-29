@@ -258,7 +258,8 @@ func updateCommand() *cobra.Command {
 }
 
 func uninstallCommand() *cobra.Command {
-	return &cobra.Command{
+	var yes bool
+	cmd := &cobra.Command{
 		Use:   "uninstall [component]",
 		Short: "Remove Termix profiles, dependencies, data, themes, and executable",
 		Long: `Remove Termix-managed profiles, config, cache, downloaded themes, external dependencies, and the executable.
@@ -281,6 +282,16 @@ To remove only one part:
 			} else {
 				component = args[0]
 			}
+			if !yes {
+				fmt.Fprintf(os.Stdout, "This will uninstall Termix component %q. Continue? [y/N] ", component)
+				var answer string
+				if _, err := fmt.Fscanln(os.Stdin, &answer); err != nil {
+					return fmt.Errorf("uninstall cancelled")
+				}
+				if !strings.EqualFold(answer, "y") && !strings.EqualFold(answer, "yes") {
+					return fmt.Errorf("uninstall cancelled")
+				}
+			}
 			rt, err := runtime(cmd.Context())
 			if err != nil {
 				return err
@@ -296,6 +307,8 @@ To remove only one part:
 			return nil
 		},
 	}
+	cmd.Flags().BoolVar(&yes, "yes", false, "confirm uninstall without prompting")
+	return cmd
 }
 
 func themesCommand() *cobra.Command {

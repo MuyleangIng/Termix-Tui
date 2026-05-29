@@ -40,6 +40,10 @@ func (m Manager) Scan(ctx context.Context) ([]Theme, error) {
 	return m.scan(ctx)
 }
 
+func (m Manager) ScanInstalled(ctx context.Context) ([]Theme, error) {
+	return m.scan(ctx)
+}
+
 func (m Manager) scan(ctx context.Context) ([]Theme, error) {
 	favorites := map[string]bool{}
 	for _, f := range m.cfg.FavoriteThemes {
@@ -111,6 +115,18 @@ func RebuildCache(ctx context.Context, cfg config.Config) ([]Theme, error) {
 		return nil, err
 	}
 	return Manager{cfg: cfg}.scan(ctx)
+}
+
+func ReadCache(cfg config.Config) ([]Theme, error) {
+	data, err := os.ReadFile(filepath.Join(cfg.HomeDir, "cache", "themes.json"))
+	if err != nil {
+		return nil, err
+	}
+	var themes []Theme
+	if err := json.Unmarshal(data, &themes); err != nil {
+		return nil, err
+	}
+	return themes, nil
 }
 
 func ClearCache(cfg config.Config) error {

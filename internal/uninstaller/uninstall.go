@@ -61,9 +61,19 @@ func (m Manager) Uninstall(ctx context.Context, component string) error {
 }
 
 func uninstallExternalDependencies(ctx context.Context) error {
-	if runtime.GOOS != "windows" {
+	switch runtime.GOOS {
+	case "windows":
+		return uninstallWindowsDependencies(ctx)
+	case "darwin":
+		return uninstallMacDependencies(ctx)
+	case "linux":
+		return uninstallLinuxDependencies()
+	default:
 		return nil
 	}
+}
+
+func uninstallWindowsDependencies(ctx context.Context) error {
 	if _, err := exec.LookPath("winget"); err != nil {
 		return nil
 	}
@@ -85,6 +95,56 @@ func uninstallExternalDependencies(ctx context.Context) error {
 		return fmt.Errorf("uninstall external dependencies: %s", strings.Join(failures, "\n"))
 	}
 	return nil
+}
+
+func uninstallMacDependencies(ctx context.Context) error {
+	brew := findExecutable("brew", "/opt/homebrew/bin/brew", "/usr/local/bin/brew")
+	if brew == "" {
+		return nil
+	}
+	targets := [][]string{
+		{"uninstall", "oh-my-posh"},
+		{"uninstall", "jandedobbeleer/oh-my-posh/oh-my-posh"},
+	}
+	var failures []string
+	for _, args := range targets {
+		cmd := exec.CommandContext(ctx, brew, args...)
+		output, err := cmd.CombinedOutput()
+		text := strings.ToLower(string(output))
+		if err == nil || strings.Contains(text, "no such keg") || strings.Contains(text, "not installed") {
+			continue
+		}
+		failures = append(failures, fmt.Sprintf("%s %s: %v\n%s", brew, strings.Join(args, " "), err, string(output)))
+	}
+	if len(failures) > 0 {
+		return fmt.Errorf("uninstall macOS dependencies: %s", strings.Join(failures, "\n"))
+	}
+	return nil
+}
+
+func uninstallLinuxDependencies() error {
+	home, _ := os.UserHomeDir()
+	for _, path := range []string{
+		filepath.Join(home, ".local", "bin", "oh-my-posh"),
+		filepath.Join(home, "bin", "oh-my-posh"),
+	} {
+		if err := os.Remove(path); err != nil && !os.IsNotExist(err) {
+			return err
+		}
+	}
+	return nil
+}
+
+func findExecutable(name string, fallbacks ...string) string {
+	if path, err := exec.LookPath(name); err == nil {
+		return path
+	}
+	for _, path := range fallbacks {
+		if _, err := os.Stat(path); err == nil {
+			return path
+		}
+	}
+	return ""
 }
 
 func backupAndRemove(path string) error {

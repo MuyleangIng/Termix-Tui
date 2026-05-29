@@ -56,7 +56,7 @@ if ($answer.ToLower() -ne "y" -and $answer.ToLower() -ne "yes") {
 $termixCmd = Get-Command termix -ErrorAction SilentlyContinue
 if ($termixCmd) {
     Write-TermixInfo "Running Termix full uninstall first..."
-    & $termixCmd.Source uninstall
+    & $termixCmd.Source uninstall --yes
     if ($LASTEXITCODE -eq 0) {
         Write-TermixSuccess "Termix full uninstall completed."
     } else {

@@ -158,6 +158,7 @@ type pendingAction struct {
 	kind    string
 	label   string
 	profile string
+	remove  string
 	font    string
 	theme   themepkg.Theme
 }
@@ -180,10 +181,10 @@ func base(rt *app.Runtime, setup bool) Model {
 	spin.Spinner = spinner.MiniDot
 	spin.Style = lipgloss.NewStyle().Foreground(cyan)
 	bar := progress.New(progress.WithDefaultGradient())
-	fontItems := fontpkg.Detect(userHome())
+	fontItems := fontpkg.DetectQuick(userHome())
 	initialLogs := []string{
 		"SUCCESS terminal scan complete",
-		"SUCCESS theme cache ready",
+		"INFO theme cache loading in background",
 		"INFO profile watcher idle",
 	}
 	resolvedFont := fontpkg.ResolveAvailableFamily(userHome(), rt.Config.DefaultFont)
@@ -271,6 +272,12 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 	case actionMsg:
 		m.busy = ""
+		if strings.HasPrefix(msg.label, "confirm remove ") {
+			item := strings.TrimPrefix(msg.label, "confirm remove ")
+			m.pending = pendingAction{kind: "remove", label: "remove " + item, remove: item}
+			m.confirm = true
+			return m, tea.Batch(cmds...)
+		}
 		if m.setup && strings.HasPrefix(msg.label, "setup") {
 			if msg.err != nil {
 				m.setupNotice = "ERROR " + msg.err.Error()
@@ -399,7 +406,7 @@ func (m Model) handleKey(msg tea.KeyMsg) (Model, bool, tea.Cmd) {
 	case "w":
 		if m.screen == screenFonts {
 			fontName := selectedText(fonts, m.contentIndex)
-			m.busy = "applying font to Windows Terminal"
+			m.busy = "applying font to terminal settings"
 			return m, false, applyWindowsTerminalFontCmd(m.rt, fontName)
 		}
 	case "d":
@@ -582,9 +589,15 @@ func (m Model) handleFontInputKey(msg tea.KeyMsg) (Model, bool, tea.Cmd) {
 func (m Model) handleConfirmKey(msg tea.KeyMsg) (Model, bool, tea.Cmd) {
 	switch strings.ToLower(msg.String()) {
 	case "up", "k":
+		if m.pending.kind == "remove" {
+			return m, false, nil
+		}
 		m.moveConfirmSelection(-1)
 		return m, false, nil
 	case "down", "j":
+		if m.pending.kind == "remove" {
+			return m, false, nil
+		}
 		m.moveConfirmSelection(1)
 		return m, false, nil
 	case "y", "enter":
@@ -608,6 +621,9 @@ func (m Model) handleConfirmKey(msg tea.KeyMsg) (Model, bool, tea.Cmd) {
 }
 
 func (m *Model) moveConfirmSelection(delta int) {
+	if m.pending.kind == "remove" {
+		return
+	}
 	targets := profileTargets(m.rt)
 	if len(targets) == 0 {
 		m.confirmIndex = 0
@@ -1032,8 +1048,7 @@ func (m Model) actionCmd(item string) tea.Cmd {
 		}
 	case screenUninstall:
 		return func() tea.Msg {
-			err := runRemoveAction(m.rt, item)
-			return actionMsg{label: "removed " + item, err: err}
+			return actionMsg{label: "confirm remove " + item, err: nil}
 		}
 	case screenSettings:
 		return func() tea.Msg {
@@ -1077,6 +1092,9 @@ func (m Model) pendingActionCmd(pending pendingAction) tea.Cmd {
 				m.rt.Config.DefaultFont = pending.font
 			}
 			return actionMsg{label: "installed font " + pending.font, err: err}
+		case "remove":
+			err := runRemoveAction(m.rt, pending.remove)
+			return actionMsg{label: "removed " + pending.remove, err: err}
 		default:
 			return actionMsg{label: pending.label, err: fmt.Errorf("unknown action %q", pending.kind)}
 		}
@@ -1441,7 +1459,13 @@ func expandHome(path string) string {
 
 func loadThemesCmd(rt *app.Runtime) tea.Cmd {
 	return func() tea.Msg {
-		items, err := themepkg.NewManager(rt.Config).Scan(context.Background())
+		if items, err := themepkg.ReadCache(rt.Config); err == nil && len(items) > 0 {
+			return themesMsg{items: items, err: nil}
+		}
+		if err := themepkg.EnsureStarterThemes(rt.Config); err != nil {
+			return themesMsg{err: err}
+		}
+		items, err := themepkg.NewManager(rt.Config).ScanInstalled(context.Background())
 		return themesMsg{items: items, err: err}
 	}
 }
@@ -2143,6 +2167,14 @@ func (m Model) confirmBox(w int) string {
 			"\n\nTermix will run the supported installer for this Nerd Font." +
 			"\nNo install runs until you confirm." +
 			"\n\nY/Enter install  Esc/N cancel"
+		return cardHot.Width(boxW).Render(fitBlock(body, max(24, boxW-4), 11))
+	}
+	if m.pending.kind == "remove" {
+		body := sectionTitle("REMOVE") +
+			"\nTarget: " + m.pending.remove +
+			"\n\nThis deletes Termix-managed files for this target." +
+			"\nNo removal runs until you confirm." +
+			"\n\nY/Enter remove  Esc/N cancel"
 		return cardHot.Width(boxW).Render(fitBlock(body, max(24, boxW-4), 11))
 	}
 	body := sectionTitle("APPLY THEME") +

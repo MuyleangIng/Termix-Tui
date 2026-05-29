@@ -36,7 +36,7 @@ esac
 
 if command -v termix >/dev/null 2>&1; then
   info "Running Termix full uninstall first..."
-  if termix uninstall; then
+  if termix uninstall --yes; then
     success "Termix full uninstall completed."
   else
     warn "Termix full uninstall failed. Continuing fallback cleanup."

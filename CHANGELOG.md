@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.2.8
+
+- Made TUI startup faster by avoiding network theme installation and full macOS font probing during launch.
+- Added local starter themes when no theme cache exists, so `termix-tui` opens immediately after install.
+- Added uninstall confirmation in CLI and TUI remove actions.
+- Made full uninstall remove Homebrew Oh My Posh on macOS and local Oh My Posh binaries on Linux.
+- Updated uninstall scripts to pass `--yes` after their own confirmation prompt.
+
 ## v0.2.7
 
 - Restored the v0.2.5 TUI rendering behavior while keeping the font workflow focused.
