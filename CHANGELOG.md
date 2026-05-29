@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.2.13
+
+- Added installer update confirmation when an existing Termix binary is found.
+- Added unattended update flags: Windows `-Yes`, macOS/Linux `--yes`.
+- Made installer next steps tell users to close and reopen terminals so Meslo profile settings load.
+- Updated website and docs with Meslo-only Oh My Posh font install/apply guidance and terminal-specific font FAQ.
+
 ## v0.2.12
 
 - Removed the stale Cascadia-only preferred-font check from theme previews.

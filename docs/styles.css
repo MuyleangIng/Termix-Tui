@@ -501,6 +501,38 @@ td code,
   color: var(--fg);
 }
 
+/* FAQ */
+.faq-list {
+  display: grid;
+  gap: 12px;
+  margin-top: 22px;
+}
+
+.faq-list details {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--bg);
+  padding: 0 18px;
+}
+
+.faq-list summary {
+  cursor: pointer;
+  padding: 16px 0;
+  color: var(--fg);
+  font-weight: 800;
+}
+
+.faq-list p {
+  color: var(--muted);
+  line-height: 1.65;
+}
+
+.faq-list pre {
+  border-radius: 6px;
+  margin-bottom: 16px;
+  background: var(--soft);
+}
+
 /* Check List */
 .check-list {
   margin: 0;

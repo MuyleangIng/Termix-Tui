@@ -57,12 +57,12 @@ Here is a look at selected configurations from the automated scanner:
 
 ## Quick Install
 
-Normal users do not need Go, `git clone`, or `go install`. Use the GitHub Pages installer. It downloads the latest binary from GitHub Releases and bootstraps Oh My Posh, MesloLGM Nerd Font, and official Oh My Posh themes. After installing, open a new terminal and run `termix setup` so the interactive picker receives arrow keys correctly.
+Normal users do not need Go, `git clone`, or `go install`. Use the GitHub Pages installer. It downloads the latest binary from GitHub Releases, asks before updating an existing install, and bootstraps Oh My Posh, MesloLGM Nerd Font, official Oh My Posh themes, and terminal/VS Code font settings. After installing, close and reopen the terminal, then run `termix setup` so the interactive picker receives arrow keys correctly and the new font profile is loaded.
 
 ### Windows
 
 ```powershell
-irm [https://muyleanging.github.io/Termix-Tui/install.ps1](https://muyleanging.github.io/Termix-Tui/install.ps1) | iex
+& ([scriptblock]::Create((irm https://muyleanging.github.io/Termix-Tui/install.ps1)))
 termix setup
 termix-tui
 
@@ -71,7 +71,7 @@ termix-tui
 ### macOS / Linux
 
 ```bash
-curl -fsSL [https://muyleanging.github.io/Termix-Tui/install.sh](https://muyleanging.github.io/Termix-Tui/install.sh) | bash
+curl -fsSL https://muyleanging.github.io/Termix-Tui/install.sh | bash
 termix setup
 termix-tui
 

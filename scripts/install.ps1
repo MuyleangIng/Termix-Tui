@@ -7,7 +7,8 @@ param(
     [string]$InstallDir = "$env:LOCALAPPDATA\Programs\Termix",
     [switch]$NoPath,
     [switch]$NoBuildFallback,
-    [switch]$NoBootstrap
+    [switch]$NoBootstrap,
+    [switch]$Yes
 )
 
 $ErrorActionPreference = "Stop"
@@ -174,6 +175,25 @@ function Bootstrap-TermixDefaults {
     }
 }
 
+function Confirm-ExistingInstallUpdate {
+    param(
+        [string]$Path,
+        [string]$Tag
+    )
+
+    if ($Yes) {
+        return $true
+    }
+
+    Write-TermixWarn "Termix is already installed at $Path"
+    $answer = Read-Host "Update Termix to $Tag? [Y/n]"
+    if ([string]::IsNullOrWhiteSpace($answer)) {
+        return $true
+    }
+
+    return -not ($answer.Trim().ToLowerInvariant() -in @("n", "no"))
+}
+
 function Build-TermixFromSource {
     param(
         [string]$Tag,
@@ -282,6 +302,11 @@ function Install-Termix {
     $targetTuiExe = Join-Path $InstallDir $TuiExeName
 
     if (Test-Path $targetExe) {
+        if (-not (Confirm-ExistingInstallUpdate -Path $targetExe -Tag $tag)) {
+            Write-TermixInfo "Update cancelled. Existing Termix was not changed."
+            return
+        }
+
         $backupName = "termix.exe.bak-" + (Get-Date -Format "yyyyMMdd-HHmmss")
         $backupPath = Join-Path $InstallDir $backupName
         Copy-Item $targetExe $backupPath -Force
@@ -337,7 +362,7 @@ function Install-Termix {
     Write-Host ""
     Write-TermixSuccess "Done."
     Write-Host "Next steps:"
-    Write-Host "  1. Open a new terminal."
+    Write-Host "  1. Close all Windows Terminal and VS Code terminal tabs, then open a new terminal so the Meslo font setting loads."
     Write-Host "  2. Run: termix setup"
     Write-Host "  3. Open the dashboard with: termix-tui"
 }

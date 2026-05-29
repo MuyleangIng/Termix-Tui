@@ -9,6 +9,7 @@ REPO_NAME="Termix-Tui"
 VERSION="${TERMIX_VERSION:-latest}"
 INSTALL_DIR="${TERMIX_INSTALL_DIR:-$HOME/.local/bin}"
 TEMP_DIR=""
+YES=0
 
 cleanup() {
   if [ -n "${TEMP_DIR:-}" ] && [ -d "$TEMP_DIR" ]; then
@@ -36,7 +37,7 @@ error() {
 
 usage() {
   cat <<EOF
-Usage: install.sh [--version VERSION] [--install-dir DIR]
+Usage: install.sh [--version VERSION] [--install-dir DIR] [--yes]
 
 Environment:
   TERMIX_VERSION      Release tag to install, default: latest
@@ -63,6 +64,10 @@ parse_args() {
         INSTALL_DIR="$2"
         shift 2
         ;;
+      --yes|-y)
+        YES=1
+        shift
+        ;;
       --help|-h)
         usage
         exit 0
@@ -74,6 +79,36 @@ parse_args() {
         ;;
     esac
   done
+}
+
+confirm_existing_install_update() {
+  local path="$1"
+  local version_label="$2"
+  local answer=""
+
+  if [ "$YES" = "1" ]; then
+    return 0
+  fi
+
+  warn "Termix is already installed at $path"
+
+  if [ -r /dev/tty ]; then
+    printf "Update Termix to %s? [Y/n] " "$version_label" > /dev/tty
+    IFS= read -r answer < /dev/tty || answer=""
+  elif [ -t 0 ]; then
+    printf "Update Termix to %s? [Y/n] " "$version_label"
+    IFS= read -r answer || answer=""
+  else
+    warn "No interactive terminal available for update confirmation; continuing. Use --yes to suppress this message."
+    return 0
+  fi
+
+  case "$(printf '%s' "$answer" | tr '[:upper:]' '[:lower:]')" in
+    n|no)
+      info "Update cancelled. Existing Termix was not changed."
+      exit 0
+      ;;
+  esac
 }
 
 detect_os() {
@@ -151,6 +186,20 @@ sys.exit(1)
 PY
 }
 
+extract_release_tag() {
+  local release_file="$1"
+
+  python3 - "$release_file" <<'PY'
+import json
+import sys
+
+with open(sys.argv[1], "r", encoding="utf-8") as handle:
+    data = json.load(handle)
+
+print(data.get("tag_name", "latest"))
+PY
+}
+
 install_termix() {
   need_cmd python3
   need_cmd tar
@@ -171,6 +220,10 @@ install_termix() {
   local release_json="$TEMP_DIR/release.json"
   get_release_json > "$release_json"
 
+  local release_tag
+  release_tag="$(extract_release_tag "$release_json")"
+  info "Selected release: $release_tag"
+
   local asset_url
   asset_url="$(extract_asset_url "$asset_name" "$release_json" || true)"
 
@@ -182,6 +235,13 @@ install_termix() {
   fi
 
   local archive="$TEMP_DIR/$asset_name"
+  local version_label="$release_tag"
+
+  mkdir -p "$INSTALL_DIR"
+
+  if [ -f "$INSTALL_DIR/termix" ]; then
+    confirm_existing_install_update "$INSTALL_DIR/termix" "$version_label"
+  fi
 
   info "Downloading Termix..."
   download_file "$asset_url" "$archive"
@@ -196,8 +256,6 @@ install_termix() {
     error "termix binary was not found in archive."
     exit 1
   fi
-
-  mkdir -p "$INSTALL_DIR"
 
   if [ -f "$INSTALL_DIR/termix" ]; then
     cp "$INSTALL_DIR/termix" "$INSTALL_DIR/termix.bak-$(date +%Y%m%d-%H%M%S)"
@@ -234,7 +292,7 @@ install_termix() {
   echo ""
   success "Done."
   info "Next steps:"
-  echo "  1. Open a new terminal."
+  echo "  1. Close and reopen your terminal so the Meslo font/profile settings load."
   echo "  2. Run: termix setup"
   echo "  3. Open the dashboard with: termix-tui"
 }

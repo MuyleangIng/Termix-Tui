@@ -22,8 +22,7 @@ termix cache rebuild
 This is a warning, not a startup failure. Use:
 
 ```bash
-termix fonts list
-termix fonts install "MesloLGM Nerd Font" --yes
+oh-my-posh font install meslo
 termix fonts apply "MesloLGM Nerd Font"
 ```
 

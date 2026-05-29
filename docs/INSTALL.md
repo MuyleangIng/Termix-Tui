@@ -15,9 +15,21 @@ termix setup
 ```
 
 The GitHub Pages scripts download the latest binary from GitHub Releases.
-The installer also bootstraps Oh My Posh, MesloLGM Nerd Font, and official Oh My Posh themes.
+If Termix is already installed, the installer asks before replacing it. Use `-Yes` on Windows or `--yes` on macOS/Linux for unattended updates.
 
-Open a new terminal after install, then run `termix setup`. The setup screen asks for the target profile and applies the default Termix font/theme automatically.
+The installer also bootstraps Oh My Posh, MesloLGM Nerd Font, official Oh My Posh themes, and terminal/VS Code font settings.
+
+Close and reopen your terminal after install, then run `termix setup`. The setup screen asks for the target profile and applies the default Termix font/theme automatically.
+
+Pinned release examples:
+
+```powershell
+& ([scriptblock]::Create((irm https://muyleanging.github.io/Termix-Tui/install.ps1))) -Version v0.2.13 -Yes
+```
+
+```bash
+curl -fsSL https://muyleanging.github.io/Termix-Tui/install.sh | bash -s -- --version v0.2.13 --yes
+```
 
 Manual downloads are available at:
 

@@ -19,8 +19,8 @@ Open `docs/index.html` in a browser. No build step is required.
 
 ## Public Install URLs
 
-GitHub Pages hosts only the website and installer scripts. The scripts download real binaries from GitHub Releases and bootstrap Oh My Posh, MesloLGM Nerd Font, and official Oh My Posh themes.
-After installing, open a new terminal before running `termix setup`; setup is not launched from inside the installer so arrow-key selection works correctly.
+GitHub Pages hosts only the website and installer scripts. The scripts download real binaries from GitHub Releases, ask before updating an existing install, and bootstrap Oh My Posh, MesloLGM Nerd Font, official Oh My Posh themes, and terminal/VS Code font settings.
+After installing, close and reopen the terminal before running `termix setup`; setup is not launched from inside the installer so arrow-key selection works correctly and the new font profile is loaded.
 
 ```powershell
 irm https://muyleanging.github.io/Termix-Tui/install.ps1 | iex
@@ -44,7 +44,7 @@ curl -fsSL https://muyleanging.github.io/Termix-Tui/install.sh | bash
 
 ## Fonts
 
-Termix recommends `MesloLGM Nerd Font` through Oh My Posh but does not require one to run. Use `termix fonts install "MesloLGM Nerd Font" --yes`, then `termix fonts apply "MesloLGM Nerd Font"` to update supported terminal settings.
+Termix uses `MesloLGM Nerd Font` through Oh My Posh but does not require one to run. Use `oh-my-posh font install meslo`, then `termix fonts apply "MesloLGM Nerd Font"` to update supported terminal settings.
 
 Useful Windows installs:
 

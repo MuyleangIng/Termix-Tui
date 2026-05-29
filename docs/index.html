@@ -107,7 +107,7 @@
         </div>
         <div class="showcase-grid">
           <article class="tui-panel dark-panel">
-            <div class="tui-header"><strong>TERMIX v0.2.8</strong><span>Dark</span></div>
+            <div class="tui-header"><strong>TERMIX v0.2.13</strong><span>Dark</span></div>
             <div class="tui-body">
               <p class="tui-title">Navigation</p>
               <p><span class="cursor">›</span> Themes</p>
@@ -188,19 +188,21 @@
           <p>
             Normal users do not need to clone the repository or install Go.
             Use the installer script from GitHub Pages. The script downloads
-            the latest Termix binary from GitHub Releases. On Windows, it also
-            bootstraps the default tools, a Nerd Font, and official Oh My Posh
-            themes. Open a new terminal before running setup so the
-            interactive picker receives arrow keys correctly.
+            the latest Termix binary from GitHub Releases, asks before replacing
+            an existing install, then bootstraps Oh My Posh, MesloLGM Nerd Font,
+            official Oh My Posh themes, and terminal/VS Code font settings.
+            Close and reopen your terminal after install so the font profile
+            setting is loaded by the terminal app.
           </p>
         </div>
         <div class="code-grid">
           <article>
             <h3>Windows PowerShell</h3>
-            <pre><code>irm https://muyleanging.github.io/Termix-Tui/install.ps1 | iex
+            <pre><code>&amp; ([scriptblock]::Create((irm https://muyleanging.github.io/Termix-Tui/install.ps1)))
 
 termix setup
 termix-tui</code></pre>
+            <p>Pin a release or skip the update prompt with <code>-Version v0.2.13 -Yes</code>.</p>
           </article>
           <article>
             <h3>macOS / Linux</h3>
@@ -208,6 +210,7 @@ termix-tui</code></pre>
 
 termix setup
 termix-tui</code></pre>
+            <p>Pin a release or skip the update prompt with <code>bash -s -- --version v0.2.13 --yes</code>.</p>
           </article>
         </div>
         <div class="section-heading">
@@ -407,9 +410,10 @@ termix uninstall config</code></pre>
           <h2>Install, choose, and customize fonts</h2>
         </div>
         <p>
-          Termix recommends a Nerd Font for prompt icons, but it should never require one to start.
-          If <code>MesloLGM Nerd Font</code> is missing, Termix can install it with Oh My Posh and falls back to the next available
-          font and shows a warning instead of blocking the app.
+          Termix uses Meslo through Oh My Posh for prompt icons. Fonts are installed
+          on the host system and selected by the terminal app, not by the shell
+          profile. That means WSL and containers must use the font configured in
+          Windows Terminal, VS Code, Apple Terminal, or the host terminal emulator.
         </p>
         <div class="card-grid">
           <article class="plain-card">
@@ -422,27 +426,26 @@ termix uninstall config</code></pre>
           </article>
           <article class="plain-card">
             <h3>Fonts page controls</h3>
-            <p><code>I</code> installs a missing recommended Nerd Font. <code>Enter</code> saves it in Termix. <code>W</code> applies it to Windows Terminal, Apple Terminal, or VS Code where supported. <code>A</code>/<code>E</code>/<code>D</code> manage custom names. <code>R</code> rescans.</p>
+            <p><code>I</code> installs Meslo. <code>Enter</code> saves it in Termix. <code>W</code> applies it to Windows Terminal, Apple Terminal, and VS Code where supported. <code>R</code> rescans.</p>
           </article>
         </div>
         <div class="code-grid">
           <article>
             <h3>Windows install</h3>
-            <pre><code>oh-my-posh font install meslo</code></pre>
+            <pre><code>oh-my-posh font install meslo
+termix fonts apply "MesloLGM Nerd Font"</code></pre>
           </article>
           <article>
             <h3>macOS install</h3>
-            <pre><code>brew search nerd-font
-brew install --cask font-caskaydia-cove-nerd-font
-brew install --cask font-jetbrains-mono-nerd-font
-brew install --cask font-fira-code-nerd-font</code></pre>
-            <p>Termix uses <code>oh-my-posh font install meslo</code> for the recommended font. After installing, <code>termix fonts apply "MesloLGM Nerd Font"</code> updates supported terminal settings or prints the exact manual step.</p>
+            <pre><code>oh-my-posh font install meslo
+termix fonts apply "MesloLGM Nerd Font"</code></pre>
+            <p>Apple Terminal uses <code>MesloLGM Nerd Font Mono</code>. Termix applies that face through AppleScript when available, or prints the manual setting to choose.</p>
           </article>
           <article>
             <h3>Linux install</h3>
-            <pre><code>mkdir -p ~/.local/share/fonts
-# extract Nerd Font .ttf files there
-fc-cache -fv</code></pre>
+            <pre><code>oh-my-posh font install meslo
+termix fonts apply "MesloLGM Nerd Font"</code></pre>
+            <p>If your terminal emulator cannot be edited automatically, choose <code>MesloLGM Nerd Font</code> in its preferences.</p>
           </article>
         </div>
         <div class="table-wrap">
@@ -460,11 +463,11 @@ fc-cache -fv</code></pre>
               </tr>
               <tr>
                 <td>Install Nerd Font</td>
-                <td>Highlight a missing recommended Nerd Font, press <code>I</code>, confirm with <code>Y</code>, then press <code>R</code> to rescan. On macOS Termix uses Homebrew casks such as <code>font-fira-code-nerd-font</code>.</td>
+                <td>Highlight <code>MesloLGM Nerd Font</code>, press <code>I</code>, confirm with <code>Y</code>, then press <code>R</code> to rescan. Termix uses <code>oh-my-posh font install meslo</code>.</td>
               </tr>
               <tr>
                 <td>Add custom font</td>
-                <td>Press <code>A</code>, type the exact font family name, press <code>Enter</code>. Use <code>E</code> to edit and <code>D</code> to remove custom fonts.</td>
+                <td>Termix is Meslo-first. Use <code>termix fonts apply "MesloLGM Nerd Font"</code> for the supported automatic setup.</td>
               </tr>
               <tr>
                 <td>Manual macOS terminal setup</td>
@@ -476,6 +479,42 @@ fc-cache -fv</code></pre>
               </tr>
             </tbody>
           </table>
+        </div>
+        <div class="faq-list" aria-label="Font troubleshooting FAQ">
+          <details>
+            <summary>Why do icons show boxes or question marks?</summary>
+            <p>A Nerd Font may be installed but the current terminal profile is still using another font. Run <code>termix fonts apply "MesloLGM Nerd Font"</code>, then close every terminal tab and open a new terminal. For WSL or containers, install and configure the font on the host terminal app.</p>
+          </details>
+          <details>
+            <summary>Windows Terminal font setting</summary>
+            <pre><code>{
+  "profiles": {
+    "defaults": {
+      "font": {
+        "face": "MesloLGM Nerd Font"
+      }
+    }
+  }
+}</code></pre>
+          </details>
+          <details>
+            <summary>VS Code terminal font setting</summary>
+            <pre><code>"terminal.integrated.fontFamily": "MesloLGM Nerd Font"</code></pre>
+            <p>Restart the integrated terminal after changing this setting.</p>
+          </details>
+          <details>
+            <summary>Apple Terminal font setting</summary>
+            <p>Open <code>Terminal &gt; Settings &gt; Profiles &gt; Text &gt; Font</code>, select the active profile, choose <code>MesloLGM Nerd Font Mono</code>, then restart Terminal.</p>
+            <pre><code>osascript -e 'tell application "Terminal" to set font of settings set "Basic" to "MesloLGM Nerd Font Mono"'</code></pre>
+          </details>
+          <details>
+            <summary>Themes only show the small starter set</summary>
+            <p>Run <code>termix install themes</code>, then <code>termix cache rebuild</code>, and reopen <code>termix-tui</code>. The installer also runs the official theme download during the 75% bootstrap step.</p>
+          </details>
+          <details>
+            <summary>The installer font step failed</summary>
+            <p>Run <code>oh-my-posh font install meslo</code>, then <code>termix fonts apply "MesloLGM Nerd Font"</code>. Font install failures do not stop the Termix binary or official themes from installing.</p>
+          </details>
         </div>
       </section>
 
@@ -519,7 +558,7 @@ fc-cache -fv</code></pre>
               </tr>
               <tr>
                 <td>Missing MesloLGM Nerd Font</td>
-                <td>Run <code>termix fonts install "MesloLGM Nerd Font" --yes</code>, then <code>termix fonts apply "MesloLGM Nerd Font"</code>. Missing Nerd Font is a warning, not a startup failure.</td>
+                <td>Run <code>oh-my-posh font install meslo</code>, then <code>termix fonts apply "MesloLGM Nerd Font"</code>. Missing Nerd Font is a warning, not a startup failure.</td>
               </tr>
               <tr>
                 <td>PowerShell prompt did not change</td>
@@ -608,7 +647,7 @@ fc-cache -fv</code></pre>
     </main>
 
     <footer class="site-footer">
-      <span>Termix v0.2.8</span>
+      <span>Termix v0.2.13</span>
       <span>Open source project</span>
       <span>Founder: Ing Muyleang</span>
     </footer>
