@@ -13,6 +13,7 @@ import (
 	"github.com/muyleanging/termix/internal/font"
 	"github.com/muyleanging/termix/internal/installer"
 	"github.com/muyleanging/termix/internal/profile"
+	"github.com/muyleanging/termix/internal/shell"
 	"github.com/muyleanging/termix/internal/theme"
 	"github.com/muyleanging/termix/internal/tui"
 	"github.com/muyleanging/termix/internal/uninstaller"
@@ -226,7 +227,7 @@ func doctorCommand() *cobra.Command {
 func installCommand() *cobra.Command {
 	return &cobra.Command{
 		Use:   "install [component]",
-		Short: "Install Oh My Posh, PowerShell 7, Windows Terminal, Git Bash, WSL, fonts, or profiles",
+		Short: "Install Oh My Posh, shells, terminal tools, fonts, or themes for the current OS",
 		Args:  cobra.MaximumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			component := "all"
@@ -506,11 +507,9 @@ func profileCommand() *cobra.Command {
 		Short: "List supported shell profiles and paths",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			home, _ := os.UserHomeDir()
-			for _, shellName := range []string{"PowerShell 7", "Windows PowerShell", "Git Bash", "WSL Bash", "Zsh", "Fish", "Nushell"} {
-				path := profile.ProfilePath(home, shellName)
-				if path == "" {
-					continue
-				}
+			for _, adapter := range shell.Available(home) {
+				shellName := adapter.Name()
+				path := adapter.ProfilePath(home)
 				status := "missing"
 				if profile.HasPromptBlock(home, shellName) {
 					status = "integrated"

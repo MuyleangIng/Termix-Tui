@@ -3,6 +3,7 @@ package doctor
 import (
 	"context"
 	"fmt"
+	"runtime"
 	"strings"
 
 	"github.com/muyleanging/termix/internal/app"
@@ -28,15 +29,26 @@ func New(rt *app.Runtime) Doctor { return Doctor{rt: rt} }
 
 func (d Doctor) Run(ctx context.Context) Report {
 	env := d.rt.Env
-	return Report{Checks: []Check{
+	checks := []Check{
 		tool("Oh My Posh", env.OhMyPosh, "Install with: termix install oh-my-posh"),
-		tool("PowerShell 7", env.PowerShell, "Install with: termix install powershell"),
-		tool("Windows Terminal", env.WindowsTerminal, "Install with: termix install terminal"),
-		tool("WSL", env.WSL, "Install with: termix install wsl"),
 		{Name: "ANSI support", OK: env.ANSI, Detail: boolDetail(env.ANSI), Repair: "Use Windows Terminal or a modern ANSI terminal"},
 		{Name: "Unicode support", OK: env.Unicode, Detail: boolDetail(env.Unicode), Repair: "Enable UTF-8 locale and install a Nerd Font"},
-		{Name: "Profile manager", OK: env.PowerShell.Installed || env.GitBash.Installed || env.WSL.Installed, Detail: "shell profiles available", Repair: "Install PowerShell 7, Git Bash, or WSL"},
-	}}
+	}
+	if runtime.GOOS == "windows" {
+		checks = append(checks,
+			tool("PowerShell 7", env.PowerShell, "Install with: termix install powershell"),
+			tool("Windows Terminal", env.WindowsTerminal, "Install with: termix install terminal"),
+			tool("WSL", env.WSL, "Install with: termix install wsl"),
+			Check{Name: "Profile manager", OK: env.PowerShell.Installed || env.GitBash.Installed || env.WSL.Installed, Detail: "shell profiles available", Repair: "Install PowerShell 7, Git Bash, or WSL"},
+		)
+	} else {
+		checks = append(checks,
+			tool("Zsh", env.Zsh, "Install with: termix install zsh"),
+			tool("Bash", env.GitBash, "Install with: termix install bash"),
+			Check{Name: "Profile manager", OK: env.Zsh.Installed || env.GitBash.Installed || env.PowerShell.Installed || env.Fish.Installed || env.Nushell.Installed, Detail: "shell profiles available", Repair: "Install zsh, bash, PowerShell 7, fish, or nushell"},
+		)
+	}
+	return Report{Checks: checks}
 }
 
 func tool(name string, state detector.ToolState, repair string) Check {

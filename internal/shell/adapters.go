@@ -18,11 +18,15 @@ type Adapter interface {
 type PowerShell struct{}
 type WindowsPowerShell struct{}
 type Bash struct{ Label string }
+type Zsh struct{}
 type Fish struct{}
 type Nushell struct{}
 
 func (PowerShell) Name() string { return "PowerShell 7" }
 func (PowerShell) ProfilePath(home string) string {
+	if runtime.GOOS != "windows" {
+		return filepath.Join(home, ".config", "powershell", "Microsoft.PowerShell_profile.ps1")
+	}
 	return filepath.Join(documentsDir(home), "PowerShell", "Microsoft.PowerShell_profile.ps1")
 }
 func (PowerShell) InitSnippet(themePath string) string {
@@ -48,6 +52,12 @@ func (Bash) InitSnippet(themePath string) string {
 	return fmt.Sprintf("eval \"$(%s init bash --config %q)\"", shellCommand(ohMyPoshCommand()), themePath)
 }
 
+func (Zsh) Name() string                   { return "Zsh" }
+func (Zsh) ProfilePath(home string) string { return filepath.Join(home, ".zshrc") }
+func (Zsh) InitSnippet(themePath string) string {
+	return fmt.Sprintf("eval \"$(%s init zsh --config %q)\"", shellCommand(ohMyPoshCommand()), themePath)
+}
+
 func (Fish) Name() string { return "Fish" }
 func (Fish) ProfilePath(home string) string {
 	return filepath.Join(home, ".config", "fish", "config.fish")
@@ -58,6 +68,9 @@ func (Fish) InitSnippet(themePath string) string {
 
 func (Nushell) Name() string { return "Nushell" }
 func (Nushell) ProfilePath(home string) string {
+	if runtime.GOOS != "windows" {
+		return filepath.Join(home, ".config", "nushell", "config.nu")
+	}
 	return filepath.Join(home, "AppData", "Roaming", "nushell", "config.nu")
 }
 func (Nushell) InitSnippet(themePath string) string {
@@ -65,7 +78,81 @@ func (Nushell) InitSnippet(themePath string) string {
 }
 
 func Supported() []Adapter {
-	return []Adapter{PowerShell{}, WindowsPowerShell{}, Bash{Label: "Git Bash"}, Bash{Label: "WSL Ubuntu"}, Fish{}, Nushell{}}
+	return SupportedForOS(runtime.GOOS)
+}
+
+func SupportedForOS(goos string) []Adapter {
+	if goos == "windows" {
+		return []Adapter{PowerShell{}, WindowsPowerShell{}, Bash{Label: "Git Bash"}, Bash{Label: "WSL Bash"}, Fish{}, Nushell{}}
+	}
+	return []Adapter{Zsh{}, Bash{Label: "Bash"}, PowerShell{}, Fish{}, Nushell{}}
+}
+
+func Available(home string) []Adapter {
+	all := Supported()
+	out := make([]Adapter, 0, len(all))
+	for _, adapter := range all {
+		if profileExists(adapter, home) || commandAvailable(adapter) || currentShellMatches(adapter) {
+			out = append(out, adapter)
+		}
+	}
+	if len(out) == 0 {
+		for _, adapter := range all {
+			switch adapter.(type) {
+			case Zsh, Bash:
+				out = append(out, adapter)
+			}
+		}
+	}
+	return out
+}
+
+func profileExists(adapter Adapter, home string) bool {
+	if _, err := os.Stat(adapter.ProfilePath(home)); err == nil {
+		return true
+	}
+	return false
+}
+
+func commandAvailable(adapter Adapter) bool {
+	switch adapter.Name() {
+	case "PowerShell 7":
+		return commandExists("pwsh")
+	case "Windows PowerShell":
+		return commandExists("powershell")
+	case "Git Bash", "WSL Bash", "Bash":
+		return commandExists("bash")
+	case "Zsh":
+		return commandExists("zsh")
+	case "Fish":
+		return commandExists("fish")
+	case "Nushell":
+		return commandExists("nu")
+	default:
+		return false
+	}
+}
+
+func currentShellMatches(adapter Adapter) bool {
+	shellPath := strings.ToLower(os.Getenv("SHELL"))
+	if shellPath == "" {
+		return false
+	}
+	switch adapter.Name() {
+	case "Bash", "Git Bash", "WSL Bash":
+		return strings.HasSuffix(shellPath, "bash")
+	case "Zsh":
+		return strings.HasSuffix(shellPath, "zsh")
+	case "Fish":
+		return strings.HasSuffix(shellPath, "fish")
+	default:
+		return false
+	}
+}
+
+func commandExists(name string) bool {
+	_, err := exec.LookPath(name)
+	return err == nil
 }
 
 func quotePowerShellPath(path string) string {

@@ -14,6 +14,9 @@ type Environment struct {
 	WindowsTerminal ToolState
 	OhMyPosh        ToolState
 	GitBash         ToolState
+	Zsh             ToolState
+	Fish            ToolState
+	Nushell         ToolState
 	WSL             ToolState
 	Unicode         bool
 	ANSI            bool
@@ -35,6 +38,9 @@ func Detect(ctx context.Context) Environment {
 		WindowsTerminal: detectCommand("Windows Terminal", "wt"),
 		OhMyPosh:        detectTool(ctx, "Oh My Posh", "oh-my-posh", "version"),
 		GitBash:         detectTool(ctx, "Git Bash", "bash", "--version"),
+		Zsh:             detectTool(ctx, "Zsh", "zsh", "--version"),
+		Fish:            detectTool(ctx, "Fish", "fish", "--version"),
+		Nushell:         detectTool(ctx, "Nushell", "nu", "--version"),
 		WSL:             detectTool(ctx, "WSL", "wsl", "--status"),
 		Unicode:         true,
 		ANSI:            true,

@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.2.0
+
+- Added OS-aware installer flows for Windows, macOS, and Linux.
+- Added macOS/Linux shell profile support for zsh, bash, PowerShell 7, fish, and nushell through Oh My Posh.
+- Kept Windows profile choices focused on PowerShell, Windows PowerShell, Git Bash, WSL Bash, Nushell, Fish, and CMD view-only status.
+- Made CLI/TUI profile lists adapt to the current OS and available shells.
+- Removed Oh My Zsh install/detection support so Termix consistently uses Oh My Posh as the prompt engine.
+
 ## v0.1.0
 
 - First public release packaging for GitHub Releases.

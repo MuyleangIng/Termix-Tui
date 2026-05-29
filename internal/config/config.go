@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 
 	"github.com/spf13/viper"
@@ -40,7 +41,7 @@ func Load(path string) (Config, error) {
 		filepath.Join(home, "AppData", "Local", "Programs", "oh-my-posh", "themes"),
 	})
 	v.SetDefault("favorite_themes", []string{"catppuccin_mocha", "paradox", "atomic", "dracula", "tokyo"})
-	v.SetDefault("default_shell", "PowerShell 7")
+	v.SetDefault("default_shell", defaultShell())
 	v.SetDefault("default_font", "CaskaydiaCove Nerd Font")
 	v.SetDefault("font_stack", []string{"CaskaydiaCove Nerd Font", "Cascadia Code", "JetBrains Mono", "Fira Code", "Consolas", "Courier New", "monospace"})
 	v.SetDefault("custom_fonts", []string{})
@@ -57,6 +58,16 @@ func Load(path string) (Config, error) {
 		cfg.SetupComplete = true
 	}
 	return cfg, nil
+}
+
+func defaultShell() string {
+	if runtime.GOOS == "windows" {
+		return "PowerShell 7"
+	}
+	if strings.HasSuffix(strings.ToLower(os.Getenv("SHELL")), "bash") {
+		return "Bash"
+	}
+	return "Zsh"
 }
 
 func MarkSetupComplete(homeDir string) error {

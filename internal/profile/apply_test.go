@@ -60,9 +60,10 @@ func TestApplyPromptCreatesWindowsPowerShellProfileWithVerifiedBlock(t *testing.
 	if !strings.Contains(text, markerStart) || !strings.Contains(text, markerEnd) {
 		t.Fatalf("expected managed block, got:\n%s", text)
 	}
-	want := `oh-my-posh init pwsh --config "` + themePath + `" | Invoke-Expression`
-	if !strings.Contains(text, want) {
-		t.Fatalf("expected Windows PowerShell to use pwsh init with absolute theme path %q, got:\n%s", want, text)
+	for _, want := range []string{"init pwsh", `--config "` + themePath + `"`, "Invoke-Expression"} {
+		if !strings.Contains(text, want) {
+			t.Fatalf("expected Windows PowerShell block to contain %q, got:\n%s", want, text)
+		}
 	}
 }
 

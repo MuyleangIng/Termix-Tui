@@ -21,6 +21,7 @@ import (
 	"github.com/muyleanging/termix/internal/installer"
 	previewpkg "github.com/muyleanging/termix/internal/preview"
 	"github.com/muyleanging/termix/internal/profile"
+	"github.com/muyleanging/termix/internal/shell"
 	themepkg "github.com/muyleanging/termix/internal/theme"
 	"github.com/muyleanging/termix/internal/uninstaller"
 )
@@ -145,7 +146,6 @@ var nav = []navItem{
 
 var themes = []string{"catppuccin_mocha", "paradox", "atomic", "dracula", "tokyo", "night-owl", "multiverse-neon", "spaceship", "jandedobbeleer", "powerlevel10k_modern"}
 var fonts = fontpkg.Choices()
-var profiles = []string{"PowerShell 7", "Windows PowerShell", "Git Bash", "WSL Ubuntu", "CMD", "Nushell", "Fish"}
 
 type profileTarget struct {
 	Name      string
@@ -190,6 +190,13 @@ func base(rt *app.Runtime, setup bool) Model {
 	if !strings.EqualFold(resolvedFont, fontpkg.ResolveFamily(rt.Config.DefaultFont)) {
 		initialLogs = append([]string{"WARN Preferred font " + rt.Config.DefaultFont + " was not found. Termix is using fallback font " + resolvedFont + ". Some icons may look different."}, initialLogs...)
 	}
+	setupShell := rt.Config.DefaultShell
+	if profileTargetByName(rt, setupShell).Name == "" {
+		targets := profileTargets(rt)
+		if len(targets) > 0 {
+			setupShell = targets[0].Name
+		}
+	}
 	return Model{
 		rt:            rt,
 		setup:         setup,
@@ -201,8 +208,8 @@ func base(rt *app.Runtime, setup bool) Model {
 		themePreviews: map[string]string{},
 		previewErrors: map[string]string{},
 		fontItems:     fontItems,
-		activeShell:   rt.Config.DefaultShell,
-		setupShell:    rt.Config.DefaultShell,
+		activeShell:   setupShell,
+		setupShell:    setupShell,
 		setupFont:     rt.Config.DefaultFont,
 		setupTheme:    firstOrDefault(rt.Config.FavoriteThemes, "catppuccin_mocha"),
 		setupButton:   -1,
@@ -1312,15 +1319,21 @@ func setupProfileRows(rt *app.Runtime) []string {
 }
 
 func profileTargets(rt *app.Runtime) []profileTarget {
-	return []profileTarget{
-		{Name: "PowerShell 7", Installed: rt.Env.PowerShell.Installed, Supported: true, Detail: "Documents\\PowerShell profile"},
-		{Name: "Windows PowerShell", Installed: commandExists("powershell"), Supported: true, Detail: "Documents\\WindowsPowerShell profile"},
-		{Name: "Git Bash", Installed: rt.Env.GitBash.Installed, Supported: true, Detail: ".bashrc"},
-		{Name: "WSL Ubuntu", Installed: rt.Env.WSL.Installed, Supported: true, Detail: "WSL shell profile"},
-		{Name: "CMD", Installed: commandExists("cmd"), Supported: false, Detail: "CMD prompt setup needs a separate Clink-style integration"},
-		{Name: "Nushell", Installed: commandExists("nu"), Supported: true, Detail: "AppData\\Roaming\\nushell\\config.nu"},
-		{Name: "Fish", Installed: commandExists("fish"), Supported: true, Detail: ".config\\fish\\config.fish"},
+	home := userHome()
+	adapters := shell.Available(home)
+	targets := make([]profileTarget, 0, len(adapters)+1)
+	for _, adapter := range adapters {
+		targets = append(targets, profileTarget{
+			Name:      adapter.Name(),
+			Installed: profileInstalled(rt, adapter.Name()),
+			Supported: true,
+			Detail:    adapter.ProfilePath(home),
+		})
 	}
+	if runtime.GOOS == "windows" {
+		targets = append(targets, profileTarget{Name: "CMD", Installed: commandExists("cmd"), Supported: false, Detail: "CMD prompt setup needs a separate Clink-style integration"})
+	}
+	return targets
 }
 
 func profileTargetByName(rt *app.Runtime, name string) profileTarget {
@@ -1329,7 +1342,28 @@ func profileTargetByName(rt *app.Runtime, name string) profileTarget {
 			return target
 		}
 	}
-	return profileTarget{Name: name, Installed: true, Supported: true}
+	return profileTarget{}
+}
+
+func profileInstalled(rt *app.Runtime, name string) bool {
+	switch name {
+	case "PowerShell 7":
+		return rt.Env.PowerShell.Installed
+	case "Windows PowerShell":
+		return commandExists("powershell")
+	case "Git Bash", "Bash":
+		return rt.Env.GitBash.Installed
+	case "WSL Bash":
+		return rt.Env.WSL.Installed
+	case "Zsh":
+		return rt.Env.Zsh.Installed
+	case "Fish":
+		return rt.Env.Fish.Installed
+	case "Nushell":
+		return rt.Env.Nushell.Installed
+	default:
+		return false
+	}
 }
 
 func profileIndexByName(rt *app.Runtime, name string) int {
