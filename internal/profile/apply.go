@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"time"
 
@@ -119,6 +120,9 @@ func ProfilePath(home, shellName string) string {
 }
 
 func ApplyWindowsTerminalFont(home, family string) error {
+	if runtime.GOOS != "windows" {
+		return nil
+	}
 	return terminal.SetFont(home, font.ResolveAvailableFamily(home, family))
 }
 

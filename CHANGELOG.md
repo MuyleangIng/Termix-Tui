@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.2.1
+
+- Fixed macOS/Linux installer argument parsing and cleanup under `set -u`.
+- Skipped Windows Terminal font writes on non-Windows systems during setup/apply.
+
 ## v0.2.0
 
 - Added OS-aware installer flows for Windows, macOS, and Linux.

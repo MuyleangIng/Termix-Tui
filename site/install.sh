@@ -8,6 +8,15 @@ REPO_OWNER="MuyleangIng"
 REPO_NAME="Termix-Tui"
 VERSION="${TERMIX_VERSION:-latest}"
 INSTALL_DIR="${TERMIX_INSTALL_DIR:-$HOME/.local/bin}"
+TEMP_DIR=""
+
+cleanup() {
+  if [ -n "${TEMP_DIR:-}" ] && [ -d "$TEMP_DIR" ]; then
+    rm -rf "$TEMP_DIR"
+  fi
+}
+
+trap cleanup EXIT
 
 info() {
   printf '\033[36m[TERMIX]\033[0m %s\n' "$1"
@@ -23,6 +32,48 @@ warn() {
 
 error() {
   printf '\033[31m[ERROR]\033[0m %s\n' "$1"
+}
+
+usage() {
+  cat <<EOF
+Usage: install.sh [--version VERSION] [--install-dir DIR]
+
+Environment:
+  TERMIX_VERSION      Release tag to install, default: latest
+  TERMIX_INSTALL_DIR  Install directory, default: \$HOME/.local/bin
+EOF
+}
+
+parse_args() {
+  while [ "$#" -gt 0 ]; do
+    case "$1" in
+      --version|-v)
+        if [ "$#" -lt 2 ]; then
+          error "--version requires a value"
+          exit 1
+        fi
+        VERSION="$2"
+        shift 2
+        ;;
+      --install-dir|-d)
+        if [ "$#" -lt 2 ]; then
+          error "--install-dir requires a value"
+          exit 1
+        fi
+        INSTALL_DIR="$2"
+        shift 2
+        ;;
+      --help|-h)
+        usage
+        exit 0
+        ;;
+      *)
+        error "Unknown option: $1"
+        usage
+        exit 1
+        ;;
+    esac
+  done
 }
 
 detect_os() {
@@ -115,12 +166,9 @@ install_termix() {
   info "Selected platform: $os $arch"
   info "Looking for asset: $asset_name"
 
-  local temp_dir
-  temp_dir="$(mktemp -d)"
+  TEMP_DIR="$(mktemp -d)"
 
-  trap 'rm -rf "$temp_dir"' EXIT
-
-  local release_json="$temp_dir/release.json"
+  local release_json="$TEMP_DIR/release.json"
   get_release_json > "$release_json"
 
   local asset_url
@@ -133,16 +181,16 @@ install_termix() {
     exit 1
   fi
 
-  local archive="$temp_dir/$asset_name"
+  local archive="$TEMP_DIR/$asset_name"
 
   info "Downloading Termix..."
   download_file "$asset_url" "$archive"
 
   info "Extracting..."
-  tar -xzf "$archive" -C "$temp_dir"
+  tar -xzf "$archive" -C "$TEMP_DIR"
 
   local binary
-  binary="$(find "$temp_dir" -type f -name termix | head -n 1)"
+  binary="$(find "$TEMP_DIR" -type f -name termix | head -n 1)"
 
   if [ -z "$binary" ]; then
     error "termix binary was not found in archive."
@@ -185,4 +233,5 @@ install_termix() {
   echo "  3. Open the dashboard with: termix-tui"
 }
 
+parse_args "$@"
 install_termix
