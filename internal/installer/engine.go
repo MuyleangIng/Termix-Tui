@@ -66,15 +66,15 @@ func (e Engine) windowsPlan(component string) []func(context.Context) error {
 		}
 	}
 
-	installCascadiaCode := func(ctx context.Context) error {
+	installMeslo := func(ctx context.Context) error {
 		omp, err := resolveToolPath("oh-my-posh")
 		if err != nil {
 			return fmt.Errorf("oh-my-posh was installed but is not available in PATH yet; open a new terminal or run termix install again: %w", err)
 		}
-		cmd := exec.CommandContext(ctx, omp, "font", "install", "CascadiaCode", "--headless", "--plain")
+		cmd := exec.CommandContext(ctx, omp, "font", "install", "meslo", "--headless", "--plain")
 		output, err := cmd.CombinedOutput()
 		if err != nil {
-			return fmt.Errorf("oh-my-posh font install CascadiaCode failed: %w\n%s", err, string(output))
+			return fmt.Errorf("oh-my-posh font install meslo failed: %w\n%s", err, string(output))
 		}
 		return nil
 	}
@@ -85,7 +85,7 @@ func (e Engine) windowsPlan(component string) []func(context.Context) error {
 	case "font", "fonts", "nerd-font", "nerd-fonts":
 		return []func(context.Context) error{
 			requireTool("oh-my-posh", winget("JanDeDobbeleer.OhMyPosh")),
-			installCascadiaCode,
+			installMeslo,
 		}
 	case "font:CaskaydiaCove Nerd Font", "font:CascadiaCode Nerd Font", "font:Cascadia Code Nerd Font":
 		return []func(context.Context) error{winget("DEVCOM.CascadiaCodeNerdFont")}
@@ -95,6 +95,11 @@ func (e Engine) windowsPlan(component string) []func(context.Context) error {
 		return []func(context.Context) error{winget("DEVCOM.FiraCodeNerdFont")}
 	case "font:Hack Nerd Font":
 		return []func(context.Context) error{winget("DEVCOM.HackNerdFont")}
+	case "font:MesloLGS Nerd Font", "font:MesloLGM Nerd Font":
+		return []func(context.Context) error{
+			requireTool("oh-my-posh", winget("JanDeDobbeleer.OhMyPosh")),
+			installMeslo,
+		}
 	case "theme", "themes", "all-themes":
 		return []func(context.Context) error{func(ctx context.Context) error {
 			_, err := theme.InstallOfficialThemes(ctx, e.rt.Config)
@@ -121,7 +126,7 @@ func (e Engine) windowsPlan(component string) []func(context.Context) error {
 			requireTool("pwsh", winget("Microsoft.PowerShell")),
 			requireTool("wt", winget("Microsoft.WindowsTerminal")),
 			requireTool("git", winget("Git.Git")),
-			installCascadiaCode,
+			installMeslo,
 			func(ctx context.Context) error {
 				_, err := theme.InstallOfficialThemes(ctx, e.rt.Config)
 				return err
@@ -165,6 +170,9 @@ func (m macPackageManager) OhMyPosh(ctx context.Context) error {
 }
 
 func (m macPackageManager) Font(ctx context.Context, fontName string) error {
+	if ompName, ok := ohMyPoshFontName(fontName); ok && strings.EqualFold(ompName, "meslo") {
+		return installOhMyPoshFont(ctx, ompName)
+	}
 	cask, ok := macFontCask(fontName)
 	if !ok {
 		return fmt.Errorf("no Homebrew cask mapping for font %q; run brew search nerd-font and install the cask manually", fontName)
@@ -240,15 +248,15 @@ func (e Engine) unixPlan(component string, pm packageManager) []func(context.Con
 			return install(ctx)
 		}
 	}
-	installCascadiaCode := func(ctx context.Context) error {
-		if err := pm.Font(ctx, "CaskaydiaCove Nerd Font"); err == nil {
+	installMeslo := func(ctx context.Context) error {
+		if err := pm.Font(ctx, "MesloLGM Nerd Font"); err == nil {
 			return nil
 		}
 		omp, err := resolveToolPath("oh-my-posh")
 		if err != nil {
 			return fmt.Errorf("oh-my-posh was installed but is not available in PATH yet; open a new terminal or run termix install again: %w", err)
 		}
-		return run(ctx, omp, "font", "install", "CascadiaCode", "--headless", "--plain")
+		return run(ctx, omp, "font", "install", "meslo", "--headless", "--plain")
 	}
 	installThemes := func(ctx context.Context) error {
 		_, err := theme.InstallOfficialThemes(ctx, e.rt.Config)
@@ -269,7 +277,7 @@ func (e Engine) unixPlan(component string, pm packageManager) []func(context.Con
 	case "powershell":
 		return []func(context.Context) error{requireTool("pwsh", func(ctx context.Context) error { return pm.Install(ctx, "powershell") })}
 	case "font", "fonts", "nerd-font", "nerd-fonts":
-		return []func(context.Context) error{requireTool("oh-my-posh", pm.OhMyPosh), installCascadiaCode}
+		return []func(context.Context) error{requireTool("oh-my-posh", pm.OhMyPosh), installMeslo}
 	case "font:CaskaydiaCove Nerd Font", "font:CascadiaCode Nerd Font", "font:Cascadia Code Nerd Font":
 		return []func(context.Context) error{func(ctx context.Context) error { return pm.Font(ctx, "CaskaydiaCove Nerd Font") }}
 	case "font:JetBrainsMono Nerd Font":
@@ -279,9 +287,9 @@ func (e Engine) unixPlan(component string, pm packageManager) []func(context.Con
 	case "font:Hack Nerd Font":
 		return []func(context.Context) error{func(ctx context.Context) error { return pm.Font(ctx, "Hack Nerd Font") }}
 	case "font:MesloLGS Nerd Font":
-		return []func(context.Context) error{func(ctx context.Context) error { return pm.Font(ctx, "MesloLGS Nerd Font") }}
+		return []func(context.Context) error{requireTool("oh-my-posh", pm.OhMyPosh), func(ctx context.Context) error { return pm.Font(ctx, "MesloLGS Nerd Font") }}
 	case "font:MesloLGM Nerd Font":
-		return []func(context.Context) error{func(ctx context.Context) error { return pm.Font(ctx, "MesloLGM Nerd Font") }}
+		return []func(context.Context) error{requireTool("oh-my-posh", pm.OhMyPosh), func(ctx context.Context) error { return pm.Font(ctx, "MesloLGM Nerd Font") }}
 	case "font:UbuntuMono Nerd Font":
 		return []func(context.Context) error{func(ctx context.Context) error { return pm.Font(ctx, "UbuntuMono Nerd Font") }}
 	case "theme", "themes", "all-themes":
@@ -290,7 +298,7 @@ func (e Engine) unixPlan(component string, pm packageManager) []func(context.Con
 		return []func(context.Context) error{
 			requireTool("oh-my-posh", pm.OhMyPosh),
 			requireTool("zsh", func(ctx context.Context) error { return pm.Install(ctx, "zsh") }),
-			installCascadiaCode,
+			installMeslo,
 			installThemes,
 		}
 	}
@@ -328,7 +336,7 @@ func ohMyPoshFontName(fontName string) (string, bool) {
 	case "hack nerd font":
 		return "Hack", true
 	case "meslolgs nerd font", "meslolgm nerd font":
-		return "Meslo", true
+		return "meslo", true
 	case "ubuntumono nerd font", "ubuntu mono nerd font":
 		return "UbuntuMono", true
 	default:

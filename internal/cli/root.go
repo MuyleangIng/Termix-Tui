@@ -101,14 +101,14 @@ func applyCommand() *cobra.Command {
 			if err := profile.ApplyPrompt(home, shellName, themePath); err != nil {
 				return err
 			}
-			_ = profile.ApplyWindowsTerminalFont(home, fontName)
+			_, _ = profile.ApplyTerminalFont(home, fontName)
 			fmt.Fprintf(os.Stdout, "Applied %s to %s with %s\n", themeName, shellName, fontName)
 			return nil
 		},
 	}
 	cmd.Flags().StringVar(&themeName, "theme", "catppuccin_mocha", "Oh My Posh theme name")
 	cmd.Flags().StringVar(&shellName, "shell", "", "shell profile to configure")
-	cmd.Flags().StringVar(&fontName, "font", "", "Windows Terminal font family")
+	cmd.Flags().StringVar(&fontName, "font", "", "terminal font family")
 	return cmd
 }
 
@@ -469,9 +469,10 @@ func fontsInstallCommand() *cobra.Command {
 
 func fontsApplyCommand() *cobra.Command {
 	var windowsTerminal bool
+	var noTerminal bool
 	cmd := &cobra.Command{
 		Use:   "apply <font>",
-		Short: "Save selected font in Termix config and optionally Windows Terminal",
+		Short: "Save selected font and apply it to supported terminal settings",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			rt, err := runtime(cmd.Context())
@@ -484,16 +485,24 @@ func fontsApplyCommand() *cobra.Command {
 			home, _ := os.UserHomeDir()
 			resolved := font.ResolveAvailableFamily(home, args[0])
 			fmt.Fprintf(os.Stdout, "Saved Termix font: %s\nResolved available face: %s\n", args[0], resolved)
-			if windowsTerminal {
-				if err := profile.ApplyWindowsTerminalFont(home, args[0]); err != nil {
+			if windowsTerminal || !noTerminal {
+				results, err := profile.ApplyTerminalFont(home, args[0])
+				for _, result := range results {
+					status := "INFO"
+					if result.Changed {
+						status = "UPDATED"
+					}
+					fmt.Fprintf(os.Stdout, "%s %s: %s\n", status, result.Target, result.Detail)
+				}
+				if err != nil {
 					return err
 				}
-				fmt.Fprintln(os.Stdout, "Updated Windows Terminal font with backup.")
 			}
 			return nil
 		},
 	}
-	cmd.Flags().BoolVar(&windowsTerminal, "windows-terminal", false, "also apply font to Windows Terminal defaults")
+	cmd.Flags().BoolVar(&windowsTerminal, "windows-terminal", false, "apply font to Windows Terminal defaults; kept for compatibility")
+	cmd.Flags().BoolVar(&noTerminal, "no-terminal", false, "only save Termix config; do not update terminal app settings")
 	return cmd
 }
 
