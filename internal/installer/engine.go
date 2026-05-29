@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os/exec"
 	"runtime"
+	"strings"
 
 	"github.com/muyleanging/termix/internal/app"
 	"github.com/muyleanging/termix/internal/theme"
@@ -132,6 +133,7 @@ func (e Engine) windowsPlan(component string) []func(context.Context) error {
 type packageManager interface {
 	Install(ctx context.Context, pkg string) error
 	OhMyPosh(ctx context.Context) error
+	Font(ctx context.Context, fontName string) error
 }
 
 type macPackageManager struct{}
@@ -160,6 +162,18 @@ func (m macPackageManager) OhMyPosh(ctx context.Context) error {
 		return fmt.Errorf("brew install oh-my-posh failed: %w\n%s\nfallback failed: %w\n%s", err, string(output), fallbackErr, string(fallbackOutput))
 	}
 	return nil
+}
+
+func (m macPackageManager) Font(ctx context.Context, fontName string) error {
+	cask, ok := macFontCask(fontName)
+	if !ok {
+		return fmt.Errorf("no Homebrew cask mapping for font %q; run brew search nerd-font and install the cask manually", fontName)
+	}
+	brew, err := toolpath.Resolve("brew")
+	if err != nil {
+		return fmt.Errorf("Homebrew is required to install %s automatically on macOS; install Homebrew first or run: brew install --cask %s", fontName, cask)
+	}
+	return run(ctx, brew, "install", "--cask", cask)
 }
 
 type linuxPackageManager struct{}
@@ -191,6 +205,10 @@ func (linuxPackageManager) OhMyPosh(ctx context.Context) error {
 	return fmt.Errorf("curl or wget is required to install Oh My Posh automatically on Linux")
 }
 
+func (linuxPackageManager) Font(ctx context.Context, fontName string) error {
+	return fmt.Errorf("automatic Nerd Font install is not implemented for Linux yet; install %q into ~/.local/share/fonts and run fc-cache -fv", fontName)
+}
+
 func (e Engine) unixPlan(component string, pm packageManager) []func(context.Context) error {
 	requireTool := func(name string, install func(context.Context) error) func(context.Context) error {
 		return func(ctx context.Context) error {
@@ -201,6 +219,9 @@ func (e Engine) unixPlan(component string, pm packageManager) []func(context.Con
 		}
 	}
 	installCascadiaCode := func(ctx context.Context) error {
+		if err := pm.Font(ctx, "CaskaydiaCove Nerd Font"); err == nil {
+			return nil
+		}
 		omp, err := resolveToolPath("oh-my-posh")
 		if err != nil {
 			return fmt.Errorf("oh-my-posh was installed but is not available in PATH yet; open a new terminal or run termix install again: %w", err)
@@ -227,6 +248,20 @@ func (e Engine) unixPlan(component string, pm packageManager) []func(context.Con
 		return []func(context.Context) error{requireTool("pwsh", func(ctx context.Context) error { return pm.Install(ctx, "powershell") })}
 	case "font", "fonts", "nerd-font", "nerd-fonts":
 		return []func(context.Context) error{requireTool("oh-my-posh", pm.OhMyPosh), installCascadiaCode}
+	case "font:CaskaydiaCove Nerd Font", "font:CascadiaCode Nerd Font", "font:Cascadia Code Nerd Font":
+		return []func(context.Context) error{func(ctx context.Context) error { return pm.Font(ctx, "CaskaydiaCove Nerd Font") }}
+	case "font:JetBrainsMono Nerd Font":
+		return []func(context.Context) error{func(ctx context.Context) error { return pm.Font(ctx, "JetBrainsMono Nerd Font") }}
+	case "font:FiraCode Nerd Font":
+		return []func(context.Context) error{func(ctx context.Context) error { return pm.Font(ctx, "FiraCode Nerd Font") }}
+	case "font:Hack Nerd Font":
+		return []func(context.Context) error{func(ctx context.Context) error { return pm.Font(ctx, "Hack Nerd Font") }}
+	case "font:MesloLGS Nerd Font":
+		return []func(context.Context) error{func(ctx context.Context) error { return pm.Font(ctx, "MesloLGS Nerd Font") }}
+	case "font:MesloLGM Nerd Font":
+		return []func(context.Context) error{func(ctx context.Context) error { return pm.Font(ctx, "MesloLGM Nerd Font") }}
+	case "font:UbuntuMono Nerd Font":
+		return []func(context.Context) error{func(ctx context.Context) error { return pm.Font(ctx, "UbuntuMono Nerd Font") }}
 	case "theme", "themes", "all-themes":
 		return []func(context.Context) error{installThemes}
 	default:
@@ -236,6 +271,27 @@ func (e Engine) unixPlan(component string, pm packageManager) []func(context.Con
 			installCascadiaCode,
 			installThemes,
 		}
+	}
+}
+
+func macFontCask(fontName string) (string, bool) {
+	switch strings.ToLower(strings.TrimSpace(fontName)) {
+	case "caskaydiacove nerd font", "cascadiacode nerd font", "cascadia code nerd font":
+		return "font-caskaydia-cove-nerd-font", true
+	case "jetbrainsmono nerd font", "jetbrains mono nerd font":
+		return "font-jetbrains-mono-nerd-font", true
+	case "firacode nerd font", "fira code nerd font":
+		return "font-fira-code-nerd-font", true
+	case "hack nerd font":
+		return "font-hack-nerd-font", true
+	case "meslolgs nerd font":
+		return "font-meslo-lg-nerd-font", true
+	case "meslolgm nerd font":
+		return "font-meslo-lg-nerd-font", true
+	case "ubuntumono nerd font", "ubuntu mono nerd font":
+		return "font-ubuntu-mono-nerd-font", true
+	default:
+		return "", false
 	}
 }
 

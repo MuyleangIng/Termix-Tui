@@ -7,7 +7,7 @@
     <title>Termix - Terminal Theme Manager</title>
     <meta
       name="description"
-      content="Termix is an open source terminal theme manager for Oh My Posh, Nerd Fonts, Windows Terminal, PowerShell, Git Bash, and WSL."
+      content="Termix is an open source terminal theme manager for Oh My Posh, Nerd Fonts, Windows Terminal, PowerShell, Git Bash, WSL, macOS, and Linux."
     />
 
     <!-- Favicon -->
@@ -19,7 +19,7 @@
     <meta property="og:title" content="Termix - Terminal Theme Manager" />
     <meta
       property="og:description"
-      content="A modern terminal theme manager for Oh My Posh, Nerd Fonts, Windows Terminal, PowerShell, Git Bash, and WSL."
+      content="A modern terminal theme manager for Oh My Posh, Nerd Fonts, Windows Terminal, PowerShell, Git Bash, WSL, macOS, and Linux."
     />
     <meta property="og:url" content="https://muyleanging.github.io/Termix-Tui/" />
     <meta property="og:image" content="https://onhyewqcjmwup3zj.public.blob.vercel-storage.com/termix-thumbnail.png" />
@@ -34,7 +34,7 @@
     <meta name="twitter:title" content="Termix - Terminal Theme Manager" />
     <meta
       name="twitter:description"
-      content="A modern terminal theme manager for Oh My Posh, Nerd Fonts, Windows Terminal, PowerShell, Git Bash, and WSL."
+      content="A modern terminal theme manager for Oh My Posh, Nerd Fonts, Windows Terminal, PowerShell, Git Bash, WSL, macOS, and Linux."
     />
     <meta name="twitter:image" content="https://onhyewqcjmwup3zj.public.blob.vercel-storage.com/termix-thumbnail.png" />
     <meta name="twitter:image:alt" content="Termix terminal theme manager preview" />
@@ -69,7 +69,7 @@
           <h1>Termix</h1>
           <p class="lede">
             A focused CLI and TUI for managing terminal profiles, Oh My Posh themes,
-            Nerd Fonts, Windows Terminal, PowerShell 7, Git Bash, and WSL.
+            Nerd Fonts, Windows Terminal, PowerShell 7, Git Bash, WSL, macOS, and Linux.
           </p>
           <div class="actions">
             <a class="button primary" href="#install">Install</a>
@@ -107,7 +107,7 @@
         </div>
         <div class="showcase-grid">
           <article class="tui-panel dark-panel">
-            <div class="tui-header"><strong>TERMIX v0.1.11</strong><span>Dark</span></div>
+            <div class="tui-header"><strong>TERMIX v0.2.3</strong><span>Dark</span></div>
             <div class="tui-body">
               <p class="tui-title">Navigation</p>
               <p><span class="cursor">›</span> Themes</p>
@@ -129,7 +129,7 @@
               <p class="tui-title">Font Manager</p>
               <p>CaskaydiaCove <span class="status muted">missing</span></p>
               <p>Cascadia Code <span class="status success">active</span></p>
-              <p>W applies Windows Terminal</p>
+              <p>I installs, Enter saves</p>
             </div>
           </article>
         </div>
@@ -139,7 +139,7 @@
         <div class="stat-grid">
           <div>
             <strong>Profiles</strong>
-            <span>PowerShell 7, Windows PowerShell, Git Bash, WSL, Fish, Nushell</span>
+            <span>PowerShell, Git Bash, WSL, zsh, bash, Fish, Nushell</span>
           </div>
           <div>
             <strong>Themes</strong>
@@ -189,8 +189,8 @@
             Normal users do not need to clone the repository or install Go.
             Use the installer script from GitHub Pages. The script downloads
             the latest Termix binary from GitHub Releases. On Windows, it also
-            bootstraps the default tools, CascadiaCode Nerd Font, and official
-            Oh My Posh themes. Open a new terminal before running setup so the
+            bootstraps the default tools, a Nerd Font, and official Oh My Posh
+            themes. Open a new terminal before running setup so the
             interactive picker receives arrow keys correctly.
           </p>
         </div>
@@ -422,7 +422,7 @@ termix uninstall config</code></pre>
           </article>
           <article class="plain-card">
             <h3>Fonts page controls</h3>
-            <p><code>Enter</code> saves the font in Termix. <code>W</code> applies it to Windows Terminal. <code>I</code> installs a missing recommended Nerd Font. <code>A</code>/<code>E</code>/<code>D</code> manage custom names. <code>R</code> rescans.</p>
+            <p><code>I</code> installs a missing recommended Nerd Font. <code>Enter</code> saves it in Termix. <code>W</code> applies it to Windows Terminal on Windows. <code>A</code>/<code>E</code>/<code>D</code> manage custom names. <code>R</code> rescans.</p>
           </article>
         </div>
         <div class="code-grid">
@@ -435,9 +435,11 @@ winget install DEVCOM.HackNerdFont</code></pre>
           </article>
           <article>
             <h3>macOS install</h3>
-            <pre><code>brew install --cask font-caskaydia-cove-nerd-font
+            <pre><code>brew search nerd-font
+brew install --cask font-caskaydia-cove-nerd-font
 brew install --cask font-jetbrains-mono-nerd-font
 brew install --cask font-fira-code-nerd-font</code></pre>
+            <p>After installing, choose the Nerd Font in Terminal, iTerm2, Warp, VS Code, or your terminal app settings.</p>
           </article>
           <article>
             <h3>Linux install</h3>
@@ -457,15 +459,19 @@ fc-cache -fv</code></pre>
             <tbody>
               <tr>
                 <td>Fix missing font warning</td>
-                <td>Open <code>termix</code>, go to <strong>Fonts</strong>, choose an installed fallback such as <code>Cascadia Code</code> or <code>Consolas</code>, press <code>Enter</code>, then press <code>W</code> to write it to Windows Terminal.</td>
+                <td>Open <code>termix</code>, go to <strong>Fonts</strong>, install a recommended Nerd Font with <code>I</code>, press <code>R</code> to rescan, then press <code>Enter</code> to save it in Termix.</td>
               </tr>
               <tr>
                 <td>Install Nerd Font</td>
-                <td>Highlight a missing recommended Nerd Font, press <code>I</code>, confirm with <code>Y</code>, then press <code>R</code> to rescan.</td>
+                <td>Highlight a missing recommended Nerd Font, press <code>I</code>, confirm with <code>Y</code>, then press <code>R</code> to rescan. On macOS Termix uses Homebrew casks such as <code>font-fira-code-nerd-font</code>.</td>
               </tr>
               <tr>
                 <td>Add custom font</td>
                 <td>Press <code>A</code>, type the exact font family name, press <code>Enter</code>. Use <code>E</code> to edit and <code>D</code> to remove custom fonts.</td>
+              </tr>
+              <tr>
+                <td>Manual macOS terminal setup</td>
+                <td>Open your terminal app settings and choose the installed Nerd Font, for example <code>FiraCode Nerd Font</code>, <code>JetBrainsMono Nerd Font</code>, or <code>CaskaydiaCove Nerd Font</code>.</td>
               </tr>
               <tr>
                 <td>Manual Windows Terminal setup</td>
@@ -605,7 +611,7 @@ fc-cache -fv</code></pre>
     </main>
 
     <footer class="site-footer">
-      <span>Termix v0.1.11</span>
+      <span>Termix v0.2.3</span>
       <span>Open source project</span>
       <span>Founder: Ing Muyleang</span>
     </footer>
@@ -845,4 +851,3 @@ fc-cache -fv</code></pre>
     </script>
   </body>
 </html>
-</content>

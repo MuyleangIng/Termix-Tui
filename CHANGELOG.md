@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.2.3
+
+- Added macOS Homebrew cask mappings for recommended Nerd Fonts.
+- Made setup install the selected recommended Nerd Font on macOS and Windows.
+- Improved font detection for Homebrew, system, and Linux user font directories.
+- Updated the public site font instructions for macOS terminal apps.
+
 ## v0.2.2
 
 - Resolved Homebrew and Oh My Posh paths on macOS when `/opt/homebrew/bin` or `/usr/local/bin` are missing from the app PATH.

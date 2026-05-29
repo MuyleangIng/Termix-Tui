@@ -1213,6 +1213,11 @@ func setupApplyCmd(rt *app.Runtime, shellName, fontName, themeName string) tea.C
 				return actionMsg{label: "setup", err: err}
 			}
 		}
+		if runtime.GOOS != "linux" && isRecommendedNerdFont(fontName) {
+			if err := installer.New(rt).Install(context.Background(), "font:"+fontName); err != nil {
+				return actionMsg{label: "setup", err: err}
+			}
+		}
 		if err := themepkg.EnsureAvailable(context.Background(), rt.Config); err != nil {
 			return actionMsg{label: "setup", err: err}
 		}

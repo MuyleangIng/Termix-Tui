@@ -3,6 +3,7 @@ package font
 import (
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 )
 
@@ -31,6 +32,9 @@ var Supported = []Font{
 
 var FallbackStack = []string{
 	"CaskaydiaCove Nerd Font",
+	"FiraCode Nerd Font",
+	"JetBrainsMono Nerd Font",
+	"Hack Nerd Font",
 	"Cascadia Code",
 	"JetBrains Mono",
 	"Fira Code",
@@ -78,7 +82,10 @@ func ResolveAvailableFamily(home, name string) string {
 			return family
 		}
 	}
-	return "Consolas"
+	if runtime.GOOS == "windows" {
+		return "Consolas"
+	}
+	return "monospace"
 }
 
 func Detect(home string) []Font {
@@ -86,6 +93,11 @@ func Detect(home string) []Font {
 		filepath.Join(os.Getenv("WINDIR"), "Fonts"),
 		filepath.Join(home, "AppData", "Local", "Microsoft", "Windows", "Fonts"),
 		filepath.Join(home, "Library", "Fonts"),
+		"/Library/Fonts",
+		"/System/Library/Fonts",
+		filepath.Join(home, ".local", "share", "fonts"),
+		"/usr/local/share/fonts",
+		"/usr/share/fonts",
 	}
 	items := make([]Font, len(Supported))
 	copy(items, Supported)
@@ -135,6 +147,11 @@ func fontDirs(home string) []string {
 		filepath.Join(os.Getenv("WINDIR"), "Fonts"),
 		filepath.Join(home, "AppData", "Local", "Microsoft", "Windows", "Fonts"),
 		filepath.Join(home, "Library", "Fonts"),
+		"/Library/Fonts",
+		"/System/Library/Fonts",
+		filepath.Join(home, ".local", "share", "fonts"),
+		"/usr/local/share/fonts",
+		"/usr/share/fonts",
 	}
 }
 
