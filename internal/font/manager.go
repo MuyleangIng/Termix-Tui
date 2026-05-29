@@ -50,6 +50,9 @@ func ResolveAvailableFamily(home, name string) string {
 	if requested == "" {
 		requested = FallbackStack[0]
 	}
+	if isMeslo(requested) {
+		return requested
+	}
 	if installed(home, requested) {
 		return requested
 	}
@@ -148,7 +151,13 @@ func fontAliases(name string) []string {
 		compact,
 		strings.ReplaceAll(name, "MesloLGM Nerd Font", "MesloLGM Nerd Font Mono"),
 		strings.ReplaceAll(name, "MesloLGM Nerd Font", "MesloLGM NF"),
+		strings.ReplaceAll(name, "MesloLGM Nerd Font", "MesloLGMNerdFont"),
+		strings.ReplaceAll(name, "MesloLGM Nerd Font", "MesloLGMNerdFontMono"),
 	}
+}
+
+func isMeslo(family string) bool {
+	return strings.Contains(strings.ToLower(strings.NewReplacer(" ", "", "-", "", "_", "").Replace(family)), "meslolgm")
 }
 
 func installed(home, family string) bool {

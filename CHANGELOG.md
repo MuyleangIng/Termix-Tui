@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.2.11
+
+- Fixed Windows Terminal and VS Code font apply to use `MesloLGM Nerd Font` instead of the Apple-only `MesloLGM Nerd Font Mono`.
+- Kept Apple Terminal apply on `MesloLGM Nerd Font Mono`.
+- Made Meslo detection tolerant of Oh My Posh file names such as `MesloLGMNerdFontMono-Regular.ttf`.
+- Suppressed the false preferred-font-missing warning for the configured Meslo font.
+
 ## v0.2.10
 
 - Changed Windows and Unix installer bootstrap into visible 25/50/75/100 percent steps.

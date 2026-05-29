@@ -19,29 +19,29 @@ type FontApplyResult struct {
 }
 
 func ApplyFont(home, family string) ([]FontApplyResult, error) {
-	face := terminalFace(family)
+	appFace := appTerminalFace(family)
 	var results []FontApplyResult
 	var errs []string
 
 	switch runtime.GOOS {
 	case "windows":
-		if err := SetFont(home, face); err != nil {
+		if err := SetFont(home, appFace); err != nil {
 			errs = append(errs, "Windows Terminal: "+err.Error())
 			results = append(results, FontApplyResult{Target: "Windows Terminal", Detail: "settings.json not updated"})
 		} else {
-			results = append(results, FontApplyResult{Target: "Windows Terminal", Changed: true, Detail: "set defaults font.face to " + face})
+			results = append(results, FontApplyResult{Target: "Windows Terminal", Changed: true, Detail: "set defaults font.face to " + appFace})
 		}
 	case "darwin":
-		result, err := applyAppleTerminalFont(face)
+		result, err := applyAppleTerminalFont(appleTerminalFace(family))
 		results = append(results, result)
 		if err != nil {
 			errs = append(errs, err.Error())
 		}
 	default:
-		results = append(results, FontApplyResult{Target: "Linux terminal", Detail: "set the font in your terminal app preferences to " + face})
+		results = append(results, FontApplyResult{Target: "Linux terminal", Detail: "set the font in your terminal app preferences to " + appFace})
 	}
 
-	if result, err := applyVSCodeFont(home, face); err != nil {
+	if result, err := applyVSCodeFont(home, appFace); err != nil {
 		errs = append(errs, err.Error())
 		results = append(results, result)
 	} else if result.Target != "" {
@@ -54,7 +54,16 @@ func ApplyFont(home, family string) ([]FontApplyResult, error) {
 	return results, nil
 }
 
-func terminalFace(family string) string {
+func appTerminalFace(family string) string {
+	switch strings.ToLower(strings.TrimSpace(family)) {
+	case "meslolgm nerd font", "meslolgm nf":
+		return "MesloLGM Nerd Font"
+	default:
+		return family
+	}
+}
+
+func appleTerminalFace(family string) string {
 	switch strings.ToLower(strings.TrimSpace(family)) {
 	case "meslolgm nerd font", "meslolgm nf":
 		return "MesloLGM Nerd Font Mono"

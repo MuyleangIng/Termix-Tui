@@ -2,10 +2,18 @@ package terminal
 
 import "testing"
 
-func TestTerminalFaceUsesMesloMonoName(t *testing.T) {
-	got := terminalFace("MesloLGM Nerd Font")
+func TestAppTerminalFaceUsesMesloName(t *testing.T) {
+	got := appTerminalFace("MesloLGM Nerd Font")
+	want := "MesloLGM Nerd Font"
+	if got != want {
+		t.Fatalf("appTerminalFace() = %q, want %q", got, want)
+	}
+}
+
+func TestAppleTerminalFaceUsesMesloMonoName(t *testing.T) {
+	got := appleTerminalFace("MesloLGM Nerd Font")
 	want := "MesloLGM Nerd Font Mono"
 	if got != want {
-		t.Fatalf("terminalFace() = %q, want %q", got, want)
+		t.Fatalf("appleTerminalFace() = %q, want %q", got, want)
 	}
 }
