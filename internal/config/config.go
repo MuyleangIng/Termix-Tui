@@ -20,7 +20,6 @@ type Config struct {
 	CustomFonts    []string `mapstructure:"custom_fonts"`
 	ActivityHeight int      `mapstructure:"activity_height"`
 	BorderStyle    string   `mapstructure:"border_style"`
-	Icons          string   `mapstructure:"icons"`
 	SetupComplete  bool     `mapstructure:"setup_complete"`
 }
 
@@ -48,7 +47,6 @@ func Load(path string) (Config, error) {
 	v.SetDefault("custom_fonts", []string{})
 	v.SetDefault("activity_height", 7)
 	v.SetDefault("border_style", "unicode")
-	v.SetDefault("icons", "nerd")
 
 	_ = v.ReadInConfig()
 
@@ -105,8 +103,7 @@ custom_fonts:
 %s
 activity_height: %d
 border_style: %q
-icons: %q
-`, cfg.HomeDir, yamlList(cfg.ThemeDirs), themeName, shellName, fontName, yamlList(firstNonEmptyList(cfg.FontStack, []string{fontName, "Cascadia Code", "JetBrains Mono", "Fira Code", "Consolas", "Courier New", "monospace"})), yamlList(cfg.CustomFonts), normalizeActivityHeight(cfg.ActivityHeight), normalizeBorderStyle(cfg.BorderStyle), normalizeIcons(cfg.Icons))
+`, cfg.HomeDir, yamlList(cfg.ThemeDirs), themeName, shellName, fontName, yamlList(firstNonEmptyList(cfg.FontStack, []string{fontName, "Cascadia Code", "JetBrains Mono", "Fira Code", "Consolas", "Courier New", "monospace"})), yamlList(cfg.CustomFonts), normalizeActivityHeight(cfg.ActivityHeight), normalizeBorderStyle(cfg.BorderStyle))
 	return os.WriteFile(filepath.Join(cfg.HomeDir, "config.yaml"), []byte(data), 0o644)
 }
 
@@ -208,14 +205,5 @@ func normalizeBorderStyle(style string) string {
 		return strings.ToLower(strings.TrimSpace(style))
 	default:
 		return "unicode"
-	}
-}
-
-func normalizeIcons(value string) string {
-	switch strings.ToLower(strings.TrimSpace(value)) {
-	case "ascii":
-		return "ascii"
-	default:
-		return "nerd"
 	}
 }

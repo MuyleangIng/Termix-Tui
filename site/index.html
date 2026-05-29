@@ -107,7 +107,7 @@
         </div>
         <div class="showcase-grid">
           <article class="tui-panel dark-panel">
-            <div class="tui-header"><strong>TERMIX v0.2.6</strong><span>Dark</span></div>
+            <div class="tui-header"><strong>TERMIX v0.2.5</strong><span>Dark</span></div>
             <div class="tui-body">
               <p class="tui-title">Navigation</p>
               <p><span class="cursor">›</span> Themes</p>
@@ -409,8 +409,7 @@ termix uninstall config</code></pre>
         <p>
           Termix recommends a Nerd Font for prompt icons, but it should never require one to start.
           If <code>CaskaydiaCove Nerd Font</code> is missing, Termix falls back to the next available
-          font and shows a warning instead of blocking the app. If the font is installed but the
-          current terminal profile is not using it, Termix switches to readable ASCII icons.
+          font and shows a warning instead of blocking the app.
         </p>
         <div class="card-grid">
           <article class="plain-card">
@@ -424,10 +423,6 @@ termix uninstall config</code></pre>
           <article class="plain-card">
             <h3>Fonts page controls</h3>
             <p><code>I</code> installs a missing recommended Nerd Font. <code>Enter</code> saves it in Termix. <code>W</code> applies it to Windows Terminal on Windows. <code>A</code>/<code>E</code>/<code>D</code> manage custom names. <code>R</code> rescans.</p>
-          </article>
-          <article class="plain-card">
-            <h3>ASCII fallback</h3>
-            <p>Set <code>TERMIX_ASCII_ICONS=1</code> or <code>icons: "ascii"</code> in <code>~/.termix/config.yaml</code> to force readable symbols when a terminal profile renders icons as boxes.</p>
           </article>
         </div>
         <div class="code-grid">
@@ -477,10 +472,6 @@ fc-cache -fv</code></pre>
               <tr>
                 <td>Manual macOS terminal setup</td>
                 <td>Open your terminal app settings and choose the installed Nerd Font, for example <code>FiraCode Nerd Font</code>, <code>JetBrainsMono Nerd Font</code>, or <code>CaskaydiaCove Nerd Font</code>.</td>
-              </tr>
-              <tr>
-                <td>Terminal.app glyph boxes</td>
-                <td>Open <code>Terminal > Settings > Profiles > Text > Font</code>, choose a Nerd Font, then restart Terminal. Until then, Termix uses ASCII fallback instead of broken icons.</td>
               </tr>
               <tr>
                 <td>Manual Windows Terminal setup</td>
@@ -620,7 +611,7 @@ fc-cache -fv</code></pre>
     </main>
 
     <footer class="site-footer">
-      <span>Termix v0.2.6</span>
+      <span>Termix v0.2.5</span>
       <span>Open source project</span>
       <span>Founder: Ing Muyleang</span>
     </footer>

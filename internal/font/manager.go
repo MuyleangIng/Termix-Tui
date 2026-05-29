@@ -2,7 +2,6 @@ package font
 
 import (
 	"os"
-	"os/exec"
 	"path/filepath"
 	"runtime"
 	"strings"
@@ -102,12 +101,7 @@ func Detect(home string) []Font {
 	}
 	items := make([]Font, len(Supported))
 	copy(items, Supported)
-	systemFonts := installedFontNames()
 	for i := range items {
-		if matchesInstalledName(systemFonts, []string{items[i].Name, items[i].Family}...) {
-			items[i].Installed = true
-			continue
-		}
 		for _, fontDir := range fontDirs {
 			if fontDir == "Fonts" {
 				continue
@@ -119,47 +113,6 @@ func Detect(home string) []Font {
 		}
 	}
 	return items
-}
-
-func installedFontNames() string {
-	var parts []string
-	if out, err := exec.Command("fc-list").CombinedOutput(); err == nil {
-		parts = append(parts, string(out))
-	}
-	if runtime.GOOS == "darwin" {
-		if out, err := exec.Command("system_profiler", "SPFontsDataType").CombinedOutput(); err == nil {
-			parts = append(parts, string(out))
-		}
-		if out, err := exec.Command("mdfind", "kMDItemKind == 'Font'").CombinedOutput(); err == nil {
-			parts = append(parts, string(out))
-		}
-	}
-	return strings.ToLower(strings.Join(parts, "\n"))
-}
-
-func matchesInstalledName(haystack string, names ...string) bool {
-	if haystack == "" {
-		return false
-	}
-	for _, name := range names {
-		for _, alias := range fontAliases(name) {
-			if strings.Contains(haystack, strings.ToLower(alias)) {
-				return true
-			}
-		}
-	}
-	return false
-}
-
-func fontAliases(name string) []string {
-	compact := strings.NewReplacer(" ", "", "-", "", "_", "").Replace(name)
-	return []string{
-		name,
-		compact,
-		strings.ReplaceAll(name, "CaskaydiaCove", "Caskaydia Cove"),
-		strings.ReplaceAll(name, "JetBrainsMono", "JetBrains Mono"),
-		strings.ReplaceAll(name, "FiraCode", "Fira Code"),
-	}
 }
 
 func installed(home, family string) bool {
