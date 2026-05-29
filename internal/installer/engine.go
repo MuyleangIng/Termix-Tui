@@ -173,7 +173,10 @@ func (m macPackageManager) Font(ctx context.Context, fontName string) error {
 	if err != nil {
 		return fmt.Errorf("Homebrew is required to install %s automatically on macOS; install Homebrew first or run: brew install --cask %s", fontName, cask)
 	}
-	return run(ctx, brew, "install", "--cask", cask)
+	if err := run(ctx, brew, "list", "--cask", cask); err == nil {
+		return nil
+	}
+	return runBrewCaskInstall(ctx, brew, cask)
 }
 
 type linuxPackageManager struct{}
@@ -319,4 +322,17 @@ func runShell(ctx context.Context, script string) error {
 		return fmt.Errorf("shell install command failed: %w\n%s", err, string(output))
 	}
 	return nil
+}
+
+func runBrewCaskInstall(ctx context.Context, brew, cask string) error {
+	cmd := exec.CommandContext(ctx, brew, "install", "--cask", cask)
+	output, err := cmd.CombinedOutput()
+	if err == nil {
+		return nil
+	}
+	text := strings.ToLower(string(output))
+	if strings.Contains(text, "already installed") || strings.Contains(text, "is already installed") {
+		return nil
+	}
+	return fmt.Errorf("brew install --cask %s failed: %w\n%s\nManual fix: %s install --cask %s", cask, err, string(output), brew, cask)
 }

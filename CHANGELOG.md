@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.2.4
+
+- Made macOS Nerd Font installs idempotent by checking `brew list --cask` before installing.
+- Treated Homebrew “already installed” font output as success.
+- Improved macOS font install errors with the exact manual `brew install --cask` command.
+
 ## v0.2.3
 
 - Added macOS Homebrew cask mappings for recommended Nerd Fonts.
