@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.2.12
+
+- Removed the stale Cascadia-only preferred-font check from theme previews.
+- Stopped showing “Preferred Nerd Font missing” when MesloLGM Nerd Font is the configured Termix font.
+- Fixed Windows Terminal docs to use `MesloLGM Nerd Font`; Apple Terminal remains `MesloLGM Nerd Font Mono`.
+
 ## v0.2.11
 
 - Fixed Windows Terminal and VS Code font apply to use `MesloLGM Nerd Font` instead of the Apple-only `MesloLGM Nerd Font Mono`.

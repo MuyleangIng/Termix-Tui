@@ -1903,8 +1903,11 @@ func dependencyPreviewMessage(errText string) string {
 }
 
 func (m Model) preferredNerdFontMissing() bool {
+	if strings.Contains(strings.ToLower(m.rt.Config.DefaultFont), "meslolgm") {
+		return false
+	}
 	for _, item := range m.fontItems {
-		if strings.Contains(strings.ToLower(item.Name), "cascadia") && strings.Contains(strings.ToLower(item.Name), "nerd") {
+		if strings.Contains(strings.ToLower(item.Name), "meslolgm") && strings.Contains(strings.ToLower(item.Name), "nerd") {
 			return !item.Installed
 		}
 	}
