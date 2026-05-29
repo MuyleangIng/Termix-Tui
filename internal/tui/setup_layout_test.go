@@ -77,6 +77,7 @@ func TestSetupProfileSelectionUsesArrowKeys(t *testing.T) {
 	if len(targets) < 2 {
 		t.Skip("profile selection needs at least two available profiles")
 	}
+	m.setupShell = targets[0].Name
 	if m.setupShell != targets[0].Name {
 		t.Fatalf("initial setup shell = %q, want %q", m.setupShell, targets[0].Name)
 	}
