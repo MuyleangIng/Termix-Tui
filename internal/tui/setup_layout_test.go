@@ -57,7 +57,7 @@ func TestSetupViewFitsTerminal(t *testing.T) {
 	if !strings.Contains(view, "CHOOSE PROFILE") {
 		t.Fatal("setup view missing profile picker")
 	}
-	if !strings.Contains(view, "PowerShell 7") {
+	if !strings.Contains(view, m.setupShell) {
 		t.Fatal("setup view missing selected profile")
 	}
 }
@@ -73,8 +73,12 @@ func TestSetupViewSmallTerminalMessageFits(t *testing.T) {
 
 func TestSetupProfileSelectionUsesArrowKeys(t *testing.T) {
 	m := testSetupModel(100, 30)
-	if m.setupShell != "PowerShell 7" {
-		t.Fatalf("initial setup shell = %q", m.setupShell)
+	targets := profileTargets(m.rt)
+	if len(targets) < 2 {
+		t.Skip("profile selection needs at least two available profiles")
+	}
+	if m.setupShell != targets[0].Name {
+		t.Fatalf("initial setup shell = %q, want %q", m.setupShell, targets[0].Name)
 	}
 
 	next, quit, cmd := m.handleSetupKey(tea.KeyMsg{Type: tea.KeyDown})
@@ -87,8 +91,8 @@ func TestSetupProfileSelectionUsesArrowKeys(t *testing.T) {
 	if next.contentIndex != 1 {
 		t.Fatalf("contentIndex after down = %d, want 1", next.contentIndex)
 	}
-	if next.setupShell != "Windows PowerShell" {
-		t.Fatalf("setupShell after down = %q, want Windows PowerShell", next.setupShell)
+	if next.setupShell != targets[1].Name {
+		t.Fatalf("setupShell after down = %q, want %q", next.setupShell, targets[1].Name)
 	}
 	if next.setupFocusedElement() != "Profile" {
 		t.Fatalf("focus after down = %q, want Profile", next.setupFocusedElement())

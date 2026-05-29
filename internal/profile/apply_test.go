@@ -3,15 +3,18 @@ package profile
 import (
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"testing"
+
+	"github.com/muyleanging/termix/internal/shell"
 )
 
 func TestRepairPromptReplacesManagedBlockWithoutDuplicates(t *testing.T) {
 	home := t.TempDir()
 	firstTheme := writeTheme(t, home, "catppuccin_mocha")
 	secondTheme := writeTheme(t, home, "dracula")
-	profilePath := filepath.Join(home, "Documents", "PowerShell", "Microsoft.PowerShell_profile.ps1")
+	profilePath := ProfilePath(home, "PowerShell 7")
 	if err := os.MkdirAll(filepath.Dir(profilePath), 0o755); err != nil {
 		t.Fatal(err)
 	}
@@ -44,9 +47,12 @@ func TestRepairPromptReplacesManagedBlockWithoutDuplicates(t *testing.T) {
 }
 
 func TestApplyPromptCreatesWindowsPowerShellProfileWithVerifiedBlock(t *testing.T) {
+	if runtime.GOOS != "windows" {
+		t.Skip("Windows PowerShell is only supported on Windows")
+	}
 	home := t.TempDir()
 	themePath := writeTheme(t, home, "amro")
-	profilePath := filepath.Join(home, "Documents", "WindowsPowerShell", "Microsoft.PowerShell_profile.ps1")
+	profilePath := ProfilePath(home, "Windows PowerShell")
 
 	if err := ApplyPrompt(home, "Windows PowerShell", themePath); err != nil {
 		t.Fatal(err)
@@ -89,7 +95,7 @@ func TestApplyPromptRejectsUnknownShell(t *testing.T) {
 
 func TestRemovePromptRemovesOnlyManagedBlock(t *testing.T) {
 	home := t.TempDir()
-	profilePath := filepath.Join(home, "Documents", "PowerShell", "Microsoft.PowerShell_profile.ps1")
+	profilePath := ProfilePath(home, "PowerShell 7")
 	if err := os.MkdirAll(filepath.Dir(profilePath), 0o755); err != nil {
 		t.Fatal(err)
 	}
@@ -119,7 +125,8 @@ func TestRemoveAllPromptsRemovesEverySupportedProfileBlock(t *testing.T) {
 	home := t.TempDir()
 	themePath := writeTheme(t, home, "amro")
 
-	for _, shellName := range []string{"PowerShell 7", "Windows PowerShell", "Git Bash", "Fish", "Nushell"} {
+	for _, adapter := range shell.Supported() {
+		shellName := adapter.Name()
 		if err := ApplyPrompt(home, shellName, themePath); err != nil {
 			t.Fatalf("apply %s: %v", shellName, err)
 		}
@@ -129,7 +136,8 @@ func TestRemoveAllPromptsRemovesEverySupportedProfileBlock(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	for _, shellName := range []string{"PowerShell 7", "Windows PowerShell", "Git Bash", "Fish", "Nushell"} {
+	for _, adapter := range shell.Supported() {
+		shellName := adapter.Name()
 		if HasPromptBlock(home, shellName) {
 			t.Fatalf("expected %s prompt block to be removed", shellName)
 		}
