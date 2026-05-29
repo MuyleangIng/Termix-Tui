@@ -17,14 +17,17 @@ termix themes update
 termix cache rebuild
 ```
 
-## Missing CaskaydiaCove Nerd Font
+## Missing MesloLGM Nerd Font
 
 This is a warning, not a startup failure. Use:
 
 ```bash
 termix fonts list
-termix fonts apply "Cascadia Code"
+termix fonts install "MesloLGM Nerd Font" --yes
+termix fonts apply "MesloLGM Nerd Font"
 ```
+
+On Apple Terminal, restart Terminal after applying. If needed, open `Terminal > Settings > Profiles > Text > Font` and choose `MesloLGM Nerd Font Mono`.
 
 ## Windows Terminal F1 popup
 

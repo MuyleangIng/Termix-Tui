@@ -66,7 +66,7 @@ go build -o bin\termix.exe .
 - Environment detection for Windows Terminal, PowerShell 7, Git Bash, WSL, Oh My Posh, ANSI, Unicode, and profile hints
 - Real Oh My Posh preview engine using `oh-my-posh print primary --config "<theme>.omp.json"`
 - Theme scanner for `.omp.json` files, metadata extraction, favorites, categories, cache rebuild, and official theme import
-- Font manager for Nerd Fonts, installed fallbacks, custom font names, and Windows Terminal font integration
+- Font manager for Nerd Fonts, installed fallbacks, custom font names, and terminal font integration on Windows Terminal, Apple Terminal, and VS Code
 - Safe profile writer that backs up profile files and replaces one managed Termix block
 - Repair, reinstall, cache rebuild, doctor, installer, updater, and uninstaller commands
 
@@ -87,7 +87,7 @@ termix themes update                        Download official Oh My Posh themes
 termix themes apply <theme> --profile <p>   Apply a theme to a profile
 termix fonts list                           Show recommended font status
 termix fonts install <font> --yes           Install a supported Nerd Font
-termix fonts apply <font> --windows-terminal Save/apply a font
+termix fonts apply <font>                    Save/apply a font to supported terminal settings
 termix uninstall                            Fully remove Termix profiles, data, themes, and executable
 termix uninstall profile                    Remove only Termix shell profile blocks
 ```

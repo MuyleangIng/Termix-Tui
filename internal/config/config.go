@@ -42,8 +42,8 @@ func Load(path string) (Config, error) {
 	})
 	v.SetDefault("favorite_themes", []string{"catppuccin_mocha", "paradox", "atomic", "dracula", "tokyo"})
 	v.SetDefault("default_shell", defaultShell())
-	v.SetDefault("default_font", "CaskaydiaCove Nerd Font")
-	v.SetDefault("font_stack", []string{"CaskaydiaCove Nerd Font", "Cascadia Code", "JetBrains Mono", "Fira Code", "Consolas", "Courier New", "monospace"})
+	v.SetDefault("default_font", "MesloLGM Nerd Font")
+	v.SetDefault("font_stack", []string{"MesloLGM Nerd Font", "CaskaydiaCove Nerd Font", "Cascadia Code", "JetBrains Mono", "Fira Code", "Consolas", "Courier New", "monospace"})
 	v.SetDefault("custom_fonts", []string{})
 	v.SetDefault("activity_height", 7)
 	v.SetDefault("border_style", "unicode")
@@ -112,7 +112,7 @@ func SaveFontChoice(cfg Config, fontName string) error {
 		fontName = cfg.DefaultFont
 	}
 	cfg.DefaultFont = fontName
-	cfg.FontStack = prependUnique(fontName, firstNonEmptyList(cfg.FontStack, []string{"Cascadia Code", "JetBrains Mono", "Fira Code", "Consolas", "Courier New", "monospace"}))
+	cfg.FontStack = prependUnique(fontName, firstNonEmptyList(cfg.FontStack, []string{"MesloLGM Nerd Font", "CaskaydiaCove Nerd Font", "Cascadia Code", "JetBrains Mono", "Fira Code", "Consolas", "Courier New", "monospace"}))
 	return SaveSetupChoices(cfg, cfg.DefaultShell, cfg.DefaultFont, firstOrDefault(cfg.FavoriteThemes, "catppuccin_mocha"))
 }
 

@@ -107,7 +107,7 @@
         </div>
         <div class="showcase-grid">
           <article class="tui-panel dark-panel">
-            <div class="tui-header"><strong>TERMIX v0.2.5</strong><span>Dark</span></div>
+            <div class="tui-header"><strong>TERMIX v0.2.7</strong><span>Dark</span></div>
             <div class="tui-body">
               <p class="tui-title">Navigation</p>
               <p><span class="cursor">›</span> Themes</p>
@@ -127,7 +127,7 @@
             <div class="tui-header"><strong>Fonts</strong><span>Fallback</span></div>
             <div class="tui-body">
               <p class="tui-title">Font Manager</p>
-              <p>CaskaydiaCove <span class="status muted">missing</span></p>
+              <p>MesloLGM <span class="status good">active</span></p>
               <p>Cascadia Code <span class="status success">active</span></p>
               <p>I installs, Enter saves</p>
             </div>
@@ -367,8 +367,8 @@ termix uninstall config</code></pre>
                 <td>Show recommended fonts and installed/missing status.</td>
               </tr>
               <tr>
-                <td><code>termix fonts apply "JetBrainsMono Nerd Font" --windows-terminal</code></td>
-                <td>Save the font in Termix and optionally apply it to Windows Terminal with backup.</td>
+                <td><code>termix fonts apply "MesloLGM Nerd Font"</code></td>
+                <td>Save the font in Termix and apply it to supported terminal settings with backups.</td>
               </tr>
               <tr>
                 <td><code>termix fonts install "JetBrainsMono Nerd Font" --yes</code></td>
@@ -408,21 +408,21 @@ termix uninstall config</code></pre>
         </div>
         <p>
           Termix recommends a Nerd Font for prompt icons, but it should never require one to start.
-          If <code>CaskaydiaCove Nerd Font</code> is missing, Termix falls back to the next available
+          If <code>MesloLGM Nerd Font</code> is missing, Termix can install it with Oh My Posh and falls back to the next available
           font and shows a warning instead of blocking the app.
         </p>
         <div class="card-grid">
           <article class="plain-card">
             <h3>Recommended fonts</h3>
-            <p>CaskaydiaCove Nerd Font, CascadiaCode Nerd Font, JetBrainsMono Nerd Font, FiraCode Nerd Font, MesloLGM Nerd Font, Hack Nerd Font, UbuntuMono Nerd Font.</p>
+            <p>MesloLGM Nerd Font, CaskaydiaCove Nerd Font, CascadiaCode Nerd Font, JetBrainsMono Nerd Font, FiraCode Nerd Font, Hack Nerd Font, UbuntuMono Nerd Font.</p>
           </article>
           <article class="plain-card">
             <h3>Fallback stack</h3>
-            <p><code>CaskaydiaCove Nerd Font</code>, <code>Cascadia Code</code>, <code>JetBrains Mono</code>, <code>Fira Code</code>, <code>Consolas</code>, <code>Courier New</code>, <code>monospace</code>.</p>
+            <p><code>MesloLGM Nerd Font</code>, <code>CaskaydiaCove Nerd Font</code>, <code>Cascadia Code</code>, <code>JetBrains Mono</code>, <code>Fira Code</code>, <code>Consolas</code>, <code>Courier New</code>, <code>monospace</code>.</p>
           </article>
           <article class="plain-card">
             <h3>Fonts page controls</h3>
-            <p><code>I</code> installs a missing recommended Nerd Font. <code>Enter</code> saves it in Termix. <code>W</code> applies it to Windows Terminal on Windows. <code>A</code>/<code>E</code>/<code>D</code> manage custom names. <code>R</code> rescans.</p>
+            <p><code>I</code> installs a missing recommended Nerd Font. <code>Enter</code> saves it in Termix. <code>W</code> applies it to Windows Terminal, Apple Terminal, or VS Code where supported. <code>A</code>/<code>E</code>/<code>D</code> manage custom names. <code>R</code> rescans.</p>
           </article>
         </div>
         <div class="code-grid">
@@ -439,7 +439,7 @@ winget install DEVCOM.HackNerdFont</code></pre>
 brew install --cask font-caskaydia-cove-nerd-font
 brew install --cask font-jetbrains-mono-nerd-font
 brew install --cask font-fira-code-nerd-font</code></pre>
-            <p>If Homebrew cask install fails, Termix falls back to <code>oh-my-posh font install</code>. After installing, choose the Nerd Font in Terminal, iTerm2, Warp, VS Code, or your terminal app settings.</p>
+            <p>Termix uses <code>oh-my-posh font install meslo</code> for the recommended font. After installing, <code>termix fonts apply "MesloLGM Nerd Font"</code> updates supported terminal settings or prints the exact manual step.</p>
           </article>
           <article>
             <h3>Linux install</h3>
@@ -471,11 +471,11 @@ fc-cache -fv</code></pre>
               </tr>
               <tr>
                 <td>Manual macOS terminal setup</td>
-                <td>Open your terminal app settings and choose the installed Nerd Font, for example <code>FiraCode Nerd Font</code>, <code>JetBrainsMono Nerd Font</code>, or <code>CaskaydiaCove Nerd Font</code>.</td>
+                <td>Open <code>Terminal > Settings > Profiles > Text > Font</code>, choose <code>MesloLGM Nerd Font Mono</code>, then restart Terminal. Termix also tries to apply this through AppleScript.</td>
               </tr>
               <tr>
                 <td>Manual Windows Terminal setup</td>
-                <td>Open Windows Terminal settings and set the profile font face to an installed font, for example <code>Cascadia Code</code>, <code>JetBrainsMono Nerd Font</code>, or <code>Consolas</code>.</td>
+                <td>Run <code>termix fonts apply "MesloLGM Nerd Font"</code> or open Windows Terminal settings and set the default profile font face to <code>MesloLGM Nerd Font Mono</code>.</td>
               </tr>
             </tbody>
           </table>
@@ -521,8 +521,8 @@ fc-cache -fv</code></pre>
                 <td>Run <code>termix themes update</code> or <code>termix cache rebuild</code>. Cache rebuild never deletes downloaded themes.</td>
               </tr>
               <tr>
-                <td>Missing CaskaydiaCove Nerd Font</td>
-                <td>Use the Fonts page or run <code>termix fonts apply "Cascadia Code"</code>. Missing Nerd Font is a warning, not a startup failure.</td>
+                <td>Missing MesloLGM Nerd Font</td>
+                <td>Run <code>termix fonts install "MesloLGM Nerd Font" --yes</code>, then <code>termix fonts apply "MesloLGM Nerd Font"</code>. Missing Nerd Font is a warning, not a startup failure.</td>
               </tr>
               <tr>
                 <td>PowerShell prompt did not change</td>
@@ -611,7 +611,7 @@ fc-cache -fv</code></pre>
     </main>
 
     <footer class="site-footer">
-      <span>Termix v0.2.5</span>
+      <span>Termix v0.2.7</span>
       <span>Open source project</span>
       <span>Founder: Ing Muyleang</span>
     </footer>

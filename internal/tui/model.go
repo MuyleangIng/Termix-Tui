@@ -1092,8 +1092,8 @@ func saveCustomFontsCmd(rt *app.Runtime, custom []string) tea.Cmd {
 
 func applyWindowsTerminalFontCmd(rt *app.Runtime, fontName string) tea.Cmd {
 	return func() tea.Msg {
-		err := profile.ApplyWindowsTerminalFont(userHome(), fontName)
-		return actionMsg{label: "Windows Terminal font " + fontpkg.ResolveAvailableFamily(userHome(), fontName), err: err}
+		_, err := profile.ApplyTerminalFont(userHome(), fontName)
+		return actionMsg{label: "terminal font " + fontpkg.ResolveAvailableFamily(userHome(), fontName), err: err}
 	}
 }
 
@@ -1162,7 +1162,8 @@ func runSettingsAction(rt *app.Runtime, item string) error {
 	case "Theme paths":
 		return themepkg.EnsureAvailable(context.Background(), rt.Config)
 	case "Font settings":
-		return profile.ApplyWindowsTerminalFont(userHome(), rt.Config.DefaultFont)
+		_, err := profile.ApplyTerminalFont(userHome(), rt.Config.DefaultFont)
+		return err
 	case "Reset workspace":
 		return uninstaller.New(rt).Uninstall(context.Background(), "cache")
 	default:
@@ -1219,7 +1220,7 @@ func setupApplyCmd(rt *app.Runtime, shellName, fontName, themeName string) tea.C
 		if err := themepkg.EnsureAvailable(context.Background(), rt.Config); err != nil {
 			return actionMsg{label: "setup", err: err}
 		}
-		if err := profile.ApplyWindowsTerminalFont(userHome(), fontName); err != nil {
+		if _, err := profile.ApplyTerminalFont(userHome(), fontName); err != nil {
 			return actionMsg{label: "setup", err: err}
 		}
 		if !strings.EqualFold(themeName, "No prompt style") {
@@ -1811,13 +1812,16 @@ func (m Model) fontStatus(name string) string {
 	for _, item := range m.fontItems {
 		if strings.EqualFold(item.Name, name) || strings.EqualFold(item.Family, family) {
 			if item.Installed {
-				return ok.Render("Available")
+				if strings.EqualFold(name, m.rt.Config.DefaultFont) {
+					return ok.Render("Installed and active")
+				}
+				return ok.Render("Installed")
 			}
 			break
 		}
 	}
 	if !strings.Contains(strings.ToLower(name), "nerd") {
-		return warn.Render("Fallback")
+		return warn.Render("Fallback font")
 	}
 	return warn.Render("Missing")
 }
@@ -1842,7 +1846,7 @@ func (m Model) isCustomFont(name string) bool {
 }
 
 func (m Model) fontGlyphStatus(name string) string {
-	if strings.Contains(strings.ToLower(name), "nerd") && strings.Contains(m.fontStatus(name), "Available") {
+	if strings.Contains(strings.ToLower(name), "nerd") && m.isFontInstalled(name) {
 		return ok.Render("Nerd glyphs likely")
 	}
 	return label.Render("glyph fallback possible")
@@ -1850,17 +1854,14 @@ func (m Model) fontGlyphStatus(name string) string {
 
 func (m Model) fontTags(name string) string {
 	var tags []string
-	if strings.EqualFold(name, m.rt.Config.DefaultFont) {
-		tags = append(tags, ok.Render("ACTIVE"))
-	}
 	if isRecommendedNerdFont(name) {
-		tags = append(tags, accent.Render("RECOMMENDED"))
+		tags = append(tags, accent.Render("Recommended"))
 	}
 	if m.isCustomFont(name) {
-		tags = append(tags, label.Render("CUSTOM"))
+		tags = append(tags, label.Render("Custom"))
 	}
 	if !strings.Contains(strings.ToLower(name), "nerd") {
-		tags = append(tags, warn.Render("FALLBACK"))
+		tags = append(tags, warn.Render("Fallback"))
 	}
 	if len(tags) == 0 {
 		return ""

@@ -44,7 +44,7 @@ curl -fsSL https://muyleanging.github.io/Termix-Tui/install.sh | bash
 
 ## Fonts
 
-Termix recommends a Nerd Font but does not require one to run. If `CaskaydiaCove Nerd Font` is missing, choose an installed fallback in the Fonts page and press `W` to apply it to Windows Terminal.
+Termix recommends `MesloLGM Nerd Font` through Oh My Posh but does not require one to run. Use `termix fonts install "MesloLGM Nerd Font" --yes`, then `termix fonts apply "MesloLGM Nerd Font"` to update supported terminal settings.
 
 Useful Windows installs:
 

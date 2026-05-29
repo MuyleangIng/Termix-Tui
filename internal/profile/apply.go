@@ -126,6 +126,10 @@ func ApplyWindowsTerminalFont(home, family string) error {
 	return terminal.SetFont(home, font.ResolveAvailableFamily(home, family))
 }
 
+func ApplyTerminalFont(home, family string) ([]terminal.FontApplyResult, error) {
+	return terminal.ApplyFont(home, font.ResolveFamily(family))
+}
+
 func absoluteThemePath(themePath string) (string, error) {
 	themePath = strings.TrimSpace(themePath)
 	if themePath == "" {

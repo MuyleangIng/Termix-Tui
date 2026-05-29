@@ -7,7 +7,7 @@
     <title>Termix - Terminal Theme Manager</title>
     <meta
       name="description"
-      content="Termix is an open source terminal theme manager for Oh My Posh, Nerd Fonts, Windows Terminal, PowerShell, Git Bash, and WSL."
+      content="Termix is an open source terminal theme manager for Oh My Posh, Nerd Fonts, Windows Terminal, PowerShell, Git Bash, WSL, macOS, and Linux."
     />
 
     <!-- Favicon -->
@@ -19,7 +19,7 @@
     <meta property="og:title" content="Termix - Terminal Theme Manager" />
     <meta
       property="og:description"
-      content="A modern terminal theme manager for Oh My Posh, Nerd Fonts, Windows Terminal, PowerShell, Git Bash, and WSL."
+      content="A modern terminal theme manager for Oh My Posh, Nerd Fonts, Windows Terminal, PowerShell, Git Bash, WSL, macOS, and Linux."
     />
     <meta property="og:url" content="https://muyleanging.github.io/Termix-Tui/" />
     <meta property="og:image" content="https://onhyewqcjmwup3zj.public.blob.vercel-storage.com/termix-thumbnail.png" />
@@ -34,7 +34,7 @@
     <meta name="twitter:title" content="Termix - Terminal Theme Manager" />
     <meta
       name="twitter:description"
-      content="A modern terminal theme manager for Oh My Posh, Nerd Fonts, Windows Terminal, PowerShell, Git Bash, and WSL."
+      content="A modern terminal theme manager for Oh My Posh, Nerd Fonts, Windows Terminal, PowerShell, Git Bash, WSL, macOS, and Linux."
     />
     <meta name="twitter:image" content="https://onhyewqcjmwup3zj.public.blob.vercel-storage.com/termix-thumbnail.png" />
     <meta name="twitter:image:alt" content="Termix terminal theme manager preview" />
@@ -69,7 +69,7 @@
           <h1>Termix</h1>
           <p class="lede">
             A focused CLI and TUI for managing terminal profiles, Oh My Posh themes,
-            Nerd Fonts, Windows Terminal, PowerShell 7, Git Bash, and WSL.
+            Nerd Fonts, Windows Terminal, PowerShell 7, Git Bash, WSL, macOS, and Linux.
           </p>
           <div class="actions">
             <a class="button primary" href="#install">Install</a>
@@ -107,7 +107,7 @@
         </div>
         <div class="showcase-grid">
           <article class="tui-panel dark-panel">
-            <div class="tui-header"><strong>TERMIX v0.1.11</strong><span>Dark</span></div>
+            <div class="tui-header"><strong>TERMIX v0.2.7</strong><span>Dark</span></div>
             <div class="tui-body">
               <p class="tui-title">Navigation</p>
               <p><span class="cursor">›</span> Themes</p>
@@ -127,9 +127,9 @@
             <div class="tui-header"><strong>Fonts</strong><span>Fallback</span></div>
             <div class="tui-body">
               <p class="tui-title">Font Manager</p>
-              <p>CaskaydiaCove <span class="status muted">missing</span></p>
+              <p>MesloLGM <span class="status good">active</span></p>
               <p>Cascadia Code <span class="status success">active</span></p>
-              <p>W applies Windows Terminal</p>
+              <p>I installs, Enter saves</p>
             </div>
           </article>
         </div>
@@ -139,7 +139,7 @@
         <div class="stat-grid">
           <div>
             <strong>Profiles</strong>
-            <span>PowerShell 7, Windows PowerShell, Git Bash, WSL, Fish, Nushell</span>
+            <span>PowerShell, Git Bash, WSL, zsh, bash, Fish, Nushell</span>
           </div>
           <div>
             <strong>Themes</strong>
@@ -155,12 +155,13 @@
       <!-- THEMES GALLERY SECTION -->
       <section id="themes" class="section themes-section">
         <div class="section-heading">
-          <p class="eyebrow">Theme Gallery</p>
-          <h2>Browse and preview Oh My Posh themes</h2>
-          <p>
-            Click a thumbnail to see the full preview. Add your own themes by editing the <code>THEMES</code> array in this file.
-          </p>
-        </div>
+  <p class="eyebrow">Theme Gallery</p>
+  <h2>Preview 120+ Oh My Posh themes</h2>
+  <p>
+    Termix includes a growing gallery of 120+ terminal themes. Browse, preview,
+    and choose the perfect prompt style for PowerShell, Git Bash, WSL, and more.
+  </p>
+</div>
         
         <!-- Large Preview Area -->
         <div class="theme-preview-large" id="themePreviewLarge">
@@ -188,8 +189,8 @@
             Normal users do not need to clone the repository or install Go.
             Use the installer script from GitHub Pages. The script downloads
             the latest Termix binary from GitHub Releases. On Windows, it also
-            bootstraps the default tools, CascadiaCode Nerd Font, and official
-            Oh My Posh themes. Open a new terminal before running setup so the
+            bootstraps the default tools, a Nerd Font, and official Oh My Posh
+            themes. Open a new terminal before running setup so the
             interactive picker receives arrow keys correctly.
           </p>
         </div>
@@ -366,8 +367,8 @@ termix uninstall config</code></pre>
                 <td>Show recommended fonts and installed/missing status.</td>
               </tr>
               <tr>
-                <td><code>termix fonts apply "JetBrainsMono Nerd Font" --windows-terminal</code></td>
-                <td>Save the font in Termix and optionally apply it to Windows Terminal with backup.</td>
+                <td><code>termix fonts apply "MesloLGM Nerd Font"</code></td>
+                <td>Save the font in Termix and apply it to supported terminal settings with backups.</td>
               </tr>
               <tr>
                 <td><code>termix fonts install "JetBrainsMono Nerd Font" --yes</code></td>
@@ -407,21 +408,21 @@ termix uninstall config</code></pre>
         </div>
         <p>
           Termix recommends a Nerd Font for prompt icons, but it should never require one to start.
-          If <code>CaskaydiaCove Nerd Font</code> is missing, Termix falls back to the next available
+          If <code>MesloLGM Nerd Font</code> is missing, Termix can install it with Oh My Posh and falls back to the next available
           font and shows a warning instead of blocking the app.
         </p>
         <div class="card-grid">
           <article class="plain-card">
             <h3>Recommended fonts</h3>
-            <p>CaskaydiaCove Nerd Font, CascadiaCode Nerd Font, JetBrainsMono Nerd Font, FiraCode Nerd Font, MesloLGM Nerd Font, Hack Nerd Font, UbuntuMono Nerd Font.</p>
+            <p>MesloLGM Nerd Font, CaskaydiaCove Nerd Font, CascadiaCode Nerd Font, JetBrainsMono Nerd Font, FiraCode Nerd Font, Hack Nerd Font, UbuntuMono Nerd Font.</p>
           </article>
           <article class="plain-card">
             <h3>Fallback stack</h3>
-            <p><code>CaskaydiaCove Nerd Font</code>, <code>Cascadia Code</code>, <code>JetBrains Mono</code>, <code>Fira Code</code>, <code>Consolas</code>, <code>Courier New</code>, <code>monospace</code>.</p>
+            <p><code>MesloLGM Nerd Font</code>, <code>CaskaydiaCove Nerd Font</code>, <code>Cascadia Code</code>, <code>JetBrains Mono</code>, <code>Fira Code</code>, <code>Consolas</code>, <code>Courier New</code>, <code>monospace</code>.</p>
           </article>
           <article class="plain-card">
             <h3>Fonts page controls</h3>
-            <p><code>Enter</code> saves the font in Termix. <code>W</code> applies it to Windows Terminal. <code>I</code> installs a missing recommended Nerd Font. <code>A</code>/<code>E</code>/<code>D</code> manage custom names. <code>R</code> rescans.</p>
+            <p><code>I</code> installs a missing recommended Nerd Font. <code>Enter</code> saves it in Termix. <code>W</code> applies it to Windows Terminal, Apple Terminal, or VS Code where supported. <code>A</code>/<code>E</code>/<code>D</code> manage custom names. <code>R</code> rescans.</p>
           </article>
         </div>
         <div class="code-grid">
@@ -434,9 +435,11 @@ winget install DEVCOM.HackNerdFont</code></pre>
           </article>
           <article>
             <h3>macOS install</h3>
-            <pre><code>brew install --cask font-caskaydia-cove-nerd-font
+            <pre><code>brew search nerd-font
+brew install --cask font-caskaydia-cove-nerd-font
 brew install --cask font-jetbrains-mono-nerd-font
 brew install --cask font-fira-code-nerd-font</code></pre>
+            <p>Termix uses <code>oh-my-posh font install meslo</code> for the recommended font. After installing, <code>termix fonts apply "MesloLGM Nerd Font"</code> updates supported terminal settings or prints the exact manual step.</p>
           </article>
           <article>
             <h3>Linux install</h3>
@@ -456,19 +459,23 @@ fc-cache -fv</code></pre>
             <tbody>
               <tr>
                 <td>Fix missing font warning</td>
-                <td>Open <code>termix</code>, go to <strong>Fonts</strong>, choose an installed fallback such as <code>Cascadia Code</code> or <code>Consolas</code>, press <code>Enter</code>, then press <code>W</code> to write it to Windows Terminal.</td>
+                <td>Open <code>termix</code>, go to <strong>Fonts</strong>, install a recommended Nerd Font with <code>I</code>, press <code>R</code> to rescan, then press <code>Enter</code> to save it in Termix.</td>
               </tr>
               <tr>
                 <td>Install Nerd Font</td>
-                <td>Highlight a missing recommended Nerd Font, press <code>I</code>, confirm with <code>Y</code>, then press <code>R</code> to rescan.</td>
+                <td>Highlight a missing recommended Nerd Font, press <code>I</code>, confirm with <code>Y</code>, then press <code>R</code> to rescan. On macOS Termix uses Homebrew casks such as <code>font-fira-code-nerd-font</code>.</td>
               </tr>
               <tr>
                 <td>Add custom font</td>
                 <td>Press <code>A</code>, type the exact font family name, press <code>Enter</code>. Use <code>E</code> to edit and <code>D</code> to remove custom fonts.</td>
               </tr>
               <tr>
+                <td>Manual macOS terminal setup</td>
+                <td>Open <code>Terminal > Settings > Profiles > Text > Font</code>, choose <code>MesloLGM Nerd Font Mono</code>, then restart Terminal. Termix also tries to apply this through AppleScript.</td>
+              </tr>
+              <tr>
                 <td>Manual Windows Terminal setup</td>
-                <td>Open Windows Terminal settings and set the profile font face to an installed font, for example <code>Cascadia Code</code>, <code>JetBrainsMono Nerd Font</code>, or <code>Consolas</code>.</td>
+                <td>Run <code>termix fonts apply "MesloLGM Nerd Font"</code> or open Windows Terminal settings and set the default profile font face to <code>MesloLGM Nerd Font Mono</code>.</td>
               </tr>
             </tbody>
           </table>
@@ -514,8 +521,8 @@ fc-cache -fv</code></pre>
                 <td>Run <code>termix themes update</code> or <code>termix cache rebuild</code>. Cache rebuild never deletes downloaded themes.</td>
               </tr>
               <tr>
-                <td>Missing CaskaydiaCove Nerd Font</td>
-                <td>Use the Fonts page or run <code>termix fonts apply "Cascadia Code"</code>. Missing Nerd Font is a warning, not a startup failure.</td>
+                <td>Missing MesloLGM Nerd Font</td>
+                <td>Run <code>termix fonts install "MesloLGM Nerd Font" --yes</code>, then <code>termix fonts apply "MesloLGM Nerd Font"</code>. Missing Nerd Font is a warning, not a startup failure.</td>
               </tr>
               <tr>
                 <td>PowerShell prompt did not change</td>
@@ -604,7 +611,7 @@ fc-cache -fv</code></pre>
     </main>
 
     <footer class="site-footer">
-      <span>Termix v0.1.11</span>
+      <span>Termix v0.2.7</span>
       <span>Open source project</span>
       <span>Founder: Ing Muyleang</span>
     </footer>
@@ -657,8 +664,8 @@ fc-cache -fv</code></pre>
         {
           name: "atomicBit",
           category: "colorful",
-          imageDark: "./assets/theme-atomicbit.png",
-          imageLight: "./assets/theme-atomicbit.png",
+          imageDark: "./assets/theme-atomicBit.png",
+          imageLight: "./assets/theme-atomicBit.png",
           description: "A vibrant theme with a unique atomic symbol and bright color palette. Adds energy to your terminal!"
         },
         {
@@ -674,6 +681,13 @@ fc-cache -fv</code></pre>
           imageDark: "./assets/theme-1_shell.png",
           imageLight: "./assets/theme-1_shell.png",
           description: "Minimal monochrome theme with a simple shell icon and clean prompt. Focus on the essentials with this understated design."
+        },
+        {
+          name: "gmay",
+          category: "colorful",
+          imageDark: "./assets/theme-gmay.png",
+          imageLight: "./assets/theme-gmay.png",
+          description: "A colorful theme with a cute cat icon and playful color scheme. Brings fun vibes to your terminal!"
         }
         // Add more themes here! Example with separate dark/light images:
         // {
@@ -837,5 +851,3 @@ fc-cache -fv</code></pre>
     </script>
   </body>
 </html>
-</content>
-<parameter name="taskNameActive">Writing index.html

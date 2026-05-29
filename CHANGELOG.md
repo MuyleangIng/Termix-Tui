@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.2.7
+
+- Restored the v0.2.5 TUI rendering behavior while keeping the font workflow focused.
+- Switched the default Nerd Font install path to `oh-my-posh font install meslo`.
+- Added cross-platform terminal font apply support for Windows Terminal, Apple Terminal, and VS Code.
+- Improved macOS font detection through `fc-list`, `system_profiler`, `mdfind`, and standard font folders.
+- Updated docs for Apple Terminal manual font selection and restart steps.
+
 ## v0.2.5
 
 - Added Oh My Posh font install fallback when macOS Homebrew cask install fails.

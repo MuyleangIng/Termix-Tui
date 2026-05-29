@@ -2,6 +2,7 @@ package font
 
 import (
 	"os"
+	"os/exec"
 	"path/filepath"
 	"runtime"
 	"strings"
@@ -14,14 +15,14 @@ type Font struct {
 }
 
 var Supported = []Font{
+	{Name: "MesloLGM Nerd Font", Family: "MesloLGM Nerd Font"},
+	{Name: "MesloLGS Nerd Font", Family: "MesloLGS NF"},
 	{Name: "Cascadia Code Nerd Font", Family: "CaskaydiaCove Nerd Font"},
 	{Name: "CaskaydiaCove Nerd Font", Family: "CaskaydiaCove Nerd Font"},
 	{Name: "CascadiaCode Nerd Font", Family: "CaskaydiaCove Nerd Font"},
 	{Name: "JetBrainsMono Nerd Font", Family: "JetBrainsMono Nerd Font"},
 	{Name: "FiraCode Nerd Font", Family: "FiraCode Nerd Font"},
 	{Name: "Hack Nerd Font", Family: "Hack Nerd Font"},
-	{Name: "MesloLGS Nerd Font", Family: "MesloLGS NF"},
-	{Name: "MesloLGM Nerd Font", Family: "MesloLGM Nerd Font"},
 	{Name: "UbuntuMono Nerd Font", Family: "UbuntuMono Nerd Font"},
 	{Name: "Cascadia Code", Family: "Cascadia Code"},
 	{Name: "JetBrains Mono", Family: "JetBrains Mono"},
@@ -31,6 +32,7 @@ var Supported = []Font{
 }
 
 var FallbackStack = []string{
+	"MesloLGM Nerd Font",
 	"CaskaydiaCove Nerd Font",
 	"FiraCode Nerd Font",
 	"JetBrainsMono Nerd Font",
@@ -101,7 +103,12 @@ func Detect(home string) []Font {
 	}
 	items := make([]Font, len(Supported))
 	copy(items, Supported)
+	systemFonts := installedFontNames()
 	for i := range items {
+		if matchesInstalledName(systemFonts, items[i].Name, items[i].Family) {
+			items[i].Installed = true
+			continue
+		}
 		for _, fontDir := range fontDirs {
 			if fontDir == "Fonts" {
 				continue
@@ -113,6 +120,51 @@ func Detect(home string) []Font {
 		}
 	}
 	return items
+}
+
+func installedFontNames() string {
+	var parts []string
+	if out, err := exec.Command("fc-list").CombinedOutput(); err == nil {
+		parts = append(parts, string(out))
+	}
+	if runtime.GOOS == "darwin" {
+		if out, err := exec.Command("system_profiler", "SPFontsDataType").CombinedOutput(); err == nil {
+			parts = append(parts, string(out))
+		}
+		if out, err := exec.Command("mdfind", "kMDItemKind == 'Font'").CombinedOutput(); err == nil {
+			parts = append(parts, string(out))
+		}
+	}
+	return strings.ToLower(strings.Join(parts, "\n"))
+}
+
+func matchesInstalledName(haystack string, names ...string) bool {
+	if haystack == "" {
+		return false
+	}
+	for _, name := range names {
+		for _, alias := range fontAliases(name) {
+			if strings.Contains(haystack, strings.ToLower(alias)) {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+func fontAliases(name string) []string {
+	compact := strings.NewReplacer(" ", "", "-", "", "_", "").Replace(name)
+	return []string{
+		name,
+		compact,
+		strings.ReplaceAll(name, "MesloLGM Nerd Font", "MesloLGM Nerd Font Mono"),
+		strings.ReplaceAll(name, "MesloLGM Nerd Font", "MesloLGM NF"),
+		strings.ReplaceAll(name, "MesloLGS Nerd Font", "MesloLGS Nerd Font Mono"),
+		strings.ReplaceAll(name, "MesloLGS Nerd Font", "MesloLGS NF"),
+		strings.ReplaceAll(name, "CaskaydiaCove", "Caskaydia Cove"),
+		strings.ReplaceAll(name, "JetBrainsMono", "JetBrains Mono"),
+		strings.ReplaceAll(name, "FiraCode", "Fira Code"),
+	}
 }
 
 func installed(home, family string) bool {
