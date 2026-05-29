@@ -87,15 +87,7 @@ func (e Engine) windowsPlan(component string) []func(context.Context) error {
 			requireTool("oh-my-posh", winget("JanDeDobbeleer.OhMyPosh")),
 			installMeslo,
 		}
-	case "font:CaskaydiaCove Nerd Font", "font:CascadiaCode Nerd Font", "font:Cascadia Code Nerd Font":
-		return []func(context.Context) error{winget("DEVCOM.CascadiaCodeNerdFont")}
-	case "font:JetBrainsMono Nerd Font":
-		return []func(context.Context) error{winget("DEVCOM.JetBrainsMonoNerdFont")}
-	case "font:FiraCode Nerd Font":
-		return []func(context.Context) error{winget("DEVCOM.FiraCodeNerdFont")}
-	case "font:Hack Nerd Font":
-		return []func(context.Context) error{winget("DEVCOM.HackNerdFont")}
-	case "font:MesloLGS Nerd Font", "font:MesloLGM Nerd Font":
+	case "font:MesloLGM Nerd Font":
 		return []func(context.Context) error{
 			requireTool("oh-my-posh", winget("JanDeDobbeleer.OhMyPosh")),
 			installMeslo,
@@ -278,20 +270,8 @@ func (e Engine) unixPlan(component string, pm packageManager) []func(context.Con
 		return []func(context.Context) error{requireTool("pwsh", func(ctx context.Context) error { return pm.Install(ctx, "powershell") })}
 	case "font", "fonts", "nerd-font", "nerd-fonts":
 		return []func(context.Context) error{requireTool("oh-my-posh", pm.OhMyPosh), installMeslo}
-	case "font:CaskaydiaCove Nerd Font", "font:CascadiaCode Nerd Font", "font:Cascadia Code Nerd Font":
-		return []func(context.Context) error{func(ctx context.Context) error { return pm.Font(ctx, "CaskaydiaCove Nerd Font") }}
-	case "font:JetBrainsMono Nerd Font":
-		return []func(context.Context) error{func(ctx context.Context) error { return pm.Font(ctx, "JetBrainsMono Nerd Font") }}
-	case "font:FiraCode Nerd Font":
-		return []func(context.Context) error{func(ctx context.Context) error { return pm.Font(ctx, "FiraCode Nerd Font") }}
-	case "font:Hack Nerd Font":
-		return []func(context.Context) error{func(ctx context.Context) error { return pm.Font(ctx, "Hack Nerd Font") }}
-	case "font:MesloLGS Nerd Font":
-		return []func(context.Context) error{requireTool("oh-my-posh", pm.OhMyPosh), func(ctx context.Context) error { return pm.Font(ctx, "MesloLGS Nerd Font") }}
 	case "font:MesloLGM Nerd Font":
 		return []func(context.Context) error{requireTool("oh-my-posh", pm.OhMyPosh), func(ctx context.Context) error { return pm.Font(ctx, "MesloLGM Nerd Font") }}
-	case "font:UbuntuMono Nerd Font":
-		return []func(context.Context) error{func(ctx context.Context) error { return pm.Font(ctx, "UbuntuMono Nerd Font") }}
 	case "theme", "themes", "all-themes":
 		return []func(context.Context) error{installThemes}
 	default:
@@ -306,20 +286,8 @@ func (e Engine) unixPlan(component string, pm packageManager) []func(context.Con
 
 func macFontCask(fontName string) (string, bool) {
 	switch strings.ToLower(strings.TrimSpace(fontName)) {
-	case "caskaydiacove nerd font", "cascadiacode nerd font", "cascadia code nerd font":
-		return "font-caskaydia-cove-nerd-font", true
-	case "jetbrainsmono nerd font", "jetbrains mono nerd font":
-		return "font-jetbrains-mono-nerd-font", true
-	case "firacode nerd font", "fira code nerd font":
-		return "font-fira-code-nerd-font", true
-	case "hack nerd font":
-		return "font-hack-nerd-font", true
-	case "meslolgs nerd font":
-		return "font-meslo-lg-nerd-font", true
 	case "meslolgm nerd font":
 		return "font-meslo-lg-nerd-font", true
-	case "ubuntumono nerd font", "ubuntu mono nerd font":
-		return "font-ubuntu-mono-nerd-font", true
 	default:
 		return "", false
 	}
@@ -327,18 +295,8 @@ func macFontCask(fontName string) (string, bool) {
 
 func ohMyPoshFontName(fontName string) (string, bool) {
 	switch strings.ToLower(strings.TrimSpace(fontName)) {
-	case "caskaydiacove nerd font", "cascadiacode nerd font", "cascadia code nerd font":
-		return "CascadiaCode", true
-	case "jetbrainsmono nerd font", "jetbrains mono nerd font":
-		return "JetBrainsMono", true
-	case "firacode nerd font", "fira code nerd font":
-		return "FiraCode", true
-	case "hack nerd font":
-		return "Hack", true
-	case "meslolgs nerd font", "meslolgm nerd font":
+	case "meslolgm nerd font":
 		return "meslo", true
-	case "ubuntumono nerd font", "ubuntu mono nerd font":
-		return "UbuntuMono", true
 	default:
 		return "", false
 	}

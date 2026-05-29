@@ -19,7 +19,7 @@ Open `docs/index.html` in a browser. No build step is required.
 
 ## Public Install URLs
 
-GitHub Pages hosts only the website and installer scripts. The scripts download real binaries from GitHub Releases. On Windows, the installer also bootstraps the default tools, CascadiaCode Nerd Font, and official Oh My Posh themes.
+GitHub Pages hosts only the website and installer scripts. The scripts download real binaries from GitHub Releases and bootstrap Oh My Posh, MesloLGM Nerd Font, and official Oh My Posh themes.
 After installing, open a new terminal before running `termix setup`; setup is not launched from inside the installer so arrow-key selection works correctly.
 
 ```powershell
@@ -49,10 +49,7 @@ Termix recommends `MesloLGM Nerd Font` through Oh My Posh but does not require o
 Useful Windows installs:
 
 ```powershell
-winget install DEVCOM.CascadiaCodeNerdFont
-winget install DEVCOM.JetBrainsMonoNerdFont
-winget install DEVCOM.FiraCodeNerdFont
-winget install DEVCOM.HackNerdFont
+oh-my-posh font install meslo
 ```
 
 In the Termix Fonts page:
@@ -79,7 +76,7 @@ termix uninstall profile
 termix cache rebuild
 termix themes update
 termix themes apply catppuccin_mocha --profile "PowerShell 7"
-termix fonts apply "JetBrainsMono Nerd Font" --windows-terminal
+termix fonts apply "MesloLGM Nerd Font"
 termix uninstall
 ```
 

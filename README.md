@@ -57,7 +57,7 @@ Here is a look at selected configurations from the automated scanner:
 
 ## Quick Install
 
-Normal users do not need Go, `git clone`, or `go install`. Use the GitHub Pages installer. It downloads the latest binary from GitHub Releases. On Windows, the installer also bootstraps the default Termix tools, CascadiaCode Nerd Font, and official Oh My Posh themes. After installing, open a new terminal and run `termix setup` so the interactive picker receives arrow keys correctly.
+Normal users do not need Go, `git clone`, or `go install`. Use the GitHub Pages installer. It downloads the latest binary from GitHub Releases and bootstraps Oh My Posh, MesloLGM Nerd Font, and official Oh My Posh themes. After installing, open a new terminal and run `termix setup` so the interactive picker receives arrow keys correctly.
 
 ### Windows
 

@@ -120,7 +120,7 @@ func testSetupModel(width, height int) Model {
 		Config: config.Config{
 			HomeDir:        ".",
 			DefaultShell:   "PowerShell 7",
-			DefaultFont:    "CaskaydiaCove Nerd Font",
+			DefaultFont:    "MesloLGM Nerd Font",
 			FavoriteThemes: []string{"catppuccin_mocha"},
 			BorderStyle:    "unicode",
 		},

@@ -225,6 +225,13 @@ install_termix() {
 
   success "Termix installed successfully."
 
+  info "Bootstrapping Oh My Posh, Meslo font, and official themes..."
+  if "$INSTALL_DIR/termix" install; then
+    success "Default tools, Meslo font, and official themes are ready."
+  else
+    warn "Bootstrap did not complete. You can retry later with: termix install"
+  fi
+
   echo ""
   success "Done."
   info "Next steps:"

@@ -16,32 +16,10 @@ type Font struct {
 
 var Supported = []Font{
 	{Name: "MesloLGM Nerd Font", Family: "MesloLGM Nerd Font"},
-	{Name: "MesloLGS Nerd Font", Family: "MesloLGS NF"},
-	{Name: "Cascadia Code Nerd Font", Family: "CaskaydiaCove Nerd Font"},
-	{Name: "CaskaydiaCove Nerd Font", Family: "CaskaydiaCove Nerd Font"},
-	{Name: "CascadiaCode Nerd Font", Family: "CaskaydiaCove Nerd Font"},
-	{Name: "JetBrainsMono Nerd Font", Family: "JetBrainsMono Nerd Font"},
-	{Name: "FiraCode Nerd Font", Family: "FiraCode Nerd Font"},
-	{Name: "Hack Nerd Font", Family: "Hack Nerd Font"},
-	{Name: "UbuntuMono Nerd Font", Family: "UbuntuMono Nerd Font"},
-	{Name: "Cascadia Code", Family: "Cascadia Code"},
-	{Name: "JetBrains Mono", Family: "JetBrains Mono"},
-	{Name: "Fira Code", Family: "Fira Code"},
-	{Name: "Consolas", Family: "Consolas"},
-	{Name: "Courier New", Family: "Courier New"},
 }
 
 var FallbackStack = []string{
 	"MesloLGM Nerd Font",
-	"CaskaydiaCove Nerd Font",
-	"FiraCode Nerd Font",
-	"JetBrainsMono Nerd Font",
-	"Hack Nerd Font",
-	"Cascadia Code",
-	"JetBrains Mono",
-	"Fira Code",
-	"Consolas",
-	"Courier New",
 	"monospace",
 }
 
@@ -85,7 +63,7 @@ func ResolveAvailableFamily(home, name string) string {
 		}
 	}
 	if runtime.GOOS == "windows" {
-		return "Consolas"
+		return "MesloLGM Nerd Font"
 	}
 	return "monospace"
 }
@@ -170,11 +148,6 @@ func fontAliases(name string) []string {
 		compact,
 		strings.ReplaceAll(name, "MesloLGM Nerd Font", "MesloLGM Nerd Font Mono"),
 		strings.ReplaceAll(name, "MesloLGM Nerd Font", "MesloLGM NF"),
-		strings.ReplaceAll(name, "MesloLGS Nerd Font", "MesloLGS Nerd Font Mono"),
-		strings.ReplaceAll(name, "MesloLGS Nerd Font", "MesloLGS NF"),
-		strings.ReplaceAll(name, "CaskaydiaCove", "Caskaydia Cove"),
-		strings.ReplaceAll(name, "JetBrainsMono", "JetBrains Mono"),
-		strings.ReplaceAll(name, "FiraCode", "Fira Code"),
 	}
 }
 

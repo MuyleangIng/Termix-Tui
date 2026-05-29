@@ -15,7 +15,7 @@ termix setup
 ```
 
 The GitHub Pages scripts download the latest binary from GitHub Releases.
-On Windows, the installer also bootstraps the default tools, CascadiaCode Nerd Font, and official Oh My Posh themes.
+The installer also bootstraps Oh My Posh, MesloLGM Nerd Font, and official Oh My Posh themes.
 
 Open a new terminal after install, then run `termix setup`. The setup screen asks for the target profile and applies the default Termix font/theme automatically.
 

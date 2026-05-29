@@ -58,14 +58,6 @@ func terminalFace(family string) string {
 	switch strings.ToLower(strings.TrimSpace(family)) {
 	case "meslolgm nerd font", "meslolgm nf":
 		return "MesloLGM Nerd Font Mono"
-	case "meslolgs nerd font", "meslolgs nf":
-		return "MesloLGS Nerd Font Mono"
-	case "cascadia code nerd font", "cascadiacode nerd font":
-		return "CaskaydiaCove Nerd Font"
-	case "jetbrainsmono nerd font":
-		return "JetBrainsMono Nerd Font"
-	case "firacode nerd font":
-		return "FiraCode Nerd Font"
 	default:
 		return family
 	}

@@ -2,15 +2,9 @@
 
 Termix recommends Nerd Fonts for Oh My Posh icons, but missing fonts do not block startup.
 
-Recommended fonts:
+Recommended font:
 
 - MesloLGM Nerd Font
-- CaskaydiaCove Nerd Font
-- CascadiaCode Nerd Font
-- JetBrainsMono Nerd Font
-- FiraCode Nerd Font
-- Hack Nerd Font
-- UbuntuMono Nerd Font
 
 Useful commands:
 
@@ -39,11 +33,5 @@ Fallback stack:
 
 ```text
 MesloLGM Nerd Font
-CaskaydiaCove Nerd Font
-Cascadia Code
-JetBrains Mono
-Fira Code
-Consolas
-Courier New
 monospace
 ```

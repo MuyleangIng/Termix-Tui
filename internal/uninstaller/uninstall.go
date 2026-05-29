@@ -79,7 +79,6 @@ func uninstallWindowsDependencies(ctx context.Context) error {
 	}
 	targets := []string{
 		"JanDeDobbeleer.OhMyPosh",
-		"DEVCOM.CascadiaCodeNerdFont",
 	}
 	var failures []string
 	for _, id := range targets {

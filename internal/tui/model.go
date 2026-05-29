@@ -1227,15 +1227,15 @@ func setupApplyCmd(rt *app.Runtime, shellName, fontName, themeName string) tea.C
 		if err := installer.New(rt).Install(context.Background(), "oh-my-posh"); err != nil {
 			return actionMsg{label: "setup", err: err}
 		}
-		if runtime.GOOS == "windows" {
-			if err := installer.New(rt).Install(context.Background(), "fonts"); err != nil {
+		if isRecommendedNerdFont(fontName) {
+			if err := installer.New(rt).Install(context.Background(), "font:"+fontName); err != nil {
 				return actionMsg{label: "setup", err: err}
 			}
 		}
-		if runtime.GOOS != "linux" && isRecommendedNerdFont(fontName) {
-			_ = installer.New(rt).Install(context.Background(), "font:"+fontName)
-		}
 		if err := themepkg.EnsureAvailable(context.Background(), rt.Config); err != nil {
+			return actionMsg{label: "setup", err: err}
+		}
+		if _, err := themepkg.InstallOfficialThemes(context.Background(), rt.Config); err != nil {
 			return actionMsg{label: "setup", err: err}
 		}
 		if _, err := profile.ApplyTerminalFont(userHome(), fontName); err != nil {
@@ -1253,7 +1253,7 @@ func setupApplyCmd(rt *app.Runtime, shellName, fontName, themeName string) tea.C
 		if err := config.MarkSetupComplete(rt.Config.HomeDir); err != nil {
 			return actionMsg{label: "setup", err: err}
 		}
-		return actionMsg{label: "setup applied", err: nil}
+		return actionMsg{label: "setup applied", err: nil, refreshThemes: true}
 	}
 }
 
@@ -1674,9 +1674,10 @@ func (m Model) previewPanel(w, h int) string {
 			"\nHighlighted: " + font +
 			"\nResolved face: " + resolved +
 			"\nStatus: " + m.fontStatus(font) + m.fontTags(font) + warning +
-			"\n\nFallback stack:\n" + fitLine(strings.Join(fontpkg.FallbackStack, " -> "), max(16, w-6)) +
+			"\n\nTermix uses Meslo from Oh My Posh." +
+			"\nI installs Meslo. W applies it to Apple Terminal, Windows Terminal, and VS Code when available." +
 			"\n\n" + fontSampleText() +
-			"\n\n" + badgeRow("Enter config", "I install", "A add", "E edit", "D delete", "W Windows Terminal", "R rescan")
+			"\n\n" + badgeRow("Enter save", "I install Meslo", "W apply terminal/VS Code", "R rescan")
 	case screenDoctor:
 		body = sectionTitle("TERMINAL HEALTH") + "\n" + statusLine("ANSI", m.rt.Env.ANSI) + "\n" + statusLine("Unicode", m.rt.Env.Unicode) + "\n" + statusLine("Font fallback", true) + "\n" + statusLine("Oh My Posh", m.rt.Env.OhMyPosh.Installed) + "\n\n" + sectionTitle("FIXES") + "\n• Install Oh My Posh\n• Configure PowerShell profile\n• Select terminal font"
 	case screenProfiles:
@@ -2085,7 +2086,7 @@ func (m Model) startupView() string {
 		}
 		lines = append(lines, fmt.Sprintf("%s  %-20s %s", state, check, startupStatus(i, step, pct)))
 	}
-	lines = append(lines, "", label.Render("Font fallback: "+strings.Join(fontpkg.FallbackStack[:5], " → ")))
+	lines = append(lines, "", label.Render("Font: MesloLGM Nerd Font"))
 	body := fitBlock(strings.Join(lines, "\n"), innerW, min(max(10, h-4), 14))
 	return appShell.Render(lipgloss.Place(w, h, lipgloss.Center, lipgloss.Center, cardHot.Width(boxW).Render(body)))
 }

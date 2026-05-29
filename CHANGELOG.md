@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.2.9
+
+- Made macOS/Linux install scripts bootstrap Oh My Posh, MesloLGM Nerd Font, and official themes after installing the binary.
+- Reduced the recommended font model to MesloLGM Nerd Font only.
+- Removed extra Nerd Font choices from the TUI and CLI font list.
+- Kept terminal/VS Code font apply available from the Fonts page with `W`.
+- Setup now downloads the full official theme set during explicit setup apply, while TUI startup stays fast.
+
 ## v0.2.8
 
 - Made TUI startup faster by avoiding network theme installation and full macOS font probing during launch.
