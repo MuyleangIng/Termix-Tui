@@ -8,6 +8,7 @@ import (
 
 	"github.com/muyleanging/termix/internal/ansi"
 	"github.com/muyleanging/termix/internal/theme"
+	"github.com/muyleanging/termix/internal/toolpath"
 )
 
 type Engine struct {
@@ -22,7 +23,11 @@ func (e Engine) Render(ctx context.Context, item theme.Theme) (string, error) {
 	if item.Path == "" {
 		return "", errors.New("theme path is empty")
 	}
-	cmd := exec.CommandContext(ctx, "oh-my-posh", "print", "primary", "--config", item.Path)
+	omp, err := toolpath.Resolve("oh-my-posh")
+	if err != nil {
+		return "", err
+	}
+	cmd := exec.CommandContext(ctx, omp, "print", "primary", "--config", item.Path)
 	var stdout bytes.Buffer
 	cmd.Stdout = &stdout
 	cmd.Stderr = &stdout

@@ -3,10 +3,11 @@ package shell
 import (
 	"fmt"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"runtime"
 	"strings"
+
+	"github.com/muyleanging/termix/internal/toolpath"
 )
 
 type Adapter interface {
@@ -151,8 +152,7 @@ func currentShellMatches(adapter Adapter) bool {
 }
 
 func commandExists(name string) bool {
-	_, err := exec.LookPath(name)
-	return err == nil
+	return toolpath.Exists(name)
 }
 
 func quotePowerShellPath(path string) string {
@@ -162,27 +162,8 @@ func quotePowerShellPath(path string) string {
 }
 
 func ohMyPoshCommand() string {
-	if path, err := exec.LookPath("oh-my-posh"); err == nil {
+	if path, err := toolpath.Resolve("oh-my-posh"); err == nil {
 		return path
-	}
-	if runtime.GOOS != "windows" {
-		return "oh-my-posh"
-	}
-	exe := "oh-my-posh.exe"
-	candidates := []string{
-		filepath.Join(os.Getenv("LOCALAPPDATA"), "Microsoft", "WindowsApps", exe),
-		filepath.Join(os.Getenv("LOCALAPPDATA"), "Programs", "oh-my-posh", exe),
-		filepath.Join(os.Getenv("LOCALAPPDATA"), "Programs", "oh-my-posh", "bin", exe),
-		filepath.Join(os.Getenv("ProgramFiles"), "oh-my-posh", exe),
-		filepath.Join(os.Getenv("ProgramFiles"), "oh-my-posh", "bin", exe),
-	}
-	for _, candidate := range candidates {
-		if candidate == "" || !filepath.IsAbs(candidate) {
-			continue
-		}
-		if info, err := os.Stat(candidate); err == nil && !info.IsDir() {
-			return candidate
-		}
 	}
 	return "oh-my-posh"
 }

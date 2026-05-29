@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.2.2
+
+- Resolved Homebrew and Oh My Posh paths on macOS when `/opt/homebrew/bin` or `/usr/local/bin` are missing from the app PATH.
+- Made real preview, doctor, setup, and shell profile snippets use the same executable resolver.
+- Ensured setup installs/checks Oh My Posh on macOS and Linux before applying zsh/bash profiles.
+
 ## v0.2.1
 
 - Fixed macOS/Linux installer argument parsing and cleanup under `set -u`.

@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"runtime"
 	"strings"
@@ -23,6 +22,7 @@ import (
 	"github.com/muyleanging/termix/internal/profile"
 	"github.com/muyleanging/termix/internal/shell"
 	themepkg "github.com/muyleanging/termix/internal/theme"
+	"github.com/muyleanging/termix/internal/toolpath"
 	"github.com/muyleanging/termix/internal/uninstaller"
 )
 
@@ -1205,10 +1205,10 @@ func appendFile(path, data string) error {
 
 func setupApplyCmd(rt *app.Runtime, shellName, fontName, themeName string) tea.Cmd {
 	return func() tea.Msg {
+		if err := installer.New(rt).Install(context.Background(), "oh-my-posh"); err != nil {
+			return actionMsg{label: "setup", err: err}
+		}
 		if runtime.GOOS == "windows" {
-			if err := installer.New(rt).Install(context.Background(), "oh-my-posh"); err != nil {
-				return actionMsg{label: "setup", err: err}
-			}
 			if err := installer.New(rt).Install(context.Background(), "fonts"); err != nil {
 				return actionMsg{label: "setup", err: err}
 			}
@@ -1376,8 +1376,7 @@ func profileIndexByName(rt *app.Runtime, name string) int {
 }
 
 func commandExists(name string) bool {
-	_, err := exec.LookPath(name)
-	return err == nil
+	return toolpath.Exists(name)
 }
 
 func setupThemeRows() []string {

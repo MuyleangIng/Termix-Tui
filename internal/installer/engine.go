@@ -3,13 +3,12 @@ package installer
 import (
 	"context"
 	"fmt"
-	"os"
 	"os/exec"
-	"path/filepath"
 	"runtime"
 
 	"github.com/muyleanging/termix/internal/app"
 	"github.com/muyleanging/termix/internal/theme"
+	"github.com/muyleanging/termix/internal/toolpath"
 )
 
 type Engine struct {
@@ -138,22 +137,24 @@ type packageManager interface {
 type macPackageManager struct{}
 
 func (macPackageManager) Install(ctx context.Context, pkg string) error {
-	if _, err := exec.LookPath("brew"); err != nil {
+	brew, err := toolpath.Resolve("brew")
+	if err != nil {
 		return fmt.Errorf("Homebrew is required to install %s automatically on macOS; install Homebrew first or install %s manually", pkg, pkg)
 	}
-	return run(ctx, "brew", "install", pkg)
+	return run(ctx, brew, "install", pkg)
 }
 
 func (m macPackageManager) OhMyPosh(ctx context.Context) error {
-	if _, err := exec.LookPath("brew"); err != nil {
+	brew, err := toolpath.Resolve("brew")
+	if err != nil {
 		return fmt.Errorf("Homebrew is required to install Oh My Posh automatically on macOS; install Homebrew first")
 	}
-	cmd := exec.CommandContext(ctx, "brew", "install", "jandedobbeleer/oh-my-posh/oh-my-posh")
+	cmd := exec.CommandContext(ctx, brew, "install", "jandedobbeleer/oh-my-posh/oh-my-posh")
 	output, err := cmd.CombinedOutput()
 	if err == nil {
 		return nil
 	}
-	fallback := exec.CommandContext(ctx, "brew", "install", "oh-my-posh")
+	fallback := exec.CommandContext(ctx, brew, "install", "oh-my-posh")
 	fallbackOutput, fallbackErr := fallback.CombinedOutput()
 	if fallbackErr != nil {
 		return fmt.Errorf("brew install oh-my-posh failed: %w\n%s\nfallback failed: %w\n%s", err, string(output), fallbackErr, string(fallbackOutput))
@@ -239,37 +240,11 @@ func (e Engine) unixPlan(component string, pm packageManager) []func(context.Con
 }
 
 func resolveToolPath(name string) (string, error) {
-	if path, err := exec.LookPath(name); err == nil {
-		return path, nil
-	}
-	if runtime.GOOS != "windows" {
-		return "", fmt.Errorf("%s not found", name)
-	}
-	exe := name
-	if filepath.Ext(exe) == "" {
-		exe += ".exe"
-	}
-	candidates := []string{
-		filepath.Join(os.Getenv("LOCALAPPDATA"), "Microsoft", "WindowsApps", exe),
-		filepath.Join(os.Getenv("LOCALAPPDATA"), "Programs", name, exe),
-		filepath.Join(os.Getenv("LOCALAPPDATA"), "Programs", name, "bin", exe),
-		filepath.Join(os.Getenv("ProgramFiles"), name, exe),
-		filepath.Join(os.Getenv("ProgramFiles"), name, "bin", exe),
-	}
-	for _, candidate := range candidates {
-		if candidate == "" || !filepath.IsAbs(candidate) {
-			continue
-		}
-		if info, err := os.Stat(candidate); err == nil && !info.IsDir() {
-			return candidate, nil
-		}
-	}
-	return "", fmt.Errorf("%s not found", name)
+	return toolpath.Resolve(name)
 }
 
 func commandExists(name string) bool {
-	_, err := exec.LookPath(name)
-	return err == nil
+	return toolpath.Exists(name)
 }
 
 func run(ctx context.Context, name string, args ...string) error {

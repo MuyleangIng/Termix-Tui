@@ -5,6 +5,8 @@ import (
 	"os"
 	"os/exec"
 	"runtime"
+
+	"github.com/muyleanging/termix/internal/toolpath"
 )
 
 type Environment struct {
@@ -49,7 +51,7 @@ func Detect(ctx context.Context) Environment {
 }
 
 func detectCommand(name, bin string) ToolState {
-	path, err := exec.LookPath(bin)
+	path, err := toolpath.Resolve(bin)
 	if err != nil {
 		return ToolState{Name: name}
 	}
@@ -57,11 +59,11 @@ func detectCommand(name, bin string) ToolState {
 }
 
 func detectTool(ctx context.Context, name, bin, versionArg string) ToolState {
-	path, err := exec.LookPath(bin)
+	path, err := toolpath.Resolve(bin)
 	if err != nil {
 		return ToolState{Name: name}
 	}
-	out, _ := exec.CommandContext(ctx, bin, versionArg).CombinedOutput()
+	out, _ := exec.CommandContext(ctx, path, versionArg).CombinedOutput()
 	return ToolState{Name: name, Path: path, Installed: true, Version: compact(string(out))}
 }
 
