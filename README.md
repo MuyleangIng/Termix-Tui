@@ -1,3 +1,4 @@
+
 # Termix
 
 **Termix** is an open-source CLI/TUI terminal theme manager for Oh My Posh, Nerd Fonts, Windows Terminal, PowerShell, Git Bash, WSL, macOS, and Linux.
@@ -12,6 +13,48 @@ It helps developers install, preview, repair, and apply terminal themes and font
 
 https://muyleanging.github.io/Termix-Tui/
 
+---
+
+## Theme Gallery Showcase
+
+Browse a growing gallery of 120+ terminal themes inside an interactive, layout-aware TUI dashboard. 
+
+### Main Dashboard & Overview
+
+<p align="center">
+  <img src="https://muyleanging.github.io/Termix-Tui/assets/themes.png" alt="Termix Themes Grid" width="100%" />
+</p>
+
+<p align="center">
+  <img src="https://muyleanging.github.io/Termix-Tui/assets/termix-tui.png" alt="Termix TUI Dashboard Interface" width="49%" />
+  <img src="https://muyleanging.github.io/Termix-Tui/assets/termix-terminal-demo.svg" alt="Termix Terminal Dynamic Preview" width="49%" />
+</p>
+
+### Interactive Shell Previews
+
+Below are live environment render demos showing how the theme configs adapt fluidly to modern text styling, specific color palettes, and complex Nerd Font prompt segments:
+
+#### Terminal Vector Simulations
+<p align="center">
+  <img src="https://muyleanging.github.io/Termix-Tui/assets/termix-terminal-demo-dark.svg" alt="Dark Mode Terminal Variant" width="49%" />
+  <img src="https://muyleanging.github.io/Termix-Tui/assets/termix-terminal-demo-light.svg" alt="Light Mode Terminal Variant" width="49%" />
+</p>
+
+#### Snapshot Catalog
+Here is a look at selected configurations from the automated scanner:
+
+| **Theme Variant** | **Live Render Pipeline Snapshot** |
+| :--- | :--- |
+| `theme-1_shell` | <img src="https://muyleanging.github.io/Termix-Tui/assets/theme-1_shell.png" alt="theme-1_shell" width="400" height="220" /> |
+| `theme-amro` | <img src="https://muyleanging.github.io/Termix-Tui/assets/theme-amro.png" alt="theme-amro" width="400" height="220" /> |
+| `theme-atomicBit` | <img src="https://muyleanging.github.io/Termix-Tui/assets/theme-atomicBit.png" alt="theme-atomicBit" width="400" height="220" /> |
+| `theme-cert` | <img src="https://muyleanging.github.io/Termix-Tui/assets/theme-cert.png" alt="theme-cert" width="400" height="220" /> |
+| `theme-clean-detailed` | <img src="https://muyleanging.github.io/Termix-Tui/assets/theme-clean-detailed.png" alt="theme-clean-detailed" width="400" height="220" /> |
+| `theme-gmay` | <img src="https://muyleanging.github.io/Termix-Tui/assets/theme-gmay.png" alt="theme-gmay" width="400" height="220" /> |
+| `theme-m365princess` | <img src="https://muyleanging.github.io/Termix-Tui/assets/theme-m365princess.png" alt="theme-m365princess" width="400" height="220" /> |
+
+---
+
 ## Quick Install
 
 Normal users do not need Go, `git clone`, or `go install`. Use the GitHub Pages installer. It downloads the latest binary from GitHub Releases. On Windows, the installer also bootstraps the default Termix tools, CascadiaCode Nerd Font, and official Oh My Posh themes. After installing, open a new terminal and run `termix setup` so the interactive picker receives arrow keys correctly.
@@ -19,17 +62,19 @@ Normal users do not need Go, `git clone`, or `go install`. Use the GitHub Pages 
 ### Windows
 
 ```powershell
-irm https://muyleanging.github.io/Termix-Tui/install.ps1 | iex
+irm [https://muyleanging.github.io/Termix-Tui/install.ps1](https://muyleanging.github.io/Termix-Tui/install.ps1) | iex
 termix setup
 termix-tui
+
 ```
 
 ### macOS / Linux
 
 ```bash
-curl -fsSL https://muyleanging.github.io/Termix-Tui/install.sh | bash
+curl -fsSL [https://muyleanging.github.io/Termix-Tui/install.sh](https://muyleanging.github.io/Termix-Tui/install.sh) | bash
 termix setup
 termix-tui
+
 ```
 
 ## Manual Download
@@ -43,12 +88,13 @@ https://github.com/MuyleangIng/Termix-Tui/releases/latest
 Only use this if you want to contribute or build from source:
 
 ```bash
-git clone https://github.com/MuyleangIng/Termix-Tui.git
-cd termix
+git clone [https://github.com/MuyleangIng/Termix-Tui.git](https://github.com/MuyleangIng/Termix-Tui.git)
+cd Termix-Tui
 go mod tidy
 go test ./...
 go build -o bin/termix .
 ./bin/termix tui
+
 ```
 
 On Windows:
@@ -56,19 +102,23 @@ On Windows:
 ```powershell
 go build -o bin\termix.exe .
 .\bin\termix.exe tui
+
 ```
+
+---
 
 ## Features
 
-- Cobra CLI command: `termix`
-- Bubble Tea and Lip Gloss TUI with keyboard, mouse, resize-aware layouts, panels, status indicators, and Nerd Font glyphs
-- Quick first-time setup that picks the target shell profile and applies the default font/theme
-- Environment detection for Windows Terminal, PowerShell 7, Git Bash, WSL, Oh My Posh, ANSI, Unicode, and profile hints
-- Real Oh My Posh preview engine using `oh-my-posh print primary --config "<theme>.omp.json"`
-- Theme scanner for `.omp.json` files, metadata extraction, favorites, categories, cache rebuild, and official theme import
-- Font manager for Nerd Fonts, installed fallbacks, custom font names, and Windows Terminal font integration
-- Safe profile writer that backs up profile files and replaces one managed Termix block
-- Repair, reinstall, cache rebuild, doctor, installer, updater, and uninstaller commands
+* **Cobra CLI Command:** Access all functionality cleanly via the simple `termix` engine.
+* **Bubble Tea & Lip Gloss TUI:** Beautiful interactive dashboard with layout-aware terminal configurations, custom panels, status nodes, and full keyboard/mouse feedback.
+* **Profile Initialization:** Automated workflow that profiles your current workspace, establishes target variables, and sets default themes/fonts safely.
+* **Environment Context Rules:** Intelligent mapping configurations for Windows Terminal, PowerShell 7, Git Bash, WSL, and native Unix shells.
+* **Real Preview Engine:** Generates active theme configurations on the fly utilizing native layout evaluation tools (`oh-my-posh print primary`).
+* **Config Scanner:** Systematically parses downstream `.omp.json` files to pull structure metrics, tag global favorites, and categorize metadata.
+* **Font Stack Manager:** Inspect, install, and apply optimized custom families or recommended Nerd Fonts straight to target configuration systems.
+* **Safe State Management:** Performs structural file backups before parsing updates or executing changes on isolated script block zones.
+
+---
 
 ## Commands
 
@@ -90,7 +140,10 @@ termix fonts install <font> --yes           Install a supported Nerd Font
 termix fonts apply <font> --windows-terminal Save/apply a font
 termix uninstall                            Fully remove Termix profiles, data, themes, and executable
 termix uninstall profile                    Remove only Termix shell profile blocks
+
 ```
+
+---
 
 ## Release
 
@@ -102,36 +155,37 @@ git pull
 go test ./...
 git tag -a v0.1.0 -m "Termix v0.1.0 first public release"
 git push origin v0.1.0
+
 ```
 
-The release workflow publishes:
+The release workflow automatically compiles and packages:
 
-- `termix_Windows_x86_64.zip`
-- `termix_Windows_arm64.zip`
-- `termix_Linux_x86_64.tar.gz`
-- `termix_Linux_arm64.tar.gz`
-- `termix_Darwin_x86_64.tar.gz`
-- `termix_Darwin_arm64.tar.gz`
-- `checksums.txt`
+* `termix_Windows_x86_64.zip`
+* `termix_Windows_arm64.zip`
+* `termix_Linux_x86_64.tar.gz`
+* `termix_Linux_arm64.tar.gz`
+* `termix_Darwin_x86_64.tar.gz`
+* `termix_Darwin_arm64.tar.gz`
+* `checksums.txt`
 
 ## GitHub Pages
 
 Public install URL:
 
 ```text
-https://muyleanging.github.io/Termix-Tui/
+[https://muyleanging.github.io/Termix-Tui/](https://muyleanging.github.io/Termix-Tui/)
+
 ```
 
-Installer scripts:
+Installer and Uninstaller scripts:
 
 ```text
-https://muyleanging.github.io/Termix-Tui/install.ps1
-https://muyleanging.github.io/Termix-Tui/install.sh
-https://muyleanging.github.io/Termix-Tui/uninstall.ps1
-https://muyleanging.github.io/Termix-Tui/uninstall.sh
-```
+[https://muyleanging.github.io/Termix-Tui/install.ps1](https://muyleanging.github.io/Termix-Tui/install.ps1)
+[https://muyleanging.github.io/Termix-Tui/install.sh](https://muyleanging.github.io/Termix-Tui/install.sh)
+[https://muyleanging.github.io/Termix-Tui/uninstall.ps1](https://muyleanging.github.io/Termix-Tui/uninstall.ps1)
+[https://muyleanging.github.io/Termix-Tui/uninstall.sh](https://muyleanging.github.io/Termix-Tui/uninstall.sh)
 
-Use only the GitHub Pages URL above unless a custom domain is configured later.
+```
 
 ## Configuration
 
