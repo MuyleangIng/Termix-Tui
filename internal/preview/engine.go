@@ -7,16 +7,22 @@ import (
 	"os/exec"
 
 	"github.com/muyleanging/termix/internal/ansi"
+	"github.com/muyleanging/termix/internal/glyph"
 	"github.com/muyleanging/termix/internal/theme"
 	"github.com/muyleanging/termix/internal/toolpath"
 )
 
 type Engine struct {
 	Renderer ansi.Renderer
+	ASCII    bool
 }
 
 func New() Engine {
 	return Engine{Renderer: ansi.Renderer{}}
+}
+
+func NewWithGlyphs(capability glyph.Capability) Engine {
+	return Engine{Renderer: ansi.Renderer{}, ASCII: capability.ASCII}
 }
 
 func (e Engine) Render(ctx context.Context, item theme.Theme) (string, error) {
@@ -34,5 +40,9 @@ func (e Engine) Render(ctx context.Context, item theme.Theme) (string, error) {
 	if err := cmd.Run(); err != nil {
 		return "", err
 	}
-	return e.Renderer.Render(stdout.String()), nil
+	rendered := e.Renderer.Render(stdout.String())
+	if e.ASCII {
+		rendered = glyph.ReplaceUnsafe(rendered)
+	}
+	return rendered, nil
 }

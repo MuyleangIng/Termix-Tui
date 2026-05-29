@@ -8,6 +8,7 @@ import (
 
 	"github.com/muyleanging/termix/internal/app"
 	"github.com/muyleanging/termix/internal/detector"
+	"github.com/muyleanging/termix/internal/glyph"
 )
 
 type Check struct {
@@ -31,8 +32,12 @@ func (d Doctor) Run(ctx context.Context) Report {
 	env := d.rt.Env
 	checks := []Check{
 		tool("Oh My Posh", env.OhMyPosh, "Install with: termix install oh-my-posh"),
+		{Name: "Current terminal", OK: d.rt.Glyph.Terminal != "", Detail: d.rt.Glyph.Terminal, Repair: "Run inside Terminal, iTerm2, Warp, VS Code, or another modern terminal"},
 		{Name: "ANSI support", OK: env.ANSI, Detail: boolDetail(env.ANSI), Repair: "Use Windows Terminal or a modern ANSI terminal"},
-		{Name: "Unicode support", OK: env.Unicode, Detail: boolDetail(env.Unicode), Repair: "Enable UTF-8 locale and install a Nerd Font"},
+		{Name: "Unicode support", OK: env.Unicode && d.rt.Glyph.UTF8, Detail: boolDetail(env.Unicode && d.rt.Glyph.UTF8), Repair: "Enable UTF-8 locale and install a Nerd Font"},
+		{Name: "Nerd Font installed", OK: d.rt.Glyph.NerdInstalled, Detail: boolDetail(d.rt.Glyph.NerdInstalled), Repair: "Install with: termix fonts install \"FiraCode Nerd Font\" --yes"},
+		{Name: "Nerd Font active", OK: d.rt.Glyph.NerdActive, Detail: glyphDetail(d.rt.Glyph), Repair: d.rt.Glyph.Fix},
+		{Name: "ASCII fallback", OK: true, Detail: asciiDetail(d.rt.Glyph), Repair: "Set TERMIX_ASCII_ICONS=1 to force ASCII icons"},
 	}
 	if runtime.GOOS == "windows" {
 		checks = append(checks,
@@ -49,6 +54,23 @@ func (d Doctor) Run(ctx context.Context) Report {
 		)
 	}
 	return Report{Checks: checks}
+}
+
+func glyphDetail(capability glyph.Capability) string {
+	if capability.NerdActive {
+		return "terminal profile appears to use a Nerd Font"
+	}
+	if capability.Warning != "" {
+		return capability.Warning
+	}
+	return "not detected"
+}
+
+func asciiDetail(capability glyph.Capability) string {
+	if capability.ASCII {
+		return "active"
+	}
+	return "inactive"
 }
 
 func tool(name string, state detector.ToolState, repair string) Check {

@@ -17,6 +17,7 @@ import (
 	"github.com/muyleanging/termix/internal/app"
 	"github.com/muyleanging/termix/internal/config"
 	fontpkg "github.com/muyleanging/termix/internal/font"
+	"github.com/muyleanging/termix/internal/glyph"
 	"github.com/muyleanging/termix/internal/installer"
 	previewpkg "github.com/muyleanging/termix/internal/preview"
 	"github.com/muyleanging/termix/internal/profile"
@@ -134,14 +135,14 @@ type Model struct {
 }
 
 var nav = []navItem{
-	{"⌘", "Dashboard", screenDashboard},
-	{"", "Themes", screenThemes},
-	{"", "Fonts", screenFonts},
-	{"󰒡", "Doctor", screenDoctor},
-	{"", "Profiles", screenProfiles},
-	{"", "Settings", screenSettings},
-	{"󰚰", "Updates", screenUpdate},
-	{"", "Remove", screenUninstall},
+	{"dash", "Dashboard", screenDashboard},
+	{"theme", "Themes", screenThemes},
+	{"font", "Fonts", screenFonts},
+	{"doctor", "Doctor", screenDoctor},
+	{"profile", "Profiles", screenProfiles},
+	{"settings", "Settings", screenSettings},
+	{"update", "Updates", screenUpdate},
+	{"remove", "Remove", screenUninstall},
 }
 
 var themes = []string{"catppuccin_mocha", "paradox", "atomic", "dracula", "tokyo", "night-owl", "multiverse-neon", "spaceship", "jandedobbeleer", "powerlevel10k_modern"}
@@ -174,7 +175,11 @@ func NewSetup(rt *app.Runtime) Model {
 
 func base(rt *app.Runtime, setup bool) Model {
 	applyColorMode(false)
-	applyBorderMode(rt.Config.BorderStyle)
+	if rt.Glyph.ASCII {
+		applyBorderMode("ascii")
+	} else {
+		applyBorderMode(rt.Config.BorderStyle)
+	}
 	fonts = buildFontChoices(rt.Config)
 	spin := spinner.New()
 	spin.Spinner = spinner.MiniDot
@@ -190,6 +195,9 @@ func base(rt *app.Runtime, setup bool) Model {
 	if !strings.EqualFold(resolvedFont, fontpkg.ResolveFamily(rt.Config.DefaultFont)) {
 		initialLogs = append([]string{"WARN Preferred font " + rt.Config.DefaultFont + " was not found. Termix is using fallback font " + resolvedFont + ". Some icons may look different."}, initialLogs...)
 	}
+	if rt.Glyph.Warning != "" {
+		initialLogs = append([]string{"WARN " + rt.Glyph.Warning}, initialLogs...)
+	}
 	setupShell := rt.Config.DefaultShell
 	if profileTargetByName(rt, setupShell).Name == "" {
 		targets := profileTargets(rt)
@@ -204,7 +212,7 @@ func base(rt *app.Runtime, setup bool) Model {
 		now:           time.Now(),
 		spinner:       spin,
 		progress:      bar,
-		preview:       previewText(),
+		preview:       renderGlyphs(rt, previewText()),
 		themePreviews: map[string]string{},
 		previewErrors: map[string]string{},
 		fontItems:     fontItems,
@@ -1018,7 +1026,7 @@ func (m Model) themeByName(name string) themepkg.Theme {
 func (m Model) renderPreviewCmd() tea.Cmd {
 	item := m.currentTheme()
 	return func() tea.Msg {
-		text, err := previewpkg.New().Render(context.Background(), item)
+		text, err := previewpkg.NewWithGlyphs(m.rt.Glyph).Render(context.Background(), item)
 		return previewMsg{name: item.Name, text: text, err: err}
 	}
 }
@@ -1453,10 +1461,10 @@ func (m Model) View() string {
 		return m.startupView()
 	}
 	if m.fontInput {
-		return appShell.Render(fitScreen(lipgloss.Place(max(40, m.width), max(8, m.height), lipgloss.Center, lipgloss.Center, m.fontInputBox(max(40, m.width))), max(40, m.width), max(8, m.height)))
+		return m.render(fitScreen(lipgloss.Place(max(40, m.width), max(8, m.height), lipgloss.Center, lipgloss.Center, m.fontInputBox(max(40, m.width))), max(40, m.width), max(8, m.height)))
 	}
 	if m.feedback {
-		return appShell.Render(fitScreen(lipgloss.Place(max(40, m.width), max(8, m.height), lipgloss.Center, lipgloss.Center, m.feedbackBox(max(40, m.width))), max(40, m.width), max(8, m.height)))
+		return m.render(fitScreen(lipgloss.Place(max(40, m.width), max(8, m.height), lipgloss.Center, lipgloss.Center, m.feedbackBox(max(40, m.width))), max(40, m.width), max(8, m.height)))
 	}
 	if m.setup {
 		return m.setupView()
@@ -1490,9 +1498,20 @@ func (m Model) View() string {
 		fitScreen(m.footer(w), w, footerH),
 	)
 	if m.confirm {
-		return appShell.Render(fitScreen(lipgloss.Place(w, max(8, m.height), lipgloss.Center, lipgloss.Center, m.confirmBox(w)), w, max(8, m.height)))
+		return m.render(fitScreen(lipgloss.Place(w, max(8, m.height), lipgloss.Center, lipgloss.Center, m.confirmBox(w)), w, max(8, m.height)))
 	}
-	return appShell.Render(fitScreen(out, w, h))
+	return m.render(fitScreen(out, w, h))
+}
+
+func (m Model) render(text string) string {
+	return appShell.Render(renderGlyphs(m.rt, text))
+}
+
+func renderGlyphs(rt *app.Runtime, text string) string {
+	if rt != nil && rt.Glyph.ASCII {
+		return glyph.ReplaceUnsafe(text)
+	}
+	return text
 }
 
 func (m Model) content(w, h int) string {
@@ -1604,7 +1623,7 @@ func nextBorderStyle(current string) string {
 func (m Model) sidebar(w, h int) string {
 	lines := []string{label.Render(" NAVIGATION"), ""}
 	for i, item := range nav {
-		row := fmt.Sprintf("%s  %s", item.icon, item.label)
+		row := fmt.Sprintf("%s  %s", m.icon(item.icon), item.label)
 		style := menuRow(i == m.navIndex, max(8, w-4))
 		if i == m.navIndex {
 			row = "❯ " + row
@@ -1644,16 +1663,19 @@ func (m Model) previewPanel(w, h int) string {
 		if !strings.EqualFold(resolved, fontpkg.ResolveFamily(font)) {
 			warning = "\n" + warn.Render("Preferred font not found. Termix is using fallback "+resolved+". Some icons may look different.")
 		}
+		if m.rt.Glyph.ASCII && m.rt.Glyph.Warning != "" {
+			warning += "\n" + warn.Render(m.rt.Glyph.Warning)
+		}
 		body = sectionTitle("FONT MANAGER") +
 			"\nCurrent font: " + m.rt.Config.DefaultFont +
 			"\nHighlighted: " + font +
 			"\nResolved face: " + resolved +
 			"\nStatus: " + m.fontStatus(font) + m.fontTags(font) + warning +
 			"\n\nFallback stack:\n" + fitLine(strings.Join(fontpkg.FallbackStack, " -> "), max(16, w-6)) +
-			"\n\n" + fontSampleText() +
+			"\n\n" + m.fontSampleText() +
 			"\n\n" + badgeRow("Enter config", "I install", "A add", "E edit", "D delete", "W Windows Terminal", "R rescan")
 	case screenDoctor:
-		body = sectionTitle("TERMINAL HEALTH") + "\n" + statusLine("ANSI", m.rt.Env.ANSI) + "\n" + statusLine("Unicode", m.rt.Env.Unicode) + "\n" + statusLine("Font fallback", true) + "\n" + statusLine("Oh My Posh", m.rt.Env.OhMyPosh.Installed) + "\n\n" + sectionTitle("FIXES") + "\n• Install Oh My Posh\n• Configure PowerShell profile\n• Select terminal font"
+		body = sectionTitle("TERMINAL HEALTH") + "\n" + statusLine("ANSI", m.rt.Env.ANSI) + "\n" + statusLine("Unicode", m.rt.Env.Unicode && m.rt.Glyph.UTF8) + "\n" + statusLine("Nerd Font installed", m.rt.Glyph.NerdInstalled) + "\n" + statusLine("Nerd Font active", m.rt.Glyph.NerdActive) + "\n" + statusLine("ASCII fallback", m.rt.Glyph.ASCII) + "\n" + statusLine("Oh My Posh", m.rt.Env.OhMyPosh.Installed) + "\n\n" + sectionTitle("FIXES") + "\n" + m.rt.Glyph.Fix + "\nInstall Oh My Posh\nConfigure shell profile\nSelect terminal font"
 	case screenProfiles:
 		target := m.currentProfileTarget()
 		state := "missing"
@@ -1811,13 +1833,19 @@ func (m Model) fontStatus(name string) string {
 	for _, item := range m.fontItems {
 		if strings.EqualFold(item.Name, name) || strings.EqualFold(item.Family, family) {
 			if item.Installed {
-				return ok.Render("Available")
+				if m.rt.Glyph.ASCII {
+					if m.rt.Glyph.NerdInstalled {
+						return warn.Render("Installed but terminal profile not using it")
+					}
+					return warn.Render("Using ASCII fallback")
+				}
+				return ok.Render("Installed and active")
 			}
 			break
 		}
 	}
 	if !strings.Contains(strings.ToLower(name), "nerd") {
-		return warn.Render("Fallback")
+		return warn.Render("Using ASCII fallback")
 	}
 	return warn.Render("Missing")
 }
@@ -1842,7 +1870,7 @@ func (m Model) isCustomFont(name string) bool {
 }
 
 func (m Model) fontGlyphStatus(name string) string {
-	if strings.Contains(strings.ToLower(name), "nerd") && strings.Contains(m.fontStatus(name), "Available") {
+	if strings.Contains(strings.ToLower(name), "nerd") && !m.rt.Glyph.ASCII {
 		return ok.Render("Nerd glyphs likely")
 	}
 	return label.Render("glyph fallback possible")
@@ -1868,8 +1896,54 @@ func (m Model) fontTags(name string) string {
 	return "  " + strings.Join(tags, " ")
 }
 
-func fontSampleText() string {
-	return "ABC abc 123\nPowerline:      \nIcons:      ⚙\nGit:  main ✔\nPrompt: Admin   ~/workspace   main ✔\nBorders: ┌ ─ ┐ │ └ ┘"
+func (m Model) fontSampleText() string {
+	return renderGlyphs(m.rt, "ABC abc 123\nPowerline:      \nIcons:      ⚙\nGit:  main ✔\nPrompt: Admin   ~/workspace   main ✔\nBorders: ┌ ─ ┐ │ └ ┘")
+}
+
+func (m Model) icon(name string) string {
+	ascii := m.rt != nil && m.rt.Glyph.ASCII
+	if ascii {
+		switch name {
+		case "dash":
+			return ">"
+		case "theme":
+			return "theme"
+		case "font":
+			return "font"
+		case "doctor":
+			return "check"
+		case "profile":
+			return "shell"
+		case "settings":
+			return "cfg"
+		case "update":
+			return "up"
+		case "remove":
+			return "!"
+		default:
+			return ">"
+		}
+	}
+	switch name {
+	case "dash":
+		return "⌘"
+	case "theme":
+		return ""
+	case "font":
+		return ""
+	case "doctor":
+		return "󰒡"
+	case "profile":
+		return ""
+	case "settings":
+		return ""
+	case "update":
+		return "󰚰"
+	case "remove":
+		return ""
+	default:
+		return name
+	}
 }
 
 func dependencyPreviewMessage(errText string) string {
@@ -1933,7 +2007,7 @@ func (m Model) setupView() string {
 		body = m.setupOnboarding(layout.containerW, layout.containerH)
 	}
 	centered := fitScreen(lipgloss.Place(layout.terminalW, layout.bodyH, lipgloss.Center, lipgloss.Center, body), layout.terminalW, layout.bodyH)
-	return appShell.Render(fitScreen(lipgloss.JoinVertical(lipgloss.Left,
+	return m.render(fitScreen(lipgloss.JoinVertical(lipgloss.Left,
 		fitScreen(m.header(layout.terminalW), layout.terminalW, layout.headerH),
 		centered,
 		fitScreen(m.footer(layout.terminalW), layout.terminalW, layout.footerH),
@@ -2289,9 +2363,9 @@ func stateIcon(healthy bool) string {
 
 func statusLine(name string, healthy bool) string {
 	if healthy {
-		return fmt.Sprintf("%-14s %s", name, ok.Render("✓"))
+		return fmt.Sprintf("%-20s %s", name, ok.Render("[ok]"))
 	}
-	return fmt.Sprintf("%-14s %s", name, bad.Render("×"))
+	return fmt.Sprintf("%-20s %s", name, bad.Render("[x]"))
 }
 
 func badgeRow(values ...string) string {
