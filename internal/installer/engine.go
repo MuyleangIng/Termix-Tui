@@ -170,13 +170,28 @@ func (m macPackageManager) Font(ctx context.Context, fontName string) error {
 		return fmt.Errorf("no Homebrew cask mapping for font %q; run brew search nerd-font and install the cask manually", fontName)
 	}
 	brew, err := toolpath.Resolve("brew")
-	if err != nil {
-		return fmt.Errorf("Homebrew is required to install %s automatically on macOS; install Homebrew first or run: brew install --cask %s", fontName, cask)
+	if err == nil {
+		if err := run(ctx, brew, "list", "--cask", cask); err == nil {
+			return nil
+		}
+		if err := runBrewCaskInstall(ctx, brew, cask); err == nil {
+			return nil
+		}
 	}
-	if err := run(ctx, brew, "list", "--cask", cask); err == nil {
-		return nil
+	ompName, ok := ohMyPoshFontName(fontName)
+	if !ok {
+		if err != nil {
+			return fmt.Errorf("Homebrew is required to install %s automatically on macOS; install Homebrew first or run: brew install --cask %s", fontName, cask)
+		}
+		return fmt.Errorf("brew could not install %s; run manually: %s install --cask %s", fontName, brew, cask)
 	}
-	return runBrewCaskInstall(ctx, brew, cask)
+	if err := installOhMyPoshFont(ctx, ompName); err != nil {
+		if brew != "" {
+			return fmt.Errorf("font install failed for %s; try manually: %s install --cask %s\n%s", fontName, brew, cask, err)
+		}
+		return err
+	}
+	return nil
 }
 
 type linuxPackageManager struct{}
@@ -209,7 +224,11 @@ func (linuxPackageManager) OhMyPosh(ctx context.Context) error {
 }
 
 func (linuxPackageManager) Font(ctx context.Context, fontName string) error {
-	return fmt.Errorf("automatic Nerd Font install is not implemented for Linux yet; install %q into ~/.local/share/fonts and run fc-cache -fv", fontName)
+	ompName, ok := ohMyPoshFontName(fontName)
+	if !ok {
+		return fmt.Errorf("automatic Nerd Font install is not implemented for Linux font %q; install it into ~/.local/share/fonts and run fc-cache -fv", fontName)
+	}
+	return installOhMyPoshFont(ctx, ompName)
 }
 
 func (e Engine) unixPlan(component string, pm packageManager) []func(context.Context) error {
@@ -298,6 +317,25 @@ func macFontCask(fontName string) (string, bool) {
 	}
 }
 
+func ohMyPoshFontName(fontName string) (string, bool) {
+	switch strings.ToLower(strings.TrimSpace(fontName)) {
+	case "caskaydiacove nerd font", "cascadiacode nerd font", "cascadia code nerd font":
+		return "CascadiaCode", true
+	case "jetbrainsmono nerd font", "jetbrains mono nerd font":
+		return "JetBrainsMono", true
+	case "firacode nerd font", "fira code nerd font":
+		return "FiraCode", true
+	case "hack nerd font":
+		return "Hack", true
+	case "meslolgs nerd font", "meslolgm nerd font":
+		return "Meslo", true
+	case "ubuntumono nerd font", "ubuntu mono nerd font":
+		return "UbuntuMono", true
+	default:
+		return "", false
+	}
+}
+
 func resolveToolPath(name string) (string, error) {
 	return toolpath.Resolve(name)
 }
@@ -335,4 +373,17 @@ func runBrewCaskInstall(ctx context.Context, brew, cask string) error {
 		return nil
 	}
 	return fmt.Errorf("brew install --cask %s failed: %w\n%s\nManual fix: %s install --cask %s", cask, err, string(output), brew, cask)
+}
+
+func installOhMyPoshFont(ctx context.Context, name string) error {
+	omp, err := resolveToolPath("oh-my-posh")
+	if err != nil {
+		return fmt.Errorf("oh-my-posh is required to install Nerd Font %s: %w", name, err)
+	}
+	cmd := exec.CommandContext(ctx, omp, "font", "install", name, "--headless", "--plain")
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		return fmt.Errorf("oh-my-posh font install %s failed: %w\n%s", name, err, string(output))
+	}
+	return nil
 }

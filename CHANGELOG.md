@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.2.5
+
+- Added Oh My Posh font install fallback when macOS Homebrew cask install fails.
+- Prevented first-time setup from failing only because a Nerd Font install failed.
+- Added Linux Nerd Font install support through Oh My Posh where available.
+
 ## v0.2.4
 
 - Made macOS Nerd Font installs idempotent by checking `brew list --cask` before installing.
