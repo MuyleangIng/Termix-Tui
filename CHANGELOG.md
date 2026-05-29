@@ -1,13 +1,5 @@
 # Changelog
 
-## v0.2.6
-
-- Added runtime glyph capability detection and ASCII icon fallback.
-- Added `TERMIX_ASCII_ICONS=1` and config `icons: "ascii"` support.
-- Improved macOS font detection with `fc-list`, `system_profiler`, `mdfind`, and font directory scans.
-- Added Doctor checks for active Nerd Font, UTF-8 locale, current terminal, and ASCII fallback state.
-- Replaced broken Nerd Font glyphs in TUI and previews with readable ASCII when the terminal profile is not using a Nerd Font.
-
 ## v0.2.5
 
 - Added Oh My Posh font install fallback when macOS Homebrew cask install fails.
