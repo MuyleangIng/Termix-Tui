@@ -30,6 +30,13 @@ func (e Engine) Install(ctx context.Context, component string) error {
 	return nil
 }
 
+func ignoreError(step func(context.Context) error) func(context.Context) error {
+	return func(ctx context.Context) error {
+		_ = step(ctx)
+		return nil
+	}
+}
+
 func (e Engine) plan(component string) []func(context.Context) error {
 	switch runtime.GOOS {
 	case "windows":
@@ -118,7 +125,7 @@ func (e Engine) windowsPlan(component string) []func(context.Context) error {
 			requireTool("pwsh", winget("Microsoft.PowerShell")),
 			requireTool("wt", winget("Microsoft.WindowsTerminal")),
 			requireTool("git", winget("Git.Git")),
-			installMeslo,
+			ignoreError(installMeslo),
 			func(ctx context.Context) error {
 				_, err := theme.InstallOfficialThemes(ctx, e.rt.Config)
 				return err
@@ -278,7 +285,7 @@ func (e Engine) unixPlan(component string, pm packageManager) []func(context.Con
 		return []func(context.Context) error{
 			requireTool("oh-my-posh", pm.OhMyPosh),
 			requireTool("zsh", func(ctx context.Context) error { return pm.Install(ctx, "zsh") }),
-			installMeslo,
+			ignoreError(installMeslo),
 			installThemes,
 		}
 	}

@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.2.10
+
+- Changed Windows and Unix installer bootstrap into visible 25/50/75/100 percent steps.
+- Made Meslo font install failures non-blocking during bootstrap so official themes still download.
+- Added terminal/VS Code font apply as a bootstrap step after installing Meslo.
+- Kept `termix install` from aborting full bootstrap when Oh My Posh font install exits with a font-specific error.
+
 ## v0.2.9
 
 - Made macOS/Linux install scripts bootstrap Oh My Posh, MesloLGM Nerd Font, and official themes after installing the binary.

@@ -140,18 +140,37 @@ function Bootstrap-TermixDefaults {
         return
     }
 
-    Write-TermixInfo "Installing default tools, Nerd Font, and official themes..."
-    try {
-        & $Path install
-        if ($LASTEXITCODE -eq 0) {
-            Write-TermixSuccess "Default tools, font, and themes are ready."
-            return
+    $steps = @(
+        @{ Percent = 25; Name = "Oh My Posh"; Args = @("install", "oh-my-posh"); Required = $false },
+        @{ Percent = 50; Name = "MesloLGM Nerd Font"; Args = @("fonts", "install", "MesloLGM Nerd Font", "--yes"); Required = $false },
+        @{ Percent = 75; Name = "Official themes"; Args = @("install", "themes"); Required = $true },
+        @{ Percent = 100; Name = "Terminal and VS Code font config"; Args = @("fonts", "apply", "MesloLGM Nerd Font"); Required = $false }
+    )
+
+    foreach ($step in $steps) {
+        Write-TermixInfo ("[{0}%] {1}..." -f $step.Percent, $step.Name)
+        try {
+            $argsList = $step.Args
+            & $Path @argsList
+            if ($LASTEXITCODE -eq 0) {
+                Write-TermixSuccess ("[{0}%] {1} ready." -f $step.Percent, $step.Name)
+                continue
+            }
+            $message = "[{0}%] {1} exited with code {2}." -f $step.Percent, $step.Name, $LASTEXITCODE
+            if ($step.Required) {
+                Write-TermixWarn "$message You can retry with: termix $($step.Args -join ' ')"
+            } else {
+                Write-TermixWarn "$message Continuing bootstrap."
+            }
         }
-        Write-TermixWarn "Bootstrap exited with code $LASTEXITCODE. You can retry later with: termix install"
-    }
-    catch {
-        Write-TermixWarn "Bootstrap did not complete. You can retry later with: termix install"
-        Write-TermixWarn $_
+        catch {
+            if ($step.Required) {
+                Write-TermixWarn ("[{0}%] {1} failed. You can retry with: termix {2}" -f $step.Percent, $step.Name, ($step.Args -join ' '))
+            } else {
+                Write-TermixWarn ("[{0}%] {1} failed. Continuing bootstrap." -f $step.Percent, $step.Name)
+            }
+            Write-TermixWarn $_
+        }
     }
 }
 

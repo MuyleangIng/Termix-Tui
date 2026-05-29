@@ -225,12 +225,11 @@ install_termix() {
 
   success "Termix installed successfully."
 
-  info "Bootstrapping Oh My Posh, Meslo font, and official themes..."
-  if "$INSTALL_DIR/termix" install; then
-    success "Default tools, Meslo font, and official themes are ready."
-  else
-    warn "Bootstrap did not complete. You can retry later with: termix install"
-  fi
+  info "Bootstrapping Oh My Posh, Meslo font, official themes, and terminal config..."
+  bootstrap_step 25 "Oh My Posh" "$INSTALL_DIR/termix" install oh-my-posh || true
+  bootstrap_step 50 "MesloLGM Nerd Font" "$INSTALL_DIR/termix" fonts install "MesloLGM Nerd Font" --yes || true
+  bootstrap_step 75 "Official themes" "$INSTALL_DIR/termix" install themes || warn "Retry themes later with: termix install themes"
+  bootstrap_step 100 "Terminal and VS Code font config" "$INSTALL_DIR/termix" fonts apply "MesloLGM Nerd Font" || true
 
   echo ""
   success "Done."
@@ -238,6 +237,19 @@ install_termix() {
   echo "  1. Open a new terminal."
   echo "  2. Run: termix setup"
   echo "  3. Open the dashboard with: termix-tui"
+}
+
+bootstrap_step() {
+  local percent="$1"
+  local name="$2"
+  shift 2
+  info "[$percent%] $name..."
+  if "$@"; then
+    success "[$percent%] $name ready."
+    return 0
+  fi
+  warn "[$percent%] $name failed. Continuing bootstrap."
+  return 1
 }
 
 parse_args "$@"
